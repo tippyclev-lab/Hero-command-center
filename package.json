@@ -1,0 +1,7 @@
+{
+  "name": "hero-command-center",
+  "private": true,
+  "dependencies": {
+    "@netlify/blobs": "^10.0.0"
+  }
+}
