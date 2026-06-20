@@ -1,11 +1,7 @@
 [build]
-  functions = "netlify/functions"
+  functions = "Netlify/Functions"
   publish = "."
 
-# This site is one self-contained HTML file with an inline Babel/JSX script.
-# Netlify's automatic asset optimizer doesn't understand JSX syntax and can
-# hang or fail trying to minify it. Skipping post-processing avoids that, and
-# is safe here since there's nothing else to optimize.
 [build.processing]
   skip_processing = true
 
