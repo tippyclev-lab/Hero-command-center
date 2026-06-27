@@ -381,8 +381,8 @@ function printCouncilScorecard(member, activities, reviews, motmHistory) {
   }
   function card(letter, label, earned) {
     return "<div style='display:inline-block;width:70px;text-align:center;margin:4px;padding:10px 4px;border:2px solid "+(earned?"#C9A84C":"#ccc")+";border-radius:6px;background:"+(earned?"#fffbf0":"#fafafa")+"'>"
-      +"<div style='font-size:28px;font-weight:900;color:"+(earned?"#C9A84C":"#ccc");+";font-family:Georgia,serif'>"+letter+"</div>"
-      +"<div style='font-size:9px;font-weight:700;color:"+(earned?"#8B6914":"#aaa");+"'>"+label+"</div>"
+     +"<div style='font-size:28px;font-weight:900;color:"+(earned?"#C9A84C":"#ccc")+";font-family:Georgia,serif'>"+letter+"</div>"
++"<div style='font-size:9px;font-weight:700;color:"+(earned?"#8B6914":"#aaa")+"'>"+label+"</div>"
       +"<div style='font-size:9px;margin-top:3px;color:"+(earned?"#27ae60":"#ccc")+"'>"+(earned?"✓ Earned":"Pending")+"</div>"
       +"</div>";
   }
