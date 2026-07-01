@@ -3644,15 +3644,15 @@ function MemberProfileTab({members,setMembers,activities,reviews,motmHistory,isA
       </div>
 
       {/* Culture Index result, if one has been uploaded for this member */}
-      {m.cultureIndex&&(
+      {m.cultureIndex&&m.cultureIndex.verdict&&(
         <div style={S.card}>
           <div style={S.cardTitle}>🧠 Culture Index — {m.cultureIndex.date}</div>
           <div style={{display:"flex",gap:14,alignItems:"center",flexWrap:"wrap",marginBottom:m.cultureIndex.heroAlignmentScores?12:0}}>
             <div style={{background:m.cultureIndex.verdict==="PASS"?"#0a1a0a":"#1a0000",border:`1px solid ${m.cultureIndex.verdict==="PASS"?"#204020":"#401010"}`,borderRadius:20,padding:"4px 14px",fontSize:13,fontWeight:900,color:m.cultureIndex.verdict==="PASS"?"#60c060":"#f06060"}}>{m.cultureIndex.verdict==="PASS"?"✅":"❌"} {m.cultureIndex.verdict}</div>
             {m.cultureIndex.heroFitScore!=null&&<div><span style={{fontSize:20,fontWeight:900,color:GOLD2}}>{m.cultureIndex.heroFitScore}</span><span style={{fontSize:12,color:"#604820"}}>/100 HOODZ Fit</span></div>}
           </div>
-          {m.cultureIndex.summary&&<div style={{fontSize:12,color:"#d0c090",marginBottom:m.cultureIndex.heroAlignmentScores?12:0}}>{m.cultureIndex.summary}</div>}
-          {m.cultureIndex.heroAlignmentScores&&<div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+          {m.cultureIndex&&m.cultureIndex.summary&&<div style={{fontSize:12,color:"#d0c090",marginBottom:m.cultureIndex&&m.cultureIndex.heroAlignmentScores?12:0}}>{m.cultureIndex.summary}</div>}
+          {m.cultureIndex&&m.cultureIndex.heroAlignmentScores&&<div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
             {[["honest","H",GOLD],["excellence","E","#5A8AC6"],["respect","R","#4A9A4A"],["ownIt","O","#9A4A4A"]].map(([k,l,color])=>{const v=m.cultureIndex.heroAlignmentScores[k];return v==null?null:(
               <div key={k} style={{background:"#0d0d00",border:`1px solid ${color}55`,borderRadius:6,padding:"6px 12px",textAlign:"center"}}><span style={{fontFamily:"serif",fontWeight:900,color}}>{l}</span> <span style={{fontSize:12,color:"#d0c090"}}>{v}/10</span></div>
             );})}
@@ -3957,3 +3957,4 @@ function App(){
 </script>
 </body>
 </html>
+  
