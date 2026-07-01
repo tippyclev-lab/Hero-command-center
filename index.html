@@ -1,4 +1,4 @@
-      <!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -1236,7 +1236,7 @@ function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,on
     if(!name.trim()){setError(mode==="employee"?"Select an employee first.":"Enter the candidate name.");return;}
     setLoading(true);setError("");setResult(null);
     try{const b64=preview.split(",")[1];const mt=file.type||"image/jpeg";const isImg=fType==="image";const parts=[{type:isImg?"image":"document",source:{type:"base64",media_type:mt,data:b64}},{type:"text",text:`You are an HR analyst for HOODZ of the MidSouth.\nAnalyze this Culture Index / talent profile for: ${name}.\n\nCraftsman benchmark:\n${CRAFTSMAN_PROFILE}\n\nSome reports include HOODZ-specific scoring (an overall HOODZ Fit Score out of 100, and HERO Alignment scores for Honest/Excellence/Respect/Own It out of 10 each). If those exact figures appear in the document, extract them precisely. If they do not appear, leave those fields null rather than estimating.\n\nRespond ONLY with valid JSON (no markdown, no extra text):\n{"verdict":"PASS or FAIL","confidence":"High/Medium/Low","summary":"2-3 sentences","hero_fit_score":number or null,"hero_alignment_scores":{"honest":number or null,"excellence":number or null,"respect":number or null,"ownIt":number or null},"craftsman_alignment":{"autonomy":"note","sociability":"note","pace":"note","conformity":"note","overall_fit":"1-2 sentences"},"strengths":["s1","s2","s3"],"watch_areas":["w1","w2"],"hiring_recommendation":"one sentence","notes":"observations"}`}];
-    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":getCIKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1100,messages:[{role:"user",content:parts}]})});
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":getCIKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1100,messages:[{role:"user",content:parts}]})});
     const data=await res.json();if(data.error)throw new Error(data.error.message);
     const raw=data.content.map(b=>b.text||"").join("").trim().replace(/```json|```/g,"").trim();
     const parsed=JSON.parse(raw);const entry={id:Date.now(),name,date:date||new Date().toISOString().slice(0,10),notes,mode,result:parsed};
@@ -1754,7 +1754,8 @@ ${statusLine}
         <div style={{fontSize:10,color:"#604820",textAlign:"center",marginTop:8}}>Opens instantly in a new tab — File → Print → Save as PDF</div>
       </div>
     </div>
-  );model:"claude-sonnet-4-6"}
+  );
+}
 
 function MotmTab({members,motmHistory,setMotmHistory,isAdmin,onLock}){
   const now=new Date();
@@ -3957,4 +3958,3 @@ function App(){
 </script>
 </body>
 </html>
- 
