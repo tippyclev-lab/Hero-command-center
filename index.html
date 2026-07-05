@@ -16,12 +16,29 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     .babel-warning{display:none!important}
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #0a0a0a; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { background: #0a0a0a; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
     input, select, textarea, button { font-family: inherit; }
     input[type=date]::-webkit-calendar-picker-indicator { filter: invert(0.6); }
+
+    /* ── REFINED INTERACTION STATES ──────────────────────────────────── */
+    button { transition: filter .15s ease, transform .1s ease, box-shadow .15s ease; }
+    button:hover { filter: brightness(1.14); }
+    button:active { transform: translateY(1px); }
+    button:focus-visible { outline: 2px solid #C9A84C; outline-offset: 2px; }
+    input, select, textarea { transition: border-color .15s ease, box-shadow .15s ease; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #C9A84C !important; box-shadow: 0 0 0 3px rgba(201,168,76,.16); }
+    ::selection { background: #C9A84C; color: #150f00; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: #0a0a00; }
+    ::-webkit-scrollbar-thumb { background: #2a2200; border-radius: 6px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4a3a00; }
 
     /* ── MOBILE OPTIMIZATION ─────────────────────────────────────────── */
     @media (max-width: 768px) {
@@ -289,23 +306,33 @@ var HIRE_DECISIONS=["Strong Hire","Hire","Hold","Do Not Hire"];
 var ROLE_PROFILES={
   asst_tech:{
     label:"Assistant Technician",
-    hire:`HOODZ "Assistant Technician" HIRING benchmark (stricter standard — evaluating new hires):
-- Autonomy (A): Low-to-moderate (2-4). Should follow direction closely, not freelance decisions on job sites.
-- Sociability (B): Moderate (4-6). Friendly with customers and crew but not a distraction.
-- Pace/Patience (C): High (7-9). Methodical, steady, does not rush safety-critical tasks.
-- Conformity (D): Very high (8-10). Strict adherence to processes, safety protocols, and company standards is non-negotiable at this level.
-- Logic (E): Moderate (4-6). Basic troubleshooting ability; does not need to be highly analytical.
-- Energy (F): Moderate-to-high (5-7). Physically capable and engaged without burning out.
-Strong hire: dependable, process-driven, safety-minded, follows direction without resistance.
-Caution flags: low Conformity (safety risk), low Pace (rushes work), very high Autonomy without Conformity to balance it.`,
-    employee:`HOODZ "Assistant Technician" DEVELOPMENT benchmark (evaluating existing employee — more developmental lens):
-- Autonomy (A): Low-to-moderate (2-5). Some independence is fine once trained.
-- Sociability (B): Moderate (3-6). Team fit matters; some variation acceptable.
-- Pace/Patience (C): Moderate-to-high (6-9). Still needs to be steady and methodical.
-- Conformity (D): High (7-10). Process adherence remains critical even for existing employees.
-- Logic (E): Moderate (4-7). Growing analytical skills are a positive development sign.
-- Energy (F): Moderate (4-7). Sustained engagement over time.
-Focus: Is this person growing toward Lead Tech readiness? Watch for development in Autonomy and Logic.`
+    hire:`HOODZ "Assistant Technician" HIRING benchmark — CRAFTSMAN PATTERN (calibrated from real HOODZ top performers, not theoretical ideals):
+
+THE KEY SIGNAL IS THE AB STACK, NOT ANY SINGLE TRAIT IN ISOLATION.
+Our best-performing technicians consistently show Autonomy (A) and Sociability (B) sitting close together at the low-to-moderate end — a classic Culture Index "Craftsman" pattern. Reference example: Jordan Kirven (Lead Tech, strong performer) scores approximately A≈1, B≈2, C≈6, D≈3. Notice D is LOW, not high — do not penalize low Conformity if the AB stack and Pace are right. A rule-bound, high-D score is NOT required for this role and is not, by itself, a sign of a better fit.
+
+Real HOODZ Craftsman pattern ranges:
+- Autonomy (A): Low-moderate (2-5). Comfortable following direction; not chasing independence.
+- Sociability (B): Very low-to-moderate (1-5). Reserved to friendly is fine; extroversion is not required or preferred.
+- Pace/Patience (C): Moderate-to-high (5-8). Steady and methodical; the strongest positive signal alongside the AB stack.
+- Conformity (D): Can vary — commonly LOW (1-4) in our actual top performers. Do not treat low D as a red flag on its own. Craftsman-pattern people take pride in doing things their own way; they are not naturally rule-followers, and that is compatible with strong performance here.
+- Logic (L/E): Moderate (4-7).
+
+HOW TO SCORE: Judge fit primarily on whether A and B are stacked close together at the low-to-moderate end (the Craftsman pattern), combined with moderate-to-high C. Treat D as a secondary, flexible trait — vary your confidence, not your verdict, based on it. A candidate with the AB stack correct but low D (like Jordan Kirven) should score as a good-to-strong fit, not be penalized.
+
+Strong hire: AB stack low-to-moderate and close together, steady Pace, reasonable Logic — regardless of where Conformity lands.
+Caution flags: A and B far apart from each other (mixed signals), very low Pace (rushes work), or very low Logic (struggles with troubleshooting). Low D alone is NOT a caution flag.`,
+    employee:`HOODZ "Assistant Technician" DEVELOPMENT benchmark (existing employee — developmental lens, same Craftsman-pattern logic as hiring):
+
+Judge primarily on the AB stack (Autonomy and Sociability sitting close together, low-to-moderate) combined with steady Pace — this is the real HOODZ Craftsman pattern seen in strong performers like Jordan Kirven (A≈1, B≈2, C≈6, D≈3). Do not flag low Conformity (D) as a problem in isolation; our best people are often low-D "do it my way, do it right" craftsmen rather than rule-followers.
+
+- Autonomy (A): Low-moderate (2-5)
+- Sociability (B): Very low-to-moderate (1-5)
+- Pace/Patience (C): Moderate-to-high (5-8), the strongest positive signal
+- Conformity (D): Flexible — low (1-4) is normal and not concerning here
+- Logic (L/E): Moderate (4-7), growth in this area is a good developmental sign
+
+Focus: Is this person growing toward Lead Tech readiness? Watch Logic development and whether Pace stays steady under more responsibility — not whether Conformity rises.`
   },
   lead_tech:{
     label:"Lead Technician",
@@ -419,20 +446,20 @@ async function atSaveArray(tableKey, arr){
 }
 
 var S={
-  app:{background:DARK,minHeight:"100vh",color:"#f0e6c0",fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif"},
+  app:{background:DARK,minHeight:"100vh",color:"#f0e6c0",fontFamily:"'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif"},
   header:{background:"linear-gradient(180deg,#150f00 0%,#0a0a0a 100%)",borderBottom:`2px solid ${GOLD}`,padding:"20px 16px 14px",textAlign:"center"},
   tabs:{display:"flex",gap:3,padding:"10px 12px",background:"#060600",borderBottom:`1px solid ${BORDER}`,overflowX:"auto",flexWrap:"wrap"},
-  tab:(a)=>({padding:"6px 13px",fontSize:12,border:`1px solid ${a?GOLD:"#2a2200"}`,borderRadius:4,cursor:"pointer",background:a?"#1a1200":"#0d0d00",color:a?GOLD2:"#806030",fontWeight:700,whiteSpace:"nowrap"}),
+  tab:(a)=>({padding:"6px 13px",fontSize:12,border:`1px solid ${a?GOLD:"#2a2200"}`,borderRadius:4,cursor:"pointer",background:a?"#1a1200":"#0d0d00",color:a?GOLD2:"#806030",fontWeight:700,whiteSpace:"nowrap",boxShadow:a?`0 0 0 1px ${GOLD}22, 0 2px 6px rgba(0,0,0,.35)`:"none"}),
   body:{padding:14,maxWidth:1000,margin:"0 auto"},
-  card:{background:"#111100",border:`1px solid ${BORDER}`,borderRadius:8,padding:"14px 16px",marginBottom:12},
-  cardTitle:{fontSize:11,fontWeight:800,color:GOLD,textTransform:"uppercase",letterSpacing:".1em",marginBottom:10},
-  th:{textAlign:"left",padding:"7px 8px",borderBottom:`1px solid ${BORDER}`,fontSize:10,fontWeight:700,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",whiteSpace:"nowrap"},
-  td:{padding:"8px 8px",borderBottom:"1px solid #1a1200",fontSize:12,color:"#d0c090",verticalAlign:"middle"},
-  input:{width:"100%",padding:"7px 10px",fontSize:12,border:"1px solid #2a2200",borderRadius:5,background:"#080800",color:"#f0e6c0"},
-  select:{width:"100%",padding:"7px 10px",fontSize:12,border:"1px solid #2a2200",borderRadius:5,background:"#080800",color:"#f0e6c0"},
-  textarea:{width:"100%",padding:"7px 10px",fontSize:12,border:"1px solid #2a2200",borderRadius:5,background:"#080800",color:"#f0e6c0",minHeight:64,resize:"vertical"},
-  btn:(v)=>{const m={primary:{background:"#1a1200",color:GOLD2,borderColor:GOLD},danger:{background:"#1a0000",color:"#ff6060",borderColor:"#5a2020"},success:{background:"#0a1a0a",color:"#60c060",borderColor:"#204020"},default:{background:"#0d0d00",color:"#a08040",borderColor:"#2a2200"}};return{...(m[v||"default"]),padding:"7px 16px",fontSize:12,fontWeight:700,border:"1px solid",borderRadius:5,cursor:"pointer"};},
-  badge:(t)=>{const m={gold:{background:"#1a1200",color:GOLD2,border:`1px solid ${GOLD}`},green:{background:"#0a1a0a",color:"#60c060",border:"1px solid #204020"},red:{background:"#1a0000",color:"#f06060",border:"1px solid #401010"},blue:{background:"#001220",color:"#60a8e0",border:"1px solid #103040"},default:{background:"#111100",color:"#806030",border:"1px solid #2a2200"},orange:{background:"#1a0d00",color:"#e8a07a",border:"1px solid #5a2a00"},purple:{background:"#0d0020",color:"#b090f0",border:"1px solid #3a2060"}};return{...(m[t||"default"]),display:"inline-block",padding:"2px 8px",borderRadius:4,fontSize:10,fontWeight:700};},
+  card:{background:"#111100",border:`1px solid ${BORDER}`,borderRadius:10,padding:"16px 18px",marginBottom:14,boxShadow:"0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.22)"},
+  cardTitle:{fontSize:11,fontWeight:800,color:GOLD,textTransform:"uppercase",letterSpacing:".14em",marginBottom:12,paddingBottom:8,borderBottom:"1px solid #241c00",display:"flex",alignItems:"center",gap:6},
+  th:{textAlign:"left",padding:"8px 8px",borderBottom:`1px solid ${BORDER}`,fontSize:10,fontWeight:700,color:"#806030",textTransform:"uppercase",letterSpacing:".08em",whiteSpace:"nowrap"},
+  td:{padding:"9px 8px",borderBottom:"1px solid #1a1200",fontSize:12,color:"#d0c090",verticalAlign:"middle"},
+  input:{width:"100%",padding:"8px 11px",fontSize:12,border:"1px solid #2a2200",borderRadius:6,background:"#080800",color:"#f0e6c0"},
+  select:{width:"100%",padding:"8px 11px",fontSize:12,border:"1px solid #2a2200",borderRadius:6,background:"#080800",color:"#f0e6c0"},
+  textarea:{width:"100%",padding:"8px 11px",fontSize:12,border:"1px solid #2a2200",borderRadius:6,background:"#080800",color:"#f0e6c0",minHeight:64,resize:"vertical"},
+  btn:(v)=>{const m={primary:{background:"#1a1200",color:GOLD2,borderColor:GOLD},danger:{background:"#1a0000",color:"#ff6060",borderColor:"#5a2020"},success:{background:"#0a1a0a",color:"#60c060",borderColor:"#204020"},default:{background:"#0d0d00",color:"#a08040",borderColor:"#2a2200"}};return{...(m[v||"default"]),padding:"8px 17px",fontSize:12,fontWeight:700,border:"1px solid",borderRadius:6,cursor:"pointer",letterSpacing:".01em"};},
+  badge:(t)=>{const m={gold:{background:"#1a1200",color:GOLD2,border:`1px solid ${GOLD}`},green:{background:"#0a1a0a",color:"#60c060",border:"1px solid #204020"},red:{background:"#1a0000",color:"#f06060",border:"1px solid #401010"},blue:{background:"#001220",color:"#60a8e0",border:"1px solid #103040"},default:{background:"#111100",color:"#806030",border:"1px solid #2a2200"},orange:{background:"#1a0d00",color:"#e8a07a",border:"1px solid #5a2a00"},purple:{background:"#0d0020",color:"#b090f0",border:"1px solid #3a2060"}};return{...(m[t||"default"]),display:"inline-block",padding:"3px 9px",borderRadius:5,fontSize:10,fontWeight:700,letterSpacing:".02em"};},
 };
 
 function levelBadge(l){const c={Candidate:"default",Certified:"blue",Ambassador:"green",Elite:"gold","Hall of Legacy":"gold"};return <span style={S.badge(c[l]||"default")}>{l}</span>;}
@@ -802,7 +829,7 @@ function HEROCards({member,onUpdate,isAdmin,onLock}){
       <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:6}}>
         {letters.map(({key,letter,label,color})=>{const has=!!member[key];return(
           <div key={key} style={{display:"flex",flexDirection:"column",alignItems:"center",gap:2,cursor:isAdmin?"pointer":"default",transition:"all .2s"}} onClick={()=>{if(!isAdmin){onLock();return;}onUpdate(key,!has);}}>
-            <div style={{width:46,height:46,borderRadius:8,background:has?`${color}22`:"#0d0d00",border:`2px solid ${has?color:"#2a2200"}`,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:22,color:has?color:"#2a2200",fontFamily:"serif",boxShadow:has?`0 0 10px ${color}55`:"none",transition:"all .2s",opacity:has?1:0.4}}>{letter}</div>
+            <div style={{width:46,height:46,borderRadius:8,background:has?`${color}22`:"#0d0d00",border:`2px solid ${has?color:"#2a2200"}`,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:900,fontSize:22,color:has?color:"#2a2200",fontFamily:"'Playfair Display',Georgia,serif",boxShadow:has?`0 0 10px ${color}55`:"none",transition:"all .2s",opacity:has?1:0.4}}>{letter}</div>
             <div style={{fontSize:9,color:has?color:"#2a2200",fontWeight:700,letterSpacing:".04em"}}>{label}</div>
           </div>
         );})}
@@ -1054,7 +1081,7 @@ function DashboardTab({members,candidates,motmHistory}){
             <button style={{...S.btn("primary"),padding:"5px 14px",fontSize:11}} onClick={()=>printWallOfFame(members,motmHistory)}>🖨️ Print Wall of Fame</button>
           </div>
           <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
-            {members.filter(m=>m.level!=="Candidate").map((m,i)=>(<div key={i} style={{background:"#0d0d00",border:`1px solid ${GOLD}44`,borderRadius:8,padding:"12px 14px",textAlign:"center",minWidth:110}}>{m.photo?<img src={m.photo} alt={m.name} style={{width:44,height:44,borderRadius:"50%",objectFit:"cover",border:`2px solid ${GOLD}`,marginBottom:6}}/>:<div style={{fontSize:26,marginBottom:4}}>{m.level==="Elite"||m.level==="Hall of Legacy"?"👑":m.level==="Ambassador"?"⭐":"🏅"}</div>}<div style={{fontSize:12,fontWeight:700,color:GOLD2}}>{m.name}</div><div style={{marginTop:4}}>{levelBadge(m.level)}</div><div style={{marginTop:6,display:"flex",gap:3,justifyContent:"center"}}>{[["h","H"],["e","E"],["r","R"],["o","O"]].map(([k,l])=>(<span key={k} style={{width:20,height:20,borderRadius:3,background:m[k]?`${GOLD}22`:"#0d0d00",border:`1px solid ${m[k]?GOLD:"#2a2200"}`,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:900,color:m[k]?GOLD:"#2a2200",fontFamily:"serif"}}>{l}</span>))}</div><div style={{fontSize:10,color:"#604820",marginTop:3,fontFamily:"monospace"}}>{m.regNum||""}</div></div>))}
+            {members.filter(m=>m.level!=="Candidate").map((m,i)=>(<div key={i} style={{background:"#0d0d00",border:`1px solid ${GOLD}44`,borderRadius:8,padding:"12px 14px",textAlign:"center",minWidth:110}}>{m.photo?<img src={m.photo} alt={m.name} style={{width:44,height:44,borderRadius:"50%",objectFit:"cover",border:`2px solid ${GOLD}`,marginBottom:6}}/>:<div style={{fontSize:26,marginBottom:4}}>{m.level==="Elite"||m.level==="Hall of Legacy"?"👑":m.level==="Ambassador"?"⭐":"🏅"}</div>}<div style={{fontSize:12,fontWeight:700,color:GOLD2}}>{m.name}</div><div style={{marginTop:4}}>{levelBadge(m.level)}</div><div style={{marginTop:6,display:"flex",gap:3,justifyContent:"center"}}>{[["h","H"],["e","E"],["r","R"],["o","O"]].map(([k,l])=>(<span key={k} style={{width:20,height:20,borderRadius:3,background:m[k]?`${GOLD}22`:"#0d0d00",border:`1px solid ${m[k]?GOLD:"#2a2200"}`,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:900,color:m[k]?GOLD:"#2a2200",fontFamily:"'Playfair Display',Georgia,serif"}}>{l}</span>))}</div><div style={{fontSize:10,color:"#604820",marginTop:3,fontFamily:"'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace"}}>{m.regNum||""}</div></div>))}
           </div>
         </div>
       )}
@@ -1159,7 +1186,7 @@ function RegistryTab({members,setMembers,activities,reviews,motmHistory,isAdmin,
                     <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginBottom:4}}>
                       <span style={{fontSize:14,fontWeight:800,color:GOLD2}}>{m.name}</span>
                       {m.foundingClass&&<span style={{fontSize:10,color:"#e8c060"}}>⭐ Founding Class</span>}
-                      <span style={{fontFamily:"monospace",fontSize:10,color:"#604820"}}>{m.regNum||""}</span>
+                      <span style={{fontFamily:"'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace",fontSize:10,color:"#604820"}}>{m.regNum||""}</span>
                       {hasAnniversary&&<span style={{...S.badge("purple"),fontSize:9}}>🎓 Anniversary Soon</span>}
                     </div>
                     <div style={{display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}}>
@@ -1315,17 +1342,17 @@ function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,on
     const roleProfile=ROLE_PROFILES[role]||(ROLE_PROFILES.asst_tech);
     const benchmark=mode==="employee"?roleProfile.employee:roleProfile.hire;
     const roleLabel=roleProfile.label;
-    const parts=[{type:isImg?"image":"document",source:{type:"base64",media_type:mt,data:b64}},{type:"text",text:`You are an HR analyst for HOODZ of the MidSouth.\nAnalyze this Culture Index / talent profile for: ${name}.\nRole being evaluated for: ${roleLabel} (${mode==="employee"?"existing employee development review":"hiring candidate screening"}).\n\nRole benchmark:\n${benchmark}\n\nSome reports include HOODZ-specific scoring (an overall HOODZ Fit Score out of 100, and HERO Alignment scores for Honest/Excellence/Respect/Own It out of 10 each). If those exact figures appear in the document, extract them precisely. If they do not appear, leave those fields null rather than estimating.\n\nRespond ONLY with valid JSON (no markdown, no extra text):\n{"verdict":"PASS or FAIL","confidence":"High/Medium/Low","summary":"2-3 sentences","role":"${roleLabel}","context":"${mode==="employee"?"Development Review":"Hiring Screen"}","hero_fit_score":number or null,"hero_alignment_scores":{"honest":number or null,"excellence":number or null,"respect":number or null,"ownIt":number or null},"craftsman_alignment":{"autonomy":"note","sociability":"note","pace":"note","conformity":"note","logic":"note","energy":"note","overall_fit":"1-2 sentences"},"strengths":["s1","s2","s3"],"watch_areas":["w1","w2"],"hiring_recommendation":"one sentence","notes":"observations"}`}];
-    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":getCIKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:2000,messages:[{role:"user",content:parts}]})});
+    const parts=[{type:isImg?"image":"document",source:{type:"base64",media_type:mt,data:b64}},{type:"text",text:`You are an HR analyst for HOODZ of the MidSouth.\nAnalyze this Culture Index / talent profile for: ${name}.\nRole being evaluated for: ${roleLabel} (${mode==="employee"?"existing employee development review":"hiring candidate screening"}).\n\nRole benchmark:\n${benchmark}\n\nSome reports include HOODZ-specific scoring (an overall HOODZ Fit Score out of 100, and HERO Alignment scores for Honest/Excellence/Respect/Own It out of 10 each). If those exact figures appear in the document, extract them precisely. If they do not appear, leave those fields null rather than estimating.\n\nSeparately, YOU must compute a fit_score by comparing this person's actual A/B/C/D/Logic traits against the role benchmark pattern above (this is your own judgment call, not extracted from the document). Use these tiers:\n- Elite Fit: 85-100\n- Strong Fit: 70-84\n- Good Fit: 55-69\n- Moderate Fit: 40-54\n- Poor Fit: below 40\n\nFor verdict, use exactly one of: "PASS" (clear fit, no reservations), "CAUTION" (fit overall but with a specific area to monitor — e.g. Pace, Logic), or "FAIL" (pattern mismatch). If CAUTION, set verdict_note to a short 2-4 word flag naming the specific watch area (e.g. "Monitor Pace"). If PASS or FAIL, set verdict_note to an empty string. Judge primarily on whether the pattern described in the benchmark matches (e.g. the AB stack for Craftsman-type roles), not on any single trait threshold in isolation.\n\nRespond ONLY with valid JSON (no markdown, no extra text):\n{"verdict":"PASS or CAUTION or FAIL","verdict_note":"short watch-area flag or empty string","fit_score":number 0-100,"fit_tier":"Elite Fit, Strong Fit, Good Fit, Moderate Fit, or Poor Fit","confidence":"High/Medium/Low","summary":"2-3 sentences","role":"${roleLabel}","context":"${mode==="employee"?"Development Review":"Hiring Screen"}","hero_fit_score":number or null,"hero_alignment_scores":{"honest":number or null,"excellence":number or null,"respect":number or null,"ownIt":number or null},"craftsman_alignment":{"autonomy":"note","sociability":"note","pace":"note","conformity":"note","logic":"note","overall_fit":"1-2 sentences"},"strengths":["s1","s2","s3"],"watch_areas":["w1","w2"],"hiring_recommendation":"one sentence","notes":"observations"}`}];
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":getCIKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1200,messages:[{role:"user",content:parts}]})});
     const data=await res.json();if(data.error)throw new Error(data.error.message);
     const raw=data.content.map(b=>b.text||"").join("").trim().replace(/```json|```/g,"").trim();
     const parsed=JSON.parse(raw);const entry={id:Date.now(),name,date:date||new Date().toISOString().slice(0,10),notes,mode,role,roleLabel:(ROLE_PROFILES[role]||ROLE_PROFILES.asst_tech).label,result:parsed};
     setResult(parsed);setHistory(prev=>[entry,...prev]);
     if(mode==="candidate"&&candidates&&setCandidates){
-      setCandidates(p=>p.map(c=>c.name&&c.name.toLowerCase().trim()===name.toLowerCase().trim()?{...c,cultureIndexResult:parsed.verdict,cultureIndexSummary:parsed.summary,cultureIndexDate:entry.date}:c));
+      setCandidates(p=>p.map(c=>c.name&&c.name.toLowerCase().trim()===name.toLowerCase().trim()?{...c,cultureIndexResult:parsed.verdict,cultureIndexVerdictNote:parsed.verdict_note,cultureIndexFitScore:parsed.fit_score,cultureIndexFitTier:parsed.fit_tier,cultureIndexSummary:parsed.summary,cultureIndexDate:entry.date}:c));
     }
     if(mode==="employee"&&members&&setMembers){
-      setMembers(p=>p.map(m=>m.name&&m.name.toLowerCase().trim()===name.toLowerCase().trim()?{...m,cultureIndex:{verdict:parsed.verdict,summary:parsed.summary,heroFitScore:parsed.hero_fit_score,heroAlignmentScores:parsed.hero_alignment_scores,date:entry.date}}:m));
+      setMembers(p=>p.map(m=>m.name&&m.name.toLowerCase().trim()===name.toLowerCase().trim()?{...m,cultureIndex:{verdict:parsed.verdict,verdictNote:parsed.verdict_note,fitScore:parsed.fit_score,fitTier:parsed.fit_tier,summary:parsed.summary,heroFitScore:parsed.hero_fit_score,heroAlignmentScores:parsed.hero_alignment_scores,date:entry.date}}:m));
     }
     }catch(err){
       const msg=err.message||"Unknown error";
@@ -1338,7 +1365,7 @@ function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,on
     }finally{setLoading(false);}
   }
   function reset(){setFile(null);setPreview(null);setFType(null);setName("");setDate("");setNotes("");setResult(null);setError("");}
-  const vc=v=>v==="PASS"?"#60c060":v==="FAIL"?"#f06060":"#e8a07a";const vbg=v=>v==="PASS"?"#0a1a0a":v==="FAIL"?"#1a0000":"#1a0d00";const vb=v=>v==="PASS"?"#204020":v==="FAIL"?"#401010":"#5a2a00";
+  const vc=v=>v==="PASS"?"#60c060":v==="FAIL"?"#f06060":v==="CAUTION"?"#e8c060":"#e8a07a";const vbg=v=>v==="PASS"?"#0a1a0a":v==="FAIL"?"#1a0000":v==="CAUTION"?"#1a1200":"#1a0d00";const vb=v=>v==="PASS"?"#204020":v==="FAIL"?"#401010":v==="CAUTION"?GOLD:"#5a2a00";const vIcon=v=>v==="PASS"?"✅":v==="FAIL"?"❌":v==="CAUTION"?"⚠️":"◆";
   return(
     <div>
       <div style={{display:"flex",gap:8,marginBottom:14,flexWrap:"wrap"}}>
@@ -1366,7 +1393,7 @@ function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,on
                   placeholder="sk-ant-api03-..."
                   defaultValue={apiKey}
                   id="ci-api-key-input"
-                  style={{...S.input,flex:1,fontFamily:"monospace"}}
+                  style={{...S.input,flex:1,fontFamily:"'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace"}}
                 />
                 <button style={{...S.btn("primary"),whiteSpace:"nowrap"}} onClick={()=>{
                   const val=document.getElementById("ci-api-key-input").value.trim();
@@ -1432,7 +1459,7 @@ function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,on
           {loading&&<div style={{...S.card,textAlign:"center",padding:"2rem"}}><div style={{fontSize:36,marginBottom:10}}>🔄</div><div style={{fontSize:14,fontWeight:700,color:GOLD2}}>Analyzing against {(ROLE_PROFILES[role]||ROLE_PROFILES.asst_tech).label} benchmark...</div><div style={{fontSize:11,color:"#806030",marginTop:4}}>{mode==="employee"?"Development Review":"Hiring Screen"}</div></div>}
           {result&&!loading&&(
             <div>
-              <div style={{background:vbg(result.verdict),border:`2px solid ${vb(result.verdict)}`,borderRadius:10,padding:"18px 20px",marginBottom:12,textAlign:"center"}}><div style={{fontSize:40,marginBottom:6}}>{result.verdict==="PASS"?"✅":result.verdict==="FAIL"?"❌":"⚠️"}</div><div style={{fontSize:22,fontWeight:900,color:vc(result.verdict),letterSpacing:3,textTransform:"uppercase",marginBottom:4}}>{result.verdict} — {result.confidence} Confidence</div>{(result.role||result.context)&&<div style={{display:"flex",gap:6,justifyContent:"center",marginBottom:8,flexWrap:"wrap"}}>{result.role&&<span style={{...S.badge("gold"),fontSize:11}}>{result.role}</span>}{result.context&&<span style={{...S.badge("default"),fontSize:11}}>{result.context}</span>}</div>}<div style={{fontSize:13,color:"#d0c090",maxWidth:500,margin:"0 auto"}}>{result.summary}</div></div>
+              <div style={{background:vbg(result.verdict),border:`2px solid ${vb(result.verdict)}`,borderRadius:10,padding:"18px 20px",marginBottom:12,textAlign:"center"}}><div style={{fontSize:40,marginBottom:6}}>{vIcon(result.verdict)}</div><div style={{fontSize:22,fontWeight:900,color:vc(result.verdict),letterSpacing:3,textTransform:"uppercase",marginBottom:4}}>{result.verdict}{result.verdict_note?` — ${result.verdict_note}`:""}</div><div style={{fontSize:11,color:"#a08040",marginBottom:8}}>{result.confidence} Confidence</div>{(result.fit_score!=null||result.fit_tier)&&<div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:10,marginBottom:8}}>{result.fit_score!=null&&<span style={{fontSize:26,fontWeight:900,fontFamily:"'Playfair Display',Georgia,serif",color:vc(result.verdict)}}>{result.fit_score}<span style={{fontSize:13,color:"#604820"}}>/100</span></span>}{result.fit_tier&&<span style={{...S.badge(result.verdict==="PASS"?"green":result.verdict==="FAIL"?"red":"gold"),fontSize:11}}>{result.fit_tier}</span>}</div>}{(result.role||result.context)&&<div style={{display:"flex",gap:6,justifyContent:"center",marginBottom:8,flexWrap:"wrap"}}>{result.role&&<span style={{...S.badge("gold"),fontSize:11}}>{result.role}</span>}{result.context&&<span style={{...S.badge("default"),fontSize:11}}>{result.context}</span>}</div>}<div style={{fontSize:13,color:"#d0c090",maxWidth:500,margin:"0 auto"}}>{result.summary}</div></div>
               {(result.hero_fit_score!=null||result.hero_alignment_scores)&&(
                 <div style={S.card}>
                   <div style={S.cardTitle}>🛡️ HOODZ / H.E.R.O. Scoring (from report)</div>
@@ -1455,7 +1482,6 @@ function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,on
               <div style={{...S.card,border:`1px solid ${GOLD}44`}}><div style={S.cardTitle}>📋 Recommendation</div><div style={{fontSize:13,color:"#e8c060",fontStyle:"italic",marginBottom:result.notes?10:0}}>"{result.hiring_recommendation}"</div>{result.notes&&<div style={{fontSize:12,color:"#604820",marginTop:8,paddingTop:8,borderTop:"1px solid #2a2200"}}><strong style={{color:"#a08040"}}>Notes: </strong>{result.notes}</div>}</div>
               {mode==="candidate"&&candidates&&candidates.some(c=>c.name&&c.name.toLowerCase().trim()===name.toLowerCase().trim())&&<div style={{background:"#0a1a0a",border:"1px solid #204020",borderRadius:6,padding:"10px 14px",display:"flex",alignItems:"center",gap:8,marginTop:8}}><span>🔗</span><span style={{fontSize:12,color:"#60c060"}}>Result linked to <strong>{name}</strong>&#39;s hiring record.</span></div>}
               {mode==="employee"&&members&&members.some(m=>m.name&&m.name.toLowerCase().trim()===name.toLowerCase().trim())&&<div style={{background:"#0a1a0a",border:"1px solid #204020",borderRadius:6,padding:"10px 14px",display:"flex",alignItems:"center",gap:8,marginTop:8}}><span>🔗</span><span style={{fontSize:12,color:"#60c060"}}>Result saved to <strong>{name}</strong>&#39;s Registry profile.</span></div>}
-            <button style={{...S.btn("primary"),padding:"11px 20px",fontSize:13,fontWeight:900,width:"100%",marginTop:10,border:"2px solid "+GOLD}} onClick={()=>{try{var payload={name:name,date:date||new Date().toISOString().slice(0,10),roleLabel:(ROLE_PROFILES[role]||ROLE_PROFILES.asst_tech).label,mode:mode,result:result};localStorage.setItem("hero_scorecard_data",JSON.stringify(payload));window.location.href="/scorecard.html";}catch(e){alert("Error: "+e.message);}}}>🖨️ Print Talent Assessment Scorecard</button>
             </div>
           )}
         </div>
@@ -1466,7 +1492,7 @@ function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,on
           history.map((entry,i)=>(<div key={entry.id} style={{...S.card,marginBottom:12}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8,marginBottom:10}}>
               <div><div style={{fontSize:15,fontWeight:800,color:GOLD2}}>{entry.name}</div><div style={{fontSize:11,color:"#604820",marginTop:2}}>{entry.date}{entry.roleLabel&&<span style={{marginLeft:6,color:"#806030"}}>· {entry.roleLabel}</span>}{entry.mode&&<span style={{marginLeft:4,color:"#604820"}}>({entry.mode==="employee"?"Dev Review":"Hiring"})</span>}</div></div>
-              <div style={{display:"flex",gap:8,alignItems:"center"}}><div style={{background:vbg(entry.result.verdict),border:`1px solid ${vb(entry.result.verdict)}`,borderRadius:20,padding:"4px 14px",fontSize:13,fontWeight:900,color:vc(entry.result.verdict)}}>{entry.result.verdict==="PASS"?"✅":"❌"} {entry.result.verdict}</div><span style={S.badge("default")}>{entry.result.confidence}</span></div>
+              <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}><div style={{background:vbg(entry.result.verdict),border:`1px solid ${vb(entry.result.verdict)}`,borderRadius:20,padding:"4px 14px",fontSize:13,fontWeight:900,color:vc(entry.result.verdict)}}>{vIcon(entry.result.verdict)} {entry.result.verdict}{entry.result.verdict_note?` — ${entry.result.verdict_note}`:""}</div>{entry.result.fit_score!=null&&<span style={{...S.badge("default"),fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700}}>{entry.result.fit_score}/100</span>}<span style={S.badge("default")}>{entry.result.confidence}</span></div>
             </div>
             <div style={{fontSize:12,color:"#d0c090",marginBottom:8}}>{entry.result.summary}</div>
             {entry.result.strengths?.length>0&&<div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:5}}>{entry.result.strengths.map((s,j)=><span key={j} style={{...S.badge("green"),fontSize:10}}>✓ {s}</span>)}</div>}
@@ -1570,7 +1596,7 @@ function QuickLogTab({members,setMembers,activities,setActivities,isAdmin,onLock
                 <span style={{marginLeft:8}}>{levelBadge(selected.level)}</span>
               </div>
               <div style={{display:"flex",gap:4}}>
-                {[["h","H"],["e","E"],["r","R"],["o","O"]].map(([k,l])=>(<span key={k} style={{width:22,height:22,borderRadius:3,background:selected[k]?`${GOLD}22`:"#1a1200",border:`1px solid ${selected[k]?GOLD:"#2a2200"}`,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:900,color:selected[k]?GOLD:"#2a2200",fontFamily:"serif"}}>{l}</span>))}
+                {[["h","H"],["e","E"],["r","R"],["o","O"]].map(([k,l])=>(<span key={k} style={{width:22,height:22,borderRadius:3,background:selected[k]?`${GOLD}22`:"#1a1200",border:`1px solid ${selected[k]?GOLD:"#2a2200"}`,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:900,color:selected[k]?GOLD:"#2a2200",fontFamily:"'Playfair Display',Georgia,serif"}}>{l}</span>))}
               </div>
               {selected.flag?.active&&<FlagBadge flag={selected.flag}/>}
             </div>
@@ -2357,7 +2383,7 @@ function ProgramTab({members}){
             <div style={{display:"flex",justifyContent:"center",gap:10,flexWrap:"wrap"}}>
               {[["H","Honesty","Integrity · Truth · Trust · Responsibility"],["E","Excellence","Standards · Improvement · Quality · Professionalism"],["R","Respect","Teamwork · Relationships · Communication · Support"],["O","Own It","Accountability · Initiative · Follow Through · Solutions"]].map(([letter,val,desc])=>(
                 <div key={letter} style={{background:"#0d0d00",border:`1px solid ${GOLD}33`,borderRadius:8,padding:"12px 14px",minWidth:120,flex:1}}>
-                  <div style={{fontSize:30,fontWeight:900,color:GOLD2,fontFamily:"serif"}}>{letter}</div>
+                  <div style={{fontSize:30,fontWeight:900,color:GOLD2,fontFamily:"'Playfair Display',Georgia,serif"}}>{letter}</div>
                   <div style={{fontSize:12,fontWeight:700,color:GOLD,marginBottom:4}}>{val}</div>
                   <div style={{fontSize:10,color:"#604820",lineHeight:1.5}}>{desc}</div>
                 </div>
@@ -2396,7 +2422,7 @@ function ProgramTab({members}){
                   <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10,flexWrap:"wrap"}}>
                     <div style={{flex:1}}>
                       <div style={{fontSize:16,fontWeight:900,color:GOLD2}}>{selMember.name}</div>
-                      <div style={{marginTop:4,display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}}>{levelBadge(selMember.level)}{selMember.readiness&&readBadge(selMember.readiness)}{selMember.regNum&&<span style={{fontFamily:"monospace",fontSize:10,color:"#604820"}}>{selMember.regNum}</span>}</div>
+                      <div style={{marginTop:4,display:"flex",gap:6,flexWrap:"wrap",alignItems:"center"}}>{levelBadge(selMember.level)}{selMember.readiness&&readBadge(selMember.readiness)}{selMember.regNum&&<span style={{fontFamily:"'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace",fontSize:10,color:"#604820"}}>{selMember.regNum}</span>}</div>
                     </div>
                     <div style={{textAlign:"center"}}><div style={{fontSize:24,fontWeight:900,color:GOLD2}}>{curIdx+1}/{LEVELS.length}</div><div style={{fontSize:9,color:"#604820",textTransform:"uppercase"}}>Level</div></div>
                   </div>
@@ -2986,7 +3012,7 @@ ${yearActivities.length>0?'<div class="section"><h2>🎓 Academy Highlights</h2>
     <div>
       <div style={{...S.card,background:"linear-gradient(135deg,#150f00,#0d0d00)",border:`1px solid ${GOLD}44`,textAlign:"center",padding:"20px 16px"}}>
         <div style={{fontSize:10,fontWeight:800,color:"#806030",textTransform:"uppercase",letterSpacing:2,marginBottom:4}}>Annual Summary</div>
-        <div style={{fontFamily:"serif",fontSize:48,fontWeight:900,color:GOLD,lineHeight:1,marginBottom:4}}>{year}</div>
+        <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:48,fontWeight:900,color:GOLD,lineHeight:1,marginBottom:4}}>{year}</div>
         <div style={{fontSize:14,fontWeight:900,color:GOLD2,marginBottom:8}}>H.E.R.O. Year in Review</div>
         <div style={{display:"flex",gap:8,alignItems:"center",justifyContent:"center",flexWrap:"wrap"}}>
           <button style={{...S.btn(),padding:"5px 12px",fontSize:11}} onClick={()=>setYear(y=>y-1)}>← {year-1}</button>
@@ -3110,7 +3136,7 @@ function BulkImportEmployees({members,setMembers,isAdmin,onLock}){
         a note for reference instead, so long-tenured employees don't show up with years of "overdue" milestones.
         Anyone whose name already matches someone in the Registry is skipped automatically.
       </div>
-      <textarea style={{...S.textarea,minHeight:160,fontFamily:"monospace",fontSize:11}} value={text} onChange={e=>setText(e.target.value)} placeholder={"Mehvan Abdullah, 03/15/2026\nMichael Aguilar, 03/31/2025\nSami Alsadi, 03/15/2026"}/>
+      <textarea style={{...S.textarea,minHeight:160,fontFamily:"'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace",fontSize:11}} value={text} onChange={e=>setText(e.target.value)} placeholder={"Mehvan Abdullah, 03/15/2026\nMichael Aguilar, 03/31/2025\nSami Alsadi, 03/15/2026"}/>
       <button style={{...S.btn("primary"),marginTop:10}} onClick={doImport}>📥 Import Employees</button>
       {result&&<div style={{marginTop:10,background:"#0a1a0a",border:"1px solid #204020",borderRadius:6,padding:"10px 12px",fontSize:12,color:"#60c060"}}>
         ✅ Imported {result.added} new employee{result.added!==1?"s":""}.{result.skipped>0&&` Skipped ${result.skipped} already in the Registry.`}
@@ -3729,7 +3755,7 @@ function MemberProfileTab({members,setMembers,activities,reviews,motmHistory,isA
         <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
           {[["h","H","Honest","#C9A84C"],["e","E","Excellence","#5A8AC6"],["r","R","Respect","#4A9A4A"],["o","O","Own It","#9A4A4A"]].map(([k,l,label,color])=>(
             <div key={k} style={{background:m[k]?"#0d1a00":"#0d0d00",border:`2px solid ${m[k]?color:"#2a2200"}`,borderRadius:8,padding:"12px 16px",textAlign:"center",minWidth:80,flex:1,opacity:m[k]?1:0.5}}>
-              <div style={{fontFamily:"serif",fontSize:32,fontWeight:900,color:m[k]?color:"#2a2200",lineHeight:1}}>{l}</div>
+              <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:32,fontWeight:900,color:m[k]?color:"#2a2200",lineHeight:1}}>{l}</div>
               <div style={{fontSize:10,fontWeight:800,color:m[k]?GOLD2:"#604820",marginTop:4,textTransform:"uppercase"}}>{label}</div>
               {m[k]?<div style={{fontSize:9,color:"#60c060",marginTop:3}}>✓ Earned</div>:<div style={{fontSize:9,color:"#604820",marginTop:3}}>Not yet earned</div>}
             </div>
@@ -3749,7 +3775,7 @@ function MemberProfileTab({members,setMembers,activities,reviews,motmHistory,isA
           {m.cultureIndex.summary&&<div style={{fontSize:12,color:"#d0c090",marginBottom:m.cultureIndex.heroAlignmentScores?12:0}}>{m.cultureIndex.summary}</div>}
           {m.cultureIndex.heroAlignmentScores&&<div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
             {[["honest","H",GOLD],["excellence","E","#5A8AC6"],["respect","R","#4A9A4A"],["ownIt","O","#9A4A4A"]].map(([k,l,color])=>{const v=m.cultureIndex.heroAlignmentScores[k];return v==null?null:(
-              <div key={k} style={{background:"#0d0d00",border:`1px solid ${color}55`,borderRadius:6,padding:"6px 12px",textAlign:"center"}}><span style={{fontFamily:"serif",fontWeight:900,color}}>{l}</span> <span style={{fontSize:12,color:"#d0c090"}}>{v}/10</span></div>
+              <div key={k} style={{background:"#0d0d00",border:`1px solid ${color}55`,borderRadius:6,padding:"6px 12px",textAlign:"center"}}><span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:900,color}}>{l}</span> <span style={{fontSize:12,color:"#d0c090"}}>{v}/10</span></div>
             );})}
           </div>}
         </div>
@@ -4009,10 +4035,10 @@ function App(){
     <div style={S.app}>
       {showPin&&<PinModal onUnlock={handleUnlock} onCancel={()=>setShowPin(false)}/>}
       <div style={S.header}>
-        <img src={LOGO} alt="HERO Certified" style={{width:80,marginBottom:6}}/>
-        <div style={{fontSize:10,fontWeight:800,color:"#604820",textTransform:"uppercase",letterSpacing:".12em",marginBottom:2}}>HOODZ of the MidSouth</div>
-        <h1 style={{fontSize:19,fontWeight:900,color:GOLD2,letterSpacing:3,textTransform:"uppercase",margin:0}}>H.E.R.O. Command Center</h1>
-        <div style={{fontSize:10,color:"#604820",marginTop:3,letterSpacing:1.5,textTransform:"uppercase"}}>Develop Leaders · Protect Culture · Leave A Legacy</div>
+        <img src={LOGO} alt="HERO Certified" style={{width:80,marginBottom:8}}/>
+        <div style={{fontSize:10,fontWeight:700,color:"#604820",textTransform:"uppercase",letterSpacing:".2em",marginBottom:4}}>HOODZ of the MidSouth</div>
+        <h1 style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:23,fontWeight:800,color:GOLD2,letterSpacing:2,textTransform:"uppercase",margin:0}}>H.E.R.O. Command Center</h1>
+        <div style={{fontSize:10,fontWeight:500,color:"#806030",marginTop:5,letterSpacing:1.5,textTransform:"uppercase"}}>Develop Leaders · Protect Culture · Leave A Legacy</div>
         <div style={{marginTop:10,display:"flex",gap:8,justifyContent:"center",alignItems:"center",flexWrap:"wrap"}}>
           {isAdmin?<button style={{...S.btn(),fontSize:11,padding:"4px 12px",borderRadius:20,color:"#60c060",borderColor:"#204020"}} onClick={()=>{setIsAdmin(false);setRole(null);}}>🔓 Admin — tap to lock</button>:role==="council"?<button style={{...S.btn(),fontSize:11,padding:"4px 12px",borderRadius:20,color:"#60a8e0",borderColor:"#103040"}} onClick={()=>setRole(null)}>🔓 Council — tap to lock</button>:<button style={{...S.btn(),fontSize:11,padding:"4px 12px",borderRadius:20}} onClick={()=>setShowPin(true)}>🔐 Login</button>}
           {saving&&<span style={{fontSize:10,color:"#604820"}}>💾 Saving...</span>}
@@ -4050,6 +4076,5 @@ function App(){
     const root = ReactDOM.createRoot(document.getElementById('root'));
     root.render(<App />);
 </script>
-<script src="/inject.js"></script>
 </body>
 </html>
