@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -289,83 +289,111 @@ var HIRE_DECISIONS=["Strong Hire","Hire","Hold","Do Not Hire"];
 var ROLE_PROFILES={
   asst_tech:{
     label:"Assistant Technician",
-    hire:`HOODZ "Assistant Technician" HIRING benchmark (stricter standard — evaluating new hires):
-- Autonomy (A): Low-to-moderate (2-4). Should follow direction closely, not freelance decisions on job sites.
-- Sociability (B): Moderate (4-6). Friendly with customers and crew but not a distraction.
-- Pace/Patience (C): High (7-9). Methodical, steady, does not rush safety-critical tasks.
-- Conformity (D): Very high (8-10). Strict adherence to processes, safety protocols, and company standards is non-negotiable at this level.
-- Logic (E): Moderate (4-6). Basic troubleshooting ability; does not need to be highly analytical.
-- Energy (F): Moderate-to-high (5-7). Physically capable and engaged without burning out.
-Strong hire: dependable, process-driven, safety-minded, follows direction without resistance.
-Caution flags: low Conformity (safety risk), low Pace (rushes work), very high Autonomy without Conformity to balance it.`,
-    employee:`HOODZ "Assistant Technician" DEVELOPMENT benchmark (evaluating existing employee — more developmental lens):
-- Autonomy (A): Low-to-moderate (2-5). Some independence is fine once trained.
-- Sociability (B): Moderate (3-6). Team fit matters; some variation acceptable.
-- Pace/Patience (C): Moderate-to-high (6-9). Still needs to be steady and methodical.
-- Conformity (D): High (7-10). Process adherence remains critical even for existing employees.
-- Logic (E): Moderate (4-7). Growing analytical skills are a positive development sign.
-- Energy (F): Moderate (4-7). Sustained engagement over time.
-Focus: Is this person growing toward Lead Tech readiness? Watch for development in Autonomy and Logic.`
+    hire:`HOODZ H.E.R.O. Certified Technician — HIRING benchmark (Kitchen Exhaust Cleaning Technician):
+
+The ideal match is a CRAFTSMAN profile with an AB stack (A and B scores close together, both low-to-moderate).
+
+Key pattern signals:
+- A (Autonomy): Low-to-moderate (1-4). Works reliably once trained without needing constant direction, but does not freelance decisions. Does not need to be in charge.
+- B (Sociability): Low-to-moderate (1-4). Works well with crew and customers but is not socially driven. AB scores should be close together (stacked) — this is the defining Craftsman signal.
+- C (Pace/Patience): High (6-9). Methodical, steady, does not rush. Comfortable with repetitive overnight work requiring sustained focus. VALUES quality over speed.
+- D (Conformity): Variable — low-to-moderate is acceptable and even expected in strong Craftsmen (1-5). The Craftsman takes pride in their own standards. High D (rule-follower) is less important than high C (patience and consistency).
+- L (Logic): Moderate (3-6). Follows NFPA procedures; doesn't need to be highly analytical.
+
+The CRITICAL signals to look for:
+1. AB STACK — A and B are close together, both on the low side. This is the Craftsman pattern.
+2. HIGH C — Patient, steady, methodical. This is non-negotiable for overnight kitchen exhaust work.
+3. LOW A + LOW B together — not assertive, not socially dominant, works within the team structure.
+
+Caution flags: High A with low B (lone wolf, resists direction), very low C (rushes work — safety risk), high B with low A (social but unreliable), extremely high D without corresponding high C (rigid follower but not steady).
+
+Real-world examples from HOODZ team: Jordan Kirven (Craftsman, Lead Tech) — A≈1, B≈2, C≈6, D≈3, AB stacked low. This is the gold standard pattern.`,
+    employee:`HOODZ H.E.R.O. Certified Technician — DEVELOPMENT benchmark (existing employee review):
+
+Same Craftsman/AB-stack pattern applies, but evaluate through a developmental lens.
+
+- A (Autonomy): Low-to-moderate (1-5). Slightly more independence is fine once fully trained.
+- B (Sociability): Low-to-moderate (1-5). AB still should be close together (stacked).
+- C (Pace/Patience): Moderate-to-high (5-9). Still the most important dimension for this role.
+- D (Conformity): Low-to-moderate (1-5). Process adherence through personal pride, not rigidity.
+- L (Logic): Moderate (3-7). Growing technical knowledge is a positive sign.
+
+Developmental focus: Is this person growing toward Lead Tech readiness? Signs to look for: A moving toward 4-6 range (more independent), C remaining high, AB staying close together (team orientation maintained).`
   },
   lead_tech:{
     label:"Lead Technician",
-    hire:`HOODZ "Lead Technician" HIRING benchmark (stricter — this person will lead a crew):
-- Autonomy (A): Moderate-to-high (6-8). Must make independent job site decisions without constant check-ins.
-- Sociability (B): Moderate-to-high (5-7). Leads crew relationships and customer interactions.
-- Pace/Patience (C): Moderate-to-high (6-8). Steady under pressure; models calm for the crew.
-- Conformity (D): Moderate-to-high (6-8). Follows company standards AND enforces them with others.
-- Logic (E): Moderate-to-high (6-8). Diagnoses complex problems; makes sound technical decisions.
-- Energy (F): High (7-9). High output, sets the pace for the team.
-Strong hire: independent executor who also develops others, technically sharp, process-respecting.
-Caution flags: low Conformity (won't enforce standards), very low Sociability (poor crew leadership), low Logic (poor diagnostic ability).`,
-    employee:`HOODZ "Lead Technician" DEVELOPMENT benchmark (existing employee lens):
-- Autonomy (A): Moderate-to-high (5-8). Comfortable owning jobs end-to-end.
-- Sociability (B): Moderate (4-7). Leading crew effectively; some variation acceptable.
-- Pace/Patience (C): Moderate-to-high (5-8). Manages job flow without rushing crew.
-- Conformity (D): Moderate-to-high (5-8). Models compliance culture for the team.
-- Logic (E): Moderate-to-high (5-8). Growing into complex diagnostics.
-- Energy (F): Moderate-to-high (6-9). Consistent output and leadership presence.
-Focus: Is this person ready for Supervisor? Watch for Autonomy growth and Sociability as indicators.`
+    hire:`HOODZ Lead Technician — HIRING benchmark:
+
+Still rooted in the Craftsman pattern but with growing independence and crew leadership ability.
+
+- A (Autonomy): Moderate (4-7). Makes job-site decisions; owns jobs end-to-end without check-ins.
+- B (Sociability): Low-to-moderate (3-6). Leads crew relationships; AB may spread slightly compared to Asst Tech.
+- C (Pace/Patience): Moderate-to-high (5-8). Models steady, quality-focused work for the crew.
+- D (Conformity): Low-to-moderate (2-6). Follows and enforces company standards through example.
+- L (Logic): Moderate-to-high (5-8). Diagnoses problems; makes sound technical decisions.
+
+Key shift from Asst Tech: A moves up (more independent), B may move slightly up (crew leadership), but C remains high and AB should still show some clustering.
+
+Caution flags: Low C (rushes crew), very low A (can't make decisions independently), low B combined with high A (technically capable but alienates crew).`,
+    employee:`HOODZ Lead Technician — DEVELOPMENT benchmark (existing employee):
+
+- A (Autonomy): Moderate (3-7). Comfortable owning job scope.
+- B (Sociability): Low-to-moderate (2-6). Leading crew effectively.
+- C (Pace/Patience): Moderate-to-high (4-8). Quality-focused job management.
+- D (Conformity): Low-to-moderate (2-6). Models compliance for the team.
+- L (Logic): Moderate-to-high (4-8). Growing technical and operational capability.
+
+Focus: Is this person Supervisor-ready? Watch for A trending up and consistent high C — steady independent decision-making without sacrificing quality.`
   },
   supervisor:{
     label:"Supervisor",
-    hire:`HOODZ "Supervisor" HIRING benchmark (stricter — managing multiple techs and customer relationships):
-- Autonomy (A): High (7-9). Makes independent operational decisions; owns their territory.
-- Sociability (B): Moderate-to-high (6-8). Builds crew trust, manages customer escalations, communicates up to management.
-- Pace/Patience (C): Moderate (5-7). Manages urgency without losing composure; delegates effectively.
-- Conformity (D): Moderate (5-7). Respects process but exercises judgment; not rigidly rule-bound.
-- Logic (E): Moderate-to-high (6-8). Analyzes team performance, job profitability, and operational problems.
-- Energy (F): High (7-9). High drive; sets the standard for the team.
-Strong hire: decisive, relationship-driven, analytically capable, operationally accountable.
-Caution flags: very low Sociability (poor people leadership), very low Conformity (won't follow or enforce company direction), low Logic (can't diagnose operational problems).`,
-    employee:`HOODZ "Supervisor" DEVELOPMENT benchmark (existing employee lens):
-- Autonomy (A): High (6-9). Owns their operational domain with confidence.
-- Sociability (B): Moderate-to-high (5-8). Leads people effectively across crew and customer contexts.
-- Pace/Patience (C): Moderate (4-7). Balances urgency with steady decision-making.
-- Conformity (D): Moderate (4-7). Exercises sound judgment within company framework.
-- Logic (E): Moderate-to-high (5-8). Evaluates performance data and operational outcomes.
-- Energy (F): Moderate-to-high (6-9). Sustained leadership energy.
-Focus: Is this person ready for Manager? Watch for Logic growth and ability to operate more strategically.`
+    hire:`HOODZ Supervisor — HIRING benchmark:
+
+Managing multiple crews, customer relationships, and operational accountability.
+
+- A (Autonomy): Moderate-to-high (6-9). Owns operational territory independently.
+- B (Sociability): Moderate (4-7). Builds crew trust; manages customer escalations; communicates with management.
+- C (Pace/Patience): Moderate (4-7). Manages urgency without losing composure; delegates.
+- D (Conformity): Low-to-moderate (3-6). Exercises judgment within company framework; not rigidly rule-bound.
+- L (Logic): Moderate-to-high (5-8). Analyzes crew performance and operational problems.
+
+Key shift: A significantly higher, B more flexible, C still solid but less dominant than in field roles.
+
+Caution flags: Very low B (poor people leadership), very low C (reactive, not steady), low L (can't diagnose operational problems).`,
+    employee:`HOODZ Supervisor — DEVELOPMENT benchmark (existing employee):
+
+- A (Autonomy): Moderate-to-high (5-9). Owns domain with growing confidence.
+- B (Sociability): Moderate (3-7). People-focused leadership.
+- C (Pace/Patience): Moderate (3-7). Steady under operational pressure.
+- D (Conformity): Low-to-moderate (2-6). Sound judgment within company framework.
+- L (Logic): Moderate-to-high (4-8). Evaluating team and operational data.
+
+Focus: Is this person Manager-ready? Watch for L growing and ability to think beyond the job to the business.`
   },
   manager:{
     label:"Manager",
-    hire:`HOODZ "Manager" HIRING benchmark (stricter — strategic, multi-team, P&L responsible):
-- Autonomy (A): Very high (8-10). Operates independently; owns outcomes without needing direction.
-- Sociability (B): Moderate-to-high (6-8). Builds organizational relationships, influences culture, communicates strategy.
-- Pace/Patience (C): Moderate (4-6). Comfortable with ambiguity and longer-horizon thinking; not impulsive.
-- Conformity (D): Low-to-moderate (3-6). Exercises strategic judgment; not bound by rigid process adherence.
-- Logic (E): High (8-10). Analytically driven; evaluates data, P&L, performance trends, and strategic options.
-- Energy (F): High (7-10). High capacity, resilient under sustained pressure.
-Strong hire: strategic, data-driven, autonomous, organizationally influential, results-accountable.
-Caution flags: low Logic (can't think strategically), very high Conformity (too process-bound for a strategic role), low Autonomy (won't operate independently at the right level).`,
-    employee:`HOODZ "Manager" DEVELOPMENT benchmark (existing employee lens):
-- Autonomy (A): Very high (7-10). Drives their domain with full ownership.
-- Sociability (B): Moderate-to-high (5-8). Organizational influence and leadership presence.
-- Pace/Patience (C): Moderate (4-7). Strategic patience; long-horizon thinking.
-- Conformity (D): Low-to-moderate (3-6). Judgment-driven rather than rule-driven.
-- Logic (E): High (7-10). Strategic analytical capability.
-- Energy (F): High (6-10). Sustained high-output leadership.
-Focus: Is this person ready for greater responsibility? Watch for strategic thinking, organizational influence, and P&L accountability growth.`
+    hire:`HOODZ Manager — HIRING benchmark:
+
+Strategic, multi-team, P&L responsible.
+
+- A (Autonomy): High (7-10). Drives outcomes without needing direction.
+- B (Sociability): Moderate-to-high (5-8). Organizational relationships; culture influence.
+- C (Pace/Patience): Moderate (3-6). Long-horizon thinking; not impulsive but not slow.
+- D (Conformity): Low (1-5). Strategic judgment; not rigidly process-bound.
+- L (Logic): High (7-10). Data-driven; evaluates P&L, performance trends, strategic options.
+
+Key shift: Very high A and L, C less dominant, D low (exercises judgment over rule-following).
+
+Caution flags: Low L (can't think strategically), very high D (too process-bound), low A (won't operate independently at the right level).`,
+    employee:`HOODZ Manager — DEVELOPMENT benchmark (existing employee):
+
+- A (Autonomy): High (6-10). Full domain ownership.
+- B (Sociability): Moderate-to-high (4-8). Organizational influence.
+- C (Pace/Patience): Moderate (3-7). Strategic patience.
+- D (Conformity): Low (1-5). Judgment-driven leadership.
+- L (Logic): High (6-10). Strategic analytical thinking.
+
+Focus: Greater responsibility readiness. Watch for strategic thinking growth and organizational influence beyond direct reports.`
   }
 };
 var CRAFTSMAN_PROFILE=ROLE_PROFILES.asst_tech.hire;
@@ -3203,7 +3231,7 @@ function SetupTab({cloudReady,members,setMembers,isAdmin,onLock}){
           {n:"1",t:"Get your API Key",b:`Go to console.anthropic.com → Sign in → "API Keys" in left menu → "Create Key" → copy it (starts with sk-ant-). Free credits included when you sign up.`},
           {n:"2",t:"Enter key in the app",b:`Go to 🧠 Culture Index tab → paste your key in the setup box → click "Save Key". Key is stored in your browser permanently — you only do this once.`},
           {n:"3",t:"Upload a Culture Index profile",b:"When a candidate completes their Culture Index, export or screenshot the results page as an image (PNG/JPG) or PDF. Upload it using the file button in the tab."},
-          {n:"4",t:"Enter candidate name and run",b:`Type the candidate's name then click "Run AI Analysis". In 10-15 seconds you get: PASS/FAIL verdict, Craftsman benchmark alignment, strengths, watch areas, and hiring recommendation.`},
+          {n:"4",t:"Enter candidate name and run",b:`Type the candidate's name then click "Run AI Analysis". In 10-15 seconds you get: PASS/FAIL verdict, role benchmark alignment, strengths, watch areas, and hiring recommendation.`},
           {n:"5",t:"Cost",b:"Each analysis costs less than $0.01 (about 1,000 tokens). You can run hundreds of analyses for just a few dollars. Your API key usage is tracked at console.anthropic.com."},
         ].map(step=>(
           <div key={step.n} style={{display:"flex",gap:10,alignItems:"flex-start",background:"#0d0d00",border:`1px solid ${BORDER}`,borderRadius:6,padding:"10px 12px",marginBottom:8}}>
