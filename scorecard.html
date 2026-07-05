@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>H.E.R.O. Talent Assessment</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#060d1a;color:#fff;font-family:sans-serif;}
+.pg{max-width:900px;margin:0 auto;padding:14px;}
+.c{background:linear-gradient(135deg,#1B2A4A,#0d1a2e);border:1px solid rgba(184,150,74,0.25);border-radius:8px;padding:11px 13px;}
+.ct{font-size:9px;font-weight:700;color:#D4AF6A;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;text-align:center;}
+.g2{display:grid;grid-template-columns:1fr 140px;gap:9px;margin-bottom:9px;}
+.g3{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:9px;margin-bottom:9px;}
+.g3b{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:9px;}
+.g2v{display:grid;grid-template-columns:1fr 1.6fr;gap:9px;margin-bottom:9px;}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;}
+.gcol{display:flex;flex-direction:column;gap:7px;}
+.bw{background:#0d1a2e;border-radius:3px;height:7px;overflow:hidden;margin-top:2px;}
+.bf{height:100%;border-radius:3px;}
+.ft{border-top:1px solid rgba(184,150,74,0.3);padding-top:7px;display:flex;justify-content:space-between;margin-top:9px;}
+.btn{padding:8px 16px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;border:none;}
+.np{display:flex;gap:8px;margin-bottom:11px;flex-wrap:wrap;}
+@media print{
+  body{background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  .np{display:none!important;}
+  .pg{padding:0;max-width:100%;}
+}
+</style>
+</head>
+<body>
+<div class="pg">
+  <div class="np">
+    <button class="btn" style="background:#1B2A4A;color:#B8964A;border:1px solid #B8964A;" onclick="history.back()">← Back to Command Center</button>
+    <button class="btn" style="background:linear-gradient(135deg,#B8964A,#D4AF6A);color:#1B2A4A;" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    <button class="btn" style="background:#1B2A4A;color:#B8964A;border:1px solid #B8964A;" onclick="shareCard()">📤 Share</button>
+    <button class="btn" style="background:#1B2A4A;color:#B8964A;border:1px solid #B8964A;" onclick="window.close()">✕ Close</button>
+  </div>
+  <div id="scorecard-content" style="text-align:center;padding:40px;color:#B8964A;">Loading assessment...</div>
+</div>
+
+<script>
+var GOLD="#B8964A",GOLD2="#D4AF6A";
+
+function tier(s){
+  if(s>=85)return{l:"ELITE FIT",bg:"#0d2a0d",c:"#2ECC71"};
+  if(s>=70)return{l:"STRONG FIT",bg:"#1a2a0a",c:"#8BC34A"};
+  if(s>=55)return{l:"GOOD FIT",bg:"#1a1a00",c:"#B8964A"};
+  if(s>=40)return{l:"MODERATE FIT",bg:"#1a0d00",c:"#E67E22"};
+  return{l:"POOR FIT",bg:"#1a0000",c:"#E74C3C"};
+}
+
+function calcScore(res,md){
+  var s=50;
+  if(res.verdict==="PASS")s+=20;else if(res.verdict==="FAIL")s-=15;
+  if(res.confidence==="High")s+=10;else if(res.confidence==="Medium")s+=5;else if(res.confidence==="Low")s-=5;
+  var n=Object.values(res.craftsman_alignment||{}).join(" ").toLowerCase();
+  if(n.indexOf("strong")>=0||n.indexOf("excellent")>=0)s+=8;
+  if(n.indexOf("concern")>=0||n.indexOf("below")>=0||n.indexOf("risk")>=0)s-=8;
+  if(n.indexOf("ab stack")>=0||n.indexOf("craftsman")>=0)s+=5;
+  if(md==="employee")s+=5;
+  return Math.max(25,Math.min(95,s));
+}
+
+function stars(n){var o="";for(var i=0;i<5;i++)o+='<span style="color:'+(i<n?"#B8964A":"#1a2a1a")+';font-size:13px;">&#9733;</span>';return o;}
+function bar(p,c){return '<div class="bw"><div class="bf" style="width:'+p+'%;background:'+c+';"></div></div>';}
+
+function shareCard(){
+  if(navigator.share){
+    var d=window._data||{};
+    navigator.share({title:'H.E.R.O. Assessment — '+(d.name||""),text:(d.name||"")+" | "+(d.result&&d.result.verdict||"")});
+  }else{
+    navigator.clipboard.writeText(window.location.href).then(function(){alert("Link copied!");});
+  }
+}
+
+function render(data){
+  var result=data.result,name=data.name,date=data.date,roleLabel=data.roleLabel,mode=data.mode;
+  var fs=calcScore(result,mode),t=tier(fs);
+  var vc=result.verdict==="PASS"?"#8BC34A":result.verdict==="FAIL"?"#E74C3C":"#B8964A";
+  var vb=result.verdict==="PASS"?"#0a1a0a":result.verdict==="FAIL"?"#1a0000":"#1a1000";
+  var ht=result.hero_alignment_scores?(result.hero_alignment_scores.honest||0)+(result.hero_alignment_scores.excellence||0)+(result.hero_alignment_scores.respect||0)+(result.hero_alignment_scores.ownIt||0):null;
+  var ICONS=["🔧","⚙️","📋","🏅","🎯","🛡️"];
+  var bdg=result.verdict==="PASS"?["Process Expert","Consistent","Team Oriented","Detail Focused","Accountable","Reliable"]:["Needs Development","Monitoring Req","Coaching Focus","Skills Review","Growth Potential","Check Again"];
+  var pf=[{r:"Field Technician",s:result.verdict==="PASS"?5:2},{r:"Assistant Tech",s:result.verdict==="PASS"?4:2},{r:"Lead Technician",s:result.verdict==="PASS"?3:1},{r:"Quality Assurance",s:fs>=65?3:2},{r:"Field Supervisor",s:fs>=75?3:1}];
+  var lb=[{l:"Technical Aptitude",p:Math.min(90,fs>=70?fs+10:Math.max(30,fs))},{l:"Process Ownership",p:Math.min(85,fs>=65?fs+8:Math.max(25,fs-5))},{l:"Quality Focus",p:Math.min(88,fs>=60?fs+12:Math.max(30,fs))},{l:"People Leadership",p:Math.max(20,fs-25)},{l:"Strategic Thinking",p:Math.max(15,fs-35)}];
+
+  // Header
+  var html='<div class="c" style="border:2px solid #B8964A;display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;padding:9px 13px;">';
+  html+='<div style="display:flex;align-items:center;gap:11px;">';
+  html+='<div style="width:50px;height:50px;background:linear-gradient(135deg,#B8964A,#D4AF6A);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-direction:column;border:2px solid #1B2A4A;"><div style="font-size:9px;font-weight:900;color:#1B2A4A;letter-spacing:2px;">H.E.R.O.</div><div style="font-size:6px;color:#1B2A4A;">CERTIFIED</div></div>';
+  html+='<div><div style="font-size:8px;letter-spacing:4px;color:#D4AF6A;">H.E.R.O. CERTIFIED</div><div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;">TALENT ASSESSMENT</div><div style="font-size:9px;color:#506090;">HOODZ of the MidSouth</div></div></div>';
+  html+='<div style="text-align:right;"><div style="font-size:8px;letter-spacing:3px;color:#D4AF6A;">CI PATTERN</div><div style="font-size:18px;font-weight:900;color:#B8964A;">'+(result.role||roleLabel||"CRAFTSMAN").toUpperCase()+'</div></div></div>';
+
+  // Name + Score
+  html+='<div class="g2"><div class="c"><div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:2px;">'+name.toUpperCase()+'</div>';
+  html+='<div style="font-size:10px;color:#B8964A;margin-bottom:9px;">'+roleLabel+' &middot; '+(mode==="employee"?"Development Review":"Hiring Screen")+'</div>';
+  html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;">';
+  html+='<div><span style="font-size:9px;color:#506090;min-width:75px;display:inline-block;">Assessed</span><span style="font-size:9px;color:#D4AF6A;font-weight:600;">'+date+'</span></div>';
+  html+='<div><span style="font-size:9px;color:#506090;min-width:75px;display:inline-block;">Confidence</span><span style="font-size:9px;color:#D4AF6A;font-weight:600;">'+result.confidence+'</span></div></div></div>';
+  html+='<div class="gcol"><div class="c" style="border:2px solid #B8964A;text-align:center;flex:1;">';
+  html+='<div style="font-size:8px;letter-spacing:2px;color:#D4AF6A;margin-bottom:1px;">HOODZ FIT SCORE</div>';
+  html+='<div style="font-size:46px;font-weight:900;color:#B8964A;line-height:1;">'+fs+'</div>';
+  html+='<div style="font-size:10px;color:#507090;">/100</div>';
+  html+='<div style="margin-top:5px;background:'+t.bg+';color:'+t.c+';border:1px solid '+t.c+'44;border-radius:4px;padding:2px 5px;font-size:9px;font-weight:800;">'+t.l+'</div></div>';
+  html+='<div class="c" style="text-align:center;padding:7px 10px;"><div style="font-size:8px;letter-spacing:2px;color:#D4AF6A;">VERDICT</div>';
+  html+='<div style="font-size:12px;font-weight:900;color:'+vc+';">'+(result.verdict==="PASS"?"HIRE":result.verdict==="FAIL"?"DO NOT HIRE":"BORDERLINE")+'</div></div></div></div>';
+
+  // HERO Alignment
+  var heroH="";
+  if(result.hero_alignment_scores){
+    var hArr=[["Honesty",result.hero_alignment_scores.honest],["Excellence",result.hero_alignment_scores.excellence],["Respect",result.hero_alignment_scores.respect],["Own It",result.hero_alignment_scores.ownIt]];
+    for(var hi=0;hi<hArr.length;hi++){var hv=hArr[hi][1];if(hv!=null){var hc=hv>=9?"#2ECC71":hv>=7?"#B8964A":"#E67E22";heroH+='<div style="margin-bottom:7px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;"><div style="font-size:10px;color:#fff;">'+hArr[hi][0]+'</div><span style="font-size:11px;font-weight:900;color:'+hc+';">'+hv+'/10</span></div>'+bar(hv*10,'linear-gradient(90deg,#C0392B,'+hc+')')+'</div>';}}
+    if(ht)heroH+='<div style="margin-top:7px;border-top:1px solid rgba(184,150,74,0.2);padding-top:5px;text-align:center;"><div style="font-size:8px;color:#507090;">OVERALL H.E.R.O.</div><div style="font-size:24px;font-weight:900;color:#B8964A;">'+ht+'<span style="font-size:11px;color:#507090;">/40</span></div></div>';
+  }else{heroH='<div style="text-align:center;padding:16px;color:#506090;font-size:10px;">H.E.R.O. scores not in this report.</div>';}
+
+  // Dimensions
+  var dimH="";
+  if(result.craftsman_alignment){
+    var ks=Object.keys(result.craftsman_alignment);
+    for(var di=0;di<ks.length;di++){if(ks[di]!=="overall_fit")dimH+='<div style="margin-bottom:7px;padding-bottom:6px;border-bottom:1px solid #0d1a2e;"><div style="font-size:10px;font-weight:800;color:#B8964A;text-transform:uppercase;margin-bottom:1px;">'+ks[di]+'</div><div style="font-size:9px;color:#d0c090;line-height:1.4;">'+result.craftsman_alignment[ks[di]]+'</div></div>';}
+    if(result.craftsman_alignment.overall_fit)dimH+='<div style="background:#0d1a2e;border:1px solid rgba(184,150,74,0.25);border-radius:4px;padding:7px 9px;"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">OVERALL FIT</div><div style="font-size:9px;color:#d0c090;line-height:1.4;">'+result.craftsman_alignment.overall_fit+'</div></div>';
+  }else{dimH='<div style="color:#506090;font-size:10px;text-align:center;padding:16px;">No dimension data.</div>';}
+
+  // Position fit
+  var pfH="";for(var pi=0;pi<pf.length;pi++)pfH+='<div style="margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid rgba(184,150,74,0.1);"><div style="font-size:10px;color:#fff;margin-bottom:2px;">'+pf[pi].r+'</div><div>'+stars(pf[pi].s)+'</div></div>';
+
+  html+='<div class="g3"><div class="c"><div class="ct">H.E.R.O. Alignment</div>'+heroH+'</div>';
+  html+='<div class="c"><div class="ct">Dimension Breakdown</div>'+dimH+'</div>';
+  html+='<div class="c"><div class="ct">Best Position Fit</div>'+pfH+'<div style="font-size:8px;color:#507090;margin-top:3px;">5=Excellent &middot; 1=Poor</div></div></div>';
+
+  // Strengths + Watch + Leadership
+  var strH="";var sa=result.strengths||[];for(var si=0;si<sa.length;si++)strH+='<div style="display:flex;gap:5px;margin-bottom:5px;"><span style="color:#4EC94E;font-size:10px;">&#10003;</span><span style="font-size:9px;color:#D4AF6A;line-height:1.4;">'+sa[si]+'</span></div>';
+  var wlH="";var wa=result.watch_areas||[];for(var wi=0;wi<wa.length;wi++)wlH+='<div style="display:flex;gap:5px;margin-bottom:5px;"><span style="color:#B8964A;font-size:10px;">!</span><span style="font-size:9px;color:#D4AF6A;line-height:1.4;">'+wa[wi]+'</span></div>';
+  var lbH="";for(var li=0;li<lb.length;li++){var lc=lb[li].p>=75?"linear-gradient(90deg,#1a6b2a,#4EC94E)":lb[li].p>=55?"linear-gradient(90deg,#B8964A,#D4AF6A)":"linear-gradient(90deg,#6b2a0a,#c05a20)";var tc=lb[li].p>=75?"#4EC94E":lb[li].p>=55?"#B8964A":"#E67E22";lbH+='<div style="margin-bottom:6px;"><div style="display:flex;justify-content:space-between;font-size:10px;color:#D4AF6A;margin-bottom:1px;"><span>'+lb[li].l+'</span><span style="color:'+tc+';">'+lb[li].p+'%</span></div>'+bar(lb[li].p,lc)+'</div>';}
+
+  html+='<div class="g3b"><div class="c" style="background:linear-gradient(135deg,#0a1a0a,#0d2010);border:1px solid #1a3a1a;"><div class="ct" style="color:#4EC94E;">Strengths</div>'+strH+'</div>';
+  html+='<div class="c" style="background:linear-gradient(135deg,#1a0d00,#201000);border:1px solid #3a2a00;"><div class="ct" style="color:#B8964A;">Watch Areas</div>'+wlH+'</div>';
+  html+='<div class="c"><div class="ct">Leadership Potential</div>'+lbH+'</div></div>';
+
+  // Playbook
+  var wa2=(result.watch_areas||["Monitor areas."]).slice(0,2).join(" / ");
+  html+='<div class="c" style="margin-bottom:9px;"><div class="ct">Leadership Playbook</div><div class="g5">';
+  html+='<div style="background:#07101f;border-radius:4px;padding:7px;border:1px solid rgba(184,150,74,0.12);"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">MOTIVATE</div><div style="font-size:8px;color:#90a0b8;line-height:1.5;">Recognize privately. Give ownership. Provide stability and clear structure.</div></div>';
+  html+='<div style="background:#07101f;border-radius:4px;padding:7px;border:1px solid rgba(184,150,74,0.12);"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">COMMUNICATE</div><div style="font-size:8px;color:#90a0b8;line-height:1.5;">Be direct. Use written instructions. Explain the why behind changes.</div></div>';
+  html+='<div style="background:#07101f;border-radius:4px;padding:7px;border:1px solid rgba(184,150,74,0.12);"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">COACHING</div><div style="font-size:8px;color:#90a0b8;line-height:1.5;">Correct privately. Introduce change gradually. Reinforce consistency.</div></div>';
+  html+='<div style="background:#07101f;border-radius:4px;padding:7px;border:1px solid rgba(184,150,74,0.12);"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">WATCH FOR</div><div style="font-size:8px;color:#90a0b8;line-height:1.5;">'+wa2+'</div></div>';
+  html+='<div style="background:#07101f;border-radius:4px;padding:7px;border:1px solid rgba(184,150,74,0.12);"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">ENVIRONMENT</div><div style="font-size:8px;color:#90a0b8;line-height:1.5;">Structured, predictable, clear procedures and consistent expectations.</div></div></div></div>';
+
+  // Verdict + Badges
+  var rec=result.hiring_recommendation||"See analysis notes.";
+  var vl=result.verdict==="PASS"?"HIRE":result.verdict==="FAIL"?"DO NOT HIRE":"BORDERLINE";
+  var vi=result.verdict==="PASS"?"&#9989;":result.verdict==="FAIL"?"&#10060;":"&#9888;";
+  var bdgH="";for(var bi=0;bi<bdg.length;bi++)bdgH+='<div style="background:#07101f;border:1px solid rgba(184,150,74,0.25);border-radius:4px;padding:6px 4px;text-align:center;"><div style="font-size:17px;margin-bottom:1px;">'+ICONS[bi]+'</div><div style="font-size:7px;font-weight:800;color:#D4AF6A;line-height:1.3;">'+bdg[bi].toUpperCase()+'</div></div>';
+
+  html+='<div class="g2v"><div class="c" style="background:linear-gradient(135deg,'+vb+',#07101f);border:2px solid '+vc+';display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">';
+  html+='<div style="font-size:36px;margin-bottom:3px;">'+vi+'</div>';
+  html+='<div style="font-size:15px;font-weight:900;letter-spacing:2px;color:'+vc+';margin-bottom:4px;">'+vl+'</div>';
+  html+='<div style="font-size:9px;color:#D4AF6A;letter-spacing:2px;margin-bottom:5px;">HIRING RECOMMENDATION</div>';
+  html+='<div style="font-size:9px;color:#fff;line-height:1.5;margin-bottom:7px;font-style:italic;">"'+rec+'"</div>';
+  html+='<div style="padding:3px 8px;border-radius:3px;font-size:9px;font-weight:700;background:'+vb+';color:'+vc+';border:1px solid '+vc+'44;">Confidence: '+result.confidence+'</div></div>';
+  html+='<div class="c"><div class="ct">Strength Indicators</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:7px;">'+bdgH+'</div>';
+  html+='<div style="font-size:8px;color:#D4AF6A;font-style:italic;text-align:center;padding:5px 7px;background:#07101f;border:1px solid rgba(184,150,74,0.15);border-radius:4px;line-height:1.5;">H.E.R.O. Command Center &middot; HOODZ of the MidSouth &middot; '+date+'</div></div></div>';
+
+  html+='<div class="ft"><div style="font-size:9px;color:#B8964A;letter-spacing:1px;">H.E.R.O. CERTIFIED &middot; PEOPLE PROTECTING PEOPLE</div><div style="font-size:9px;color:#406080;">HOODZ FIRE PREVENTION &middot; CONFIDENTIAL</div></div>';
+
+  document.getElementById("scorecard-content").innerHTML=html;
+  document.title="H.E.R.O. Assessment \u2014 "+name;
+}
+
+// Load data from sessionStorage
+try{
+  var raw=localStorage.getItem('hero_scorecard_data');
+  if(raw){
+    var data=JSON.parse(raw);
+    window._data=data;
+    render(data);
+  }else{
+    document.getElementById("scorecard-content").innerHTML='<div style="text-align:center;padding:40px;"><div style="font-size:36px;margin-bottom:16px;">⚠️</div><div style="font-size:16px;color:#B8964A;margin-bottom:8px;">No assessment data found.</div><div style="font-size:12px;color:#506090;">Please run a Culture Index analysis in the Command Center first, then click the scorecard button.</div><button onclick="window.close()" style="margin-top:20px;padding:10px 20px;background:#1B2A4A;color:#B8964A;border:1px solid #B8964A;border-radius:6px;cursor:pointer;font-size:12px;">Close</button></div>';
+  }
+}catch(e){
+  document.getElementById("scorecard-content").innerHTML='<div style="text-align:center;padding:40px;color:#E74C3C;">Error loading data: '+e.message+'</div>';
+}
+</script>
+</body>
+</html>
