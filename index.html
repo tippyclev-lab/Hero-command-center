@@ -2299,10 +2299,7 @@ Registry</button>}</div>}</td></tr>;})}
 
 </tbody>
 
-</table>
-              <ScorecardButton result={result} name={name} date={date||new Date().toISOString().slice(0,10)} role={role} mode={mode}/>
-
-</div>
+</table></div>
 
 )}
 
@@ -3341,10 +3338,8 @@ function getCIKey(){ return localStorage.getItem('hero_ci_key')||''; }
 function setCIKey(k){ localStorage.setItem('hero_ci_key',k); }
 
 
-// ── HERO TALENT ASSESSMENT SCORECARD ─────────────────────────────────────────
-function generateScorecard(result, name, date, roleLabel, mode, logo) {
-  const GOLD="#B8964A",GOLD2="#D4AF6A",GREEN="#1A6B2A";
-  
+function generateScorecard(result,name,date,roleLabel,mode,logo){
+  const GOLD="#B8964A",GOLD2="#D4AF6A";
   function scoreTier(s){
     if(s>=85)return{label:"ELITE FIT",bg:"#0d2a0d",color:"#2ECC71"};
     if(s>=70)return{label:"STRONG FIT",bg:"#1a2a0a",color:"#8BC34A"};
@@ -3352,188 +3347,41 @@ function generateScorecard(result, name, date, roleLabel, mode, logo) {
     if(s>=40)return{label:"MODERATE FIT",bg:"#1a0d00",color:"#E67E22"};
     return{label:"POOR FIT",bg:"#1a0000",color:"#E74C3C"};
   }
-
-  function calcFitScore(res) {
-    let score = 50;
-    if(res.verdict==="PASS") score += 20; else if(res.verdict==="FAIL") score -= 15;
-    if(res.confidence==="High") score += 10; else if(res.confidence==="Medium") score += 5; else if(res.confidence==="Low") score -= 5;
-    const notes = Object.values(res.craftsman_alignment||{}).join(" ").toLowerCase();
-    if(notes.includes("strong")||notes.includes("excellent")||notes.includes("aligns well")) score += 8;
-    if(notes.includes("concern")||notes.includes("below")||notes.includes("risk")) score -= 8;
-    if(notes.includes("ab stack")||notes.includes("craftsman")) score += 5;
-    if(mode==="employee") score += 5;
-    return Math.max(25, Math.min(95, score));
+  function calcScore(res,md){
+    let s=50;
+    if(res.verdict==="PASS")s+=20;else if(res.verdict==="FAIL")s-=15;
+    if(res.confidence==="High")s+=10;else if(res.confidence==="Medium")s+=5;else if(res.confidence==="Low")s-=5;
+    const n=Object.values(res.craftsman_alignment||{}).join(" ").toLowerCase();
+    if(n.includes("strong")||n.includes("excellent")||n.includes("aligns well"))s+=8;
+    if(n.includes("concern")||n.includes("below")||n.includes("risk"))s-=8;
+    if(n.includes("ab stack")||n.includes("craftsman"))s+=5;
+    if(md==="employee")s+=5;
+    return Math.max(25,Math.min(95,s));
   }
-
-  const fitScore = calcFitScore(result);
-  const tier = scoreTier(fitScore);
-  const verdictColor = result.verdict==="PASS" ? "#8BC34A" : result.verdict==="FAIL" ? "#E74C3C" : GOLD;
-  const verdictBg = result.verdict==="PASS" ? "#0a1a0a" : result.verdict==="FAIL" ? "#1a0000" : "#1a1000";
-  const heroTotal = result.hero_alignment_scores ? 
-    (result.hero_alignment_scores.honest||0)+(result.hero_alignment_scores.excellence||0)+
-    (result.hero_alignment_scores.respect||0)+(result.hero_alignment_scores.ownIt||0) : null;
-  const positionFit = [
-    {r:"Field Technician", s: result.verdict==="PASS"?5:2},
-    {r:"Assistant Technician", s: result.verdict==="PASS"?4:2},
-    {r:"Lead Technician", s: result.verdict==="PASS"?3:1},
-    {r:"Quality Assurance", s: fitScore>=65?3:2},
-    {r:"Field Supervisor", s: fitScore>=75?3:1},
-  ];
-  const lBars = [
-    {l:"Technical Aptitude", p: Math.min(90,fitScore>=70?fitScore+10:Math.max(30,fitScore))},
-    {l:"Process Ownership", p: Math.min(85,fitScore>=65?fitScore+8:Math.max(25,fitScore-5))},
-    {l:"Quality Focus", p: Math.min(88,fitScore>=60?fitScore+12:Math.max(30,fitScore))},
-    {l:"People Leadership", p: Math.max(20,fitScore-25)},
-    {l:"Strategic Thinking", p: Math.max(15,fitScore-35)},
-  ];
+  const fs=calcScore(result,mode),tier=scoreTier(fs);
+  const vc=result.verdict==="PASS"?"#8BC34A":result.verdict==="FAIL"?"#E74C3C":GOLD;
+  const vb=result.verdict==="PASS"?"#0a1a0a":result.verdict==="FAIL"?"#1a0000":"#1a1000";
+  const ht=result.hero_alignment_scores?(result.hero_alignment_scores.honest||0)+(result.hero_alignment_scores.excellence||0)+(result.hero_alignment_scores.respect||0)+(result.hero_alignment_scores.ownIt||0):null;
+  const pf=[{r:"Field Technician",s:result.verdict==="PASS"?5:2},{r:"Assistant Technician",s:result.verdict==="PASS"?4:2},{r:"Lead Technician",s:result.verdict==="PASS"?3:1},{r:"Quality Assurance",s:fs>=65?3:2},{r:"Field Supervisor",s:fs>=75?3:1}];
+  const lb=[{l:"Technical Aptitude",p:Math.min(90,fs>=70?fs+10:Math.max(30,fs))},{l:"Process Ownership",p:Math.min(85,fs>=65?fs+8:Math.max(25,fs-5))},{l:"Quality Focus",p:Math.min(88,fs>=60?fs+12:Math.max(30,fs))},{l:"People Leadership",p:Math.max(20,fs-25)},{l:"Strategic Thinking",p:Math.max(15,fs-35)}];
   const ICONS=["🔧","⚙️","📋","🏅","🎯","🛡️"];
-  const badges = result.verdict==="PASS" ?
-    ["Process Expert","Consistent Worker","Team Oriented","Detail Focused","Accountable","Reliable"] :
-    ["Needs Development","Monitoring Req.","Coaching Focus","Skills Review","Growth Potential","Check Again"];
-
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>H.E.R.O. Assessment — ${name}</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Open+Sans:wght@400;600;700&display=swap');
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:#060d1a;color:#fff;font-family:'Open Sans',sans-serif;}
-.pg{max-width:900px;margin:0 auto;padding:14px;}
-@media print{body{background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}.no-print{display:none!important;}.pg{padding:0;max-width:100%;}}
-.c{background:linear-gradient(135deg,#1B2A4A,#0d1a2e);border:1px solid rgba(184,150,74,0.25);border-radius:8px;padding:11px 13px;}
-.ct{font-size:9px;font-weight:700;color:#D4AF6A;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:7px;text-align:center;font-family:'Cinzel',serif;}
-.g2{display:grid;grid-template-columns:1fr 140px;gap:9px;margin-bottom:9px;}
-.g3{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:9px;margin-bottom:9px;}
-.g3b{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:9px;}
-.g2v{display:grid;grid-template-columns:1fr 1.6fr;gap:9px;margin-bottom:9px;}
-.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;}
-.gcol{display:flex;flex-direction:column;gap:7px;}
-.bw{background:#0d1a2e;border-radius:3px;height:7px;overflow:hidden;margin-top:2px;}
-.bf{height:100%;border-radius:3px;}
-.ft{border-top:1px solid rgba(184,150,74,0.3);padding-top:7px;display:flex;justify-content:space-between;margin-top:9px;}
-.btn{padding:8px 16px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;border:none;}
-</style></head><body><div class="pg">
-<div class="no-print" style="display:flex;gap:8px;margin-bottom:11px;flex-wrap:wrap;">
-  <button class="btn" style="background:linear-gradient(135deg,#B8964A,#D4AF6A);color:#1B2A4A;" onclick="window.print()">🖨️ Print / Save as PDF</button>
-  <button class="btn" style="background:#1B2A4A;color:#B8964A;border:1px solid #B8964A;" onclick="if(navigator.share)navigator.share({title:'H.E.R.O. — ${name}',text:'${name} | ${result.verdict} | ${fitScore}/100'});else navigator.clipboard.writeText(window.location.href).then(()=>alert('Link copied!'));">📤 Share</button>
-  <button class="btn" style="background:#1B2A4A;color:#B8964A;border:1px solid #B8964A;" onclick="window.close()">✕ Close</button>
-</div>
-<div class="c" style="border:2px solid #B8964A;display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;padding:9px 13px;">
-  <div style="display:flex;align-items:center;gap:11px;">
-    <img src="${logo}" style="width:50px;height:50px;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" alt="HERO"/>
-    <div style="display:none;width:50px;height:50px;background:linear-gradient(135deg,#B8964A,#D4AF6A);border-radius:7px;align-items:center;justify-content:center;flex-direction:column;"><div style="font-size:9px;font-weight:900;color:#1B2A4A;letter-spacing:2px;font-family:Cinzel,serif;">H.E.R.O.</div><div style="font-size:6px;color:#1B2A4A;">CERTIFIED</div></div>
-    <div>
-      <div style="font-size:8px;letter-spacing:4px;color:#D4AF6A;font-family:'Cinzel',serif;">H.E.R.O. CERTIFIED</div>
-      <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;font-family:'Cinzel',serif;">TALENT ASSESSMENT</div>
-      <div style="font-size:9px;color:#506090;">HOODZ of the MidSouth · Fire Prevention</div>
-    </div>
-  </div>
-  <div style="text-align:right;">
-    <div style="font-size:8px;letter-spacing:3px;color:#D4AF6A;">CI PATTERN</div>
-    <div style="font-size:18px;font-weight:900;color:#B8964A;font-family:'Cinzel',serif;">${(result.role||roleLabel||"CRAFTSMAN").toUpperCase()}</div>
-  </div>
-</div>
-<div class="g2">
-  <div class="c">
-    <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:2px;font-family:'Cinzel',serif;">${name.toUpperCase()}</div>
-    <div style="font-size:10px;color:#B8964A;margin-bottom:9px;">${roleLabel} · ${mode==="employee"?"Development Review":"Hiring Screen"}</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;">
-      <div><span style="font-size:9px;color:#506090;min-width:75px;display:inline-block;">Assessed</span><span style="font-size:9px;color:#D4AF6A;font-weight:600;">${date}</span></div>
-      <div><span style="font-size:9px;color:#506090;min-width:75px;display:inline-block;">Confidence</span><span style="font-size:9px;color:#D4AF6A;font-weight:600;">${result.confidence}</span></div>
-    </div>
-  </div>
-  <div class="gcol">
-    <div class="c" style="border:2px solid #B8964A;text-align:center;flex:1;">
-      <div style="font-size:8px;letter-spacing:2px;color:#D4AF6A;margin-bottom:1px;">HOODZ FIT SCORE</div>
-      <div style="font-size:46px;font-weight:900;color:#B8964A;line-height:1;font-family:'Cinzel',serif;">${fitScore}</div>
-      <div style="font-size:10px;color:#507090;">/100</div>
-      <div style="margin-top:5px;background:${tier.bg};color:${tier.color};border:1px solid ${tier.color}44;border-radius:4px;padding:2px 5px;font-size:9px;font-weight:800;">${tier.label}</div>
-    </div>
-    <div class="c" style="text-align:center;padding:7px 10px;">
-      <div style="font-size:8px;letter-spacing:2px;color:#D4AF6A;">VERDICT</div>
-      <div style="font-size:12px;font-weight:900;color:${verdictColor};font-family:'Cinzel',serif;">${result.verdict==="PASS"?"HIRE":result.verdict==="FAIL"?"DO NOT HIRE":"BORDERLINE"}</div>
-    </div>
-  </div>
-</div>
-<div class="g3">
-  <div class="c">
-    <div class="ct">H.E.R.O. Alignment</div>
-    ${result.hero_alignment_scores ?
-      [["🛡️","HONESTY",result.hero_alignment_scores.honest],["⭐","EXCELLENCE",result.hero_alignment_scores.excellence],["🤝","RESPECT",result.hero_alignment_scores.respect],["🎯","OWN IT",result.hero_alignment_scores.ownIt]].map(([ic,lb,v])=>v!=null?`<div style="margin-bottom:7px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;"><div style="font-size:10px;color:#fff;">${ic} ${lb}</div><span style="font-size:11px;font-weight:900;color:${v>=9?"#2ECC71":v>=7?"#B8964A":"#E67E22"};">${v}/10</span></div><div class="bw"><div class="bf" style="width:${v*10}%;background:linear-gradient(90deg,#C0392B,${v>=9?"#2ECC71":v>=7?"#B8964A":"#E67E22"});"></div></div></div>`:"").join("")+
-      (heroTotal?`<div style="margin-top:7px;border-top:1px solid rgba(184,150,74,0.2);padding-top:5px;text-align:center;"><div style="font-size:8px;color:#507090;">OVERALL H.E.R.O.</div><div style="font-size:24px;font-weight:900;color:#B8964A;font-family:'Cinzel',serif;">${heroTotal}<span style="font-size:11px;color:#507090;">/40</span></div></div>`:"")
-      :`<div style="text-align:center;padding:16px;color:#506090;font-size:10px;">H.E.R.O. scores not present in this report.<br><span style="font-size:8px;">Only available in HOODZ-scored profiles.</span></div>`}
-  </div>
-  <div class="c">
-    <div class="ct">Dimension Breakdown</div>
-    ${result.craftsman_alignment?Object.entries(result.craftsman_alignment).filter(([k])=>k!=="overall_fit").map(([k,v])=>`<div style="margin-bottom:7px;padding-bottom:6px;border-bottom:1px solid #0d1a2e;"><div style="font-size:10px;font-weight:800;color:#B8964A;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1px;">${k}</div><div style="font-size:9px;color:#d0c090;line-height:1.4;">${v}</div></div>`).join("")+
-    (result.craftsman_alignment.overall_fit?`<div style="background:#0d1a2e;border:1px solid rgba(184,150,74,0.25);border-radius:4px;padding:7px 9px;"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">OVERALL FIT</div><div style="font-size:9px;color:#d0c090;line-height:1.4;">${result.craftsman_alignment.overall_fit}</div></div>`:""
-    ):`<div style="color:#506090;font-size:10px;text-align:center;padding:16px;">No dimension data.</div>`}
-  </div>
-  <div class="c">
-    <div class="ct">Best Position Fit</div>
-    ${positionFit.map(({r,s})=>`<div style="margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid rgba(184,150,74,0.1);"><div style="font-size:10px;color:#fff;margin-bottom:2px;">${r}</div><div>${Array.from({length:5}).map((_,i)=>`<span style="font-size:12px;color:${i<s?"#B8964A":"#1a2a1a"};">★</span>`).join("")}</div></div>`).join("")}
-    <div style="font-size:8px;color:#507090;margin-top:3px;">5 = Excellent · 1 = Poor Fit</div>
-  </div>
-</div>
-<div class="g3b">
-  <div class="c" style="background:linear-gradient(135deg,#0a1a0a,#0d2010);border:1px solid #1a3a1a;">
-    <div class="ct" style="color:#4EC94E;">💪 Strengths</div>
-    ${(result.strengths||[]).map(s=>`<div style="display:flex;gap:5px;margin-bottom:5px;"><span style="color:#4EC94E;font-size:10px;">✓</span><span style="font-size:9px;color:#D4AF6A;line-height:1.4;">${s}</span></div>`).join("")}
-  </div>
-  <div class="c" style="background:linear-gradient(135deg,#1a0d00,#201000);border:1px solid #3a2a00;">
-    <div class="ct" style="color:#B8964A;">⚠️ Watch Areas</div>
-    ${(result.watch_areas||[]).map(w=>`<div style="display:flex;gap:5px;margin-bottom:5px;"><span style="color:#B8964A;font-size:10px;">!</span><span style="font-size:9px;color:#D4AF6A;line-height:1.4;">${w}</span></div>`).join("")}
-  </div>
-  <div class="c">
-    <div class="ct">🌟 Leadership Potential</div>
-    ${lBars.map(({l,p})=>{const lc=p>=75?"linear-gradient(90deg,#1a6b2a,#4EC94E)":p>=55?`linear-gradient(90deg,#B8964A,#D4AF6A)`:"linear-gradient(90deg,#6b2a0a,#c05a20)";const tc=p>=75?"#4EC94E":p>=55?"#B8964A":"#E67E22";return`<div style="margin-bottom:6px;"><div style="display:flex;justify-content:space-between;font-size:10px;color:#D4AF6A;margin-bottom:1px;"><span>${l}</span><span style="color:${tc};">${p}%</span></div><div class="bw"><div class="bf" style="width:${p}%;background:${lc};"></div></div></div>`;}).join("")}
-  </div>
-</div>
-<div class="c" style="margin-bottom:9px;">
-  <div class="ct">📋 Leadership Playbook</div>
-  <div class="g5">
-    <div style="background:#07101f;border-radius:4px;padding:7px;border:1px solid rgba(184,150,74,0.12);"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">🎯 MOTIVATE</div><div style="font-size:8px;color:#90a0b8;line-height:1.5;">Provide clear expectations, recognize effort privately, allow ownership.</div></div>
-    <div style="background:#07101f;border-radius:4px;padding:7px;border:1px solid rgba(184,150,74,0.12);"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">💬 COMMUNICATE</div><div style="font-size:8px;color:#90a0b8;line-height:1.5;">Be direct and specific. Use written instructions. Explain the why.</div></div>
-    <div style="background:#07101f;border-radius:4px;padding:7px;border:1px solid rgba(184,150,74,0.12);"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">📈 COACHING</div><div style="font-size:8px;color:#90a0b8;line-height:1.5;">Correct privately. Introduce changes gradually. Reinforce consistency.</div></div>
-    <div style="background:#07101f;border-radius:4px;padding:7px;border:1px solid rgba(184,150,74,0.12);"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">⚡ WATCH FOR</div><div style="font-size:8px;color:#90a0b8;line-height:1.5;">${(result.watch_areas||["Monitor development areas."]).slice(0,2).join(" · ")}</div></div>
-    <div style="background:#07101f;border-radius:4px;padding:7px;border:1px solid rgba(184,150,74,0.12);"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">🏠 ENVIRONMENT</div><div style="font-size:8px;color:#90a0b8;line-height:1.5;">Structured, predictable, clear procedures and consistent expectations.</div></div>
-  </div>
-</div>
-<div class="g2v">
-  <div class="c" style="background:linear-gradient(135deg,${verdictBg},#07101f);border:2px solid ${verdictColor};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
-    <div style="font-size:36px;margin-bottom:3px;">${result.verdict==="PASS"?"✅":result.verdict==="FAIL"?"❌":"⚠️"}</div>
-    <div style="font-size:15px;font-weight:900;letter-spacing:2px;color:${verdictColor};margin-bottom:4px;font-family:'Cinzel',serif;">${result.verdict==="PASS"?"HIRE":"DO NOT HIRE"}</div>
-    <div style="font-size:9px;color:#D4AF6A;letter-spacing:2px;margin-bottom:5px;">HIRING RECOMMENDATION</div>
-    <div style="font-size:9px;color:#fff;line-height:1.5;margin-bottom:7px;font-style:italic;">"${result.hiring_recommendation||"See analysis notes above."}"</div>
-    <div style="padding:3px 8px;border-radius:3px;font-size:9px;font-weight:700;background:${verdictBg};color:${verdictColor};border:1px solid ${verdictColor}44;">Confidence: ${result.confidence}</div>
-  </div>
-  <div class="c">
-    <div class="ct">🏆 Strength Indicators</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:7px;">
-      ${badges.map((b,i)=>`<div style="background:#07101f;border:1px solid rgba(184,150,74,0.25);border-radius:4px;padding:6px 4px;text-align:center;"><div style="font-size:17px;margin-bottom:1px;">${ICONS[i]}</div><div style="font-size:7px;font-weight:800;color:#D4AF6A;line-height:1.3;">${b.toUpperCase()}</div></div>`).join("")}
-    </div>
-    <div style="font-size:8px;color:#D4AF6A;font-style:italic;text-align:center;padding:5px 7px;background:#07101f;border:1px solid rgba(184,150,74,0.15);border-radius:4px;line-height:1.5;">Assessment generated by H.E.R.O. Command Center · HOODZ of the MidSouth · ${date}</div>
-  </div>
-</div>
-<div class="ft">
-  <div style="font-size:9px;color:#B8964A;letter-spacing:1px;font-family:'Cinzel',serif;">H.E.R.O. CERTIFIED · PEOPLE PROTECTING PEOPLE</div>
-  <div style="font-size:9px;color:#406080;">HOODZ FIRE PREVENTION · CONFIDENTIAL</div>
-</div>
-</div></body></html>`;
+  const bdg=result.verdict==="PASS"?["Process Expert","Consistent Worker","Team Oriented","Detail Focused","Accountable","Reliable"]:["Needs Development","Monitoring Req.","Coaching Focus","Skills Review","Growth Potential","Check Again"];
+  const css=`*{box-sizing:border-box;margin:0;padding:0;}body{background:#060d1a;color:#fff;font-family:'Open Sans',sans-serif;}@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Open+Sans:wght@400;600;700&display=swap');.pg{max-width:900px;margin:0 auto;padding:14px;}.c{background:linear-gradient(135deg,#1B2A4A,#0d1a2e);border:1px solid rgba(184,150,74,0.25);border-radius:8px;padding:11px 13px;}.ct{font-size:9px;font-weight:700;color:#D4AF6A;letter-spacing:2px;text-transform:uppercase;margin-bottom:7px;text-align:center;font-family:Cinzel,serif;}.g2{display:grid;grid-template-columns:1fr 140px;gap:9px;margin-bottom:9px;}.g3{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:9px;margin-bottom:9px;}.g3b{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:9px;}.g2v{display:grid;grid-template-columns:1fr 1.6fr;gap:9px;margin-bottom:9px;}.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;}.gcol{display:flex;flex-direction:column;gap:7px;}.bw{background:#0d1a2e;border-radius:3px;height:7px;overflow:hidden;margin-top:2px;}.bf{height:100%;border-radius:3px;}.ft{border-top:1px solid rgba(184,150,74,0.3);padding-top:7px;display:flex;justify-content:space-between;margin-top:9px;}.btn{padding:8px 16px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;border:none;}@media print{body{background:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}.np{display:none!important;}.pg{padding:0;max-width:100%;}}`;
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><title>H.E.R.O. Assessment — ${name}</title><style>${css}</style></head><body><div class="pg"><div class="np" style="display:flex;gap:8px;margin-bottom:11px;flex-wrap:wrap;"><button class="btn" style="background:linear-gradient(135deg,#B8964A,#D4AF6A);color:#1B2A4A;" onclick="window.print()">🖨️ Print / Save as PDF</button><button class="btn" style="background:#1B2A4A;color:#B8964A;border:1px solid #B8964A;" onclick="if(navigator.share)navigator.share({title:'H.E.R.O. — ${name}',text:'${name} | ${result.verdict} | ${fs}/100'});else navigator.clipboard.writeText(window.location.href).then(()=>alert('Copied!'));">📤 Share</button><button class="btn" style="background:#1B2A4A;color:#B8964A;border:1px solid #B8964A;" onclick="window.close()">✕ Close</button></div><div class="c" style="border:2px solid #B8964A;display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;padding:9px 13px;"><div style="display:flex;align-items:center;gap:11px;"><img src="${logo}" style="width:50px;height:50px;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" alt="HERO"/><div style="display:none;width:50px;height:50px;background:linear-gradient(135deg,#B8964A,#D4AF6A);border-radius:7px;align-items:center;justify-content:center;flex-direction:column;"><div style="font-size:9px;font-weight:900;color:#1B2A4A;letter-spacing:2px;font-family:Cinzel,serif;">H.E.R.O.</div><div style="font-size:6px;color:#1B2A4A;">CERTIFIED</div></div><div><div style="font-size:8px;letter-spacing:4px;color:#D4AF6A;font-family:Cinzel,serif;">H.E.R.O. CERTIFIED</div><div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:1px;font-family:Cinzel,serif;">TALENT ASSESSMENT</div><div style="font-size:9px;color:#506090;">HOODZ of the MidSouth · Fire Prevention</div></div></div><div style="text-align:right;"><div style="font-size:8px;letter-spacing:3px;color:#D4AF6A;">CI PATTERN</div><div style="font-size:18px;font-weight:900;color:#B8964A;font-family:Cinzel,serif;">${(result.role||roleLabel||"CRAFTSMAN").toUpperCase()}</div></div></div><div class="g2"><div class="c"><div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:2px;font-family:Cinzel,serif;">${name.toUpperCase()}</div><div style="font-size:10px;color:#B8964A;margin-bottom:9px;">${roleLabel} · ${mode==="employee"?"Development Review":"Hiring Screen"}</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;"><div><span style="font-size:9px;color:#506090;min-width:75px;display:inline-block;">Assessed</span><span style="font-size:9px;color:#D4AF6A;font-weight:600;">${date}</span></div><div><span style="font-size:9px;color:#506090;min-width:75px;display:inline-block;">Confidence</span><span style="font-size:9px;color:#D4AF6A;font-weight:600;">${result.confidence}</span></div></div></div><div class="gcol"><div class="c" style="border:2px solid #B8964A;text-align:center;flex:1;"><div style="font-size:8px;letter-spacing:2px;color:#D4AF6A;margin-bottom:1px;">HOODZ FIT SCORE</div><div style="font-size:46px;font-weight:900;color:#B8964A;line-height:1;font-family:Cinzel,serif;">${fs}</div><div style="font-size:10px;color:#507090;">/100</div><div style="margin-top:5px;background:${tier.bg};color:${tier.color};border:1px solid ${tier.color}44;border-radius:4px;padding:2px 5px;font-size:9px;font-weight:800;">${tier.label}</div></div><div class="c" style="text-align:center;padding:7px 10px;"><div style="font-size:8px;letter-spacing:2px;color:#D4AF6A;">VERDICT</div><div style="font-size:12px;font-weight:900;color:${vc};font-family:Cinzel,serif;">${result.verdict==="PASS"?"HIRE":result.verdict==="FAIL"?"DO NOT HIRE":"BORDERLINE"}</div></div></div></div><div class="g3"><div class="c"><div class="ct">H.E.R.O. Alignment</div>${result.hero_alignment_scores?[["🛡️","HONESTY",result.hero_alignment_scores.honest],["⭐","EXCELLENCE",result.hero_alignment_scores.excellence],["🤝","RESPECT",result.hero_alignment_scores.respect],["🎯","OWN IT",result.hero_alignment_scores.ownIt]].map(([ic,lb2,v])=>v!=null?`<div style="margin-bottom:7px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;"><div style="font-size:10px;color:#fff;">${ic} ${lb2}</div><span style="font-size:11px;font-weight:900;color:${v>=9?"#2ECC71":v>=7?"#B8964A":"#E67E22"};">${v}/10</span></div><div class="bw"><div class="bf" style="width:${v*10}%;background:linear-gradient(90deg,#C0392B,${v>=9?"#2ECC71":v>=7?"#B8964A":"#E67E22"});"></div></div></div>`:"").join("")+(ht?`<div style="margin-top:7px;border-top:1px solid rgba(184,150,74,0.2);padding-top:5px;text-align:center;"><div style="font-size:8px;color:#507090;">OVERALL H.E.R.O.</div><div style="font-size:24px;font-weight:900;color:#B8964A;font-family:Cinzel,serif;">${ht}<span style="font-size:11px;color:#507090;">/40</span></div></div>`:""):`<div style="text-align:center;padding:16px;color:#506090;font-size:10px;">H.E.R.O. scores not in this report.</div>`}</div><div class="c"><div class="ct">Dimension Breakdown</div>${result.craftsman_alignment?Object.entries(result.craftsman_alignment).filter(([k])=>k!=="overall_fit").map(([k,v])=>`<div style="margin-bottom:7px;padding-bottom:6px;border-bottom:1px solid #0d1a2e;"><div style="font-size:10px;font-weight:800;color:#B8964A;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1px;">${k}</div><div style="font-size:9px;color:#d0c090;line-height:1.4;">${v}</div></div>`).join("")+(result.craftsman_alignment.overall_fit?`<div style="background:#0d1a2e;border:1px solid rgba(184,150,74,0.25);border-radius:4px;padding:7px 9px;"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">OVERALL FIT</div><div style="font-size:9px;color:#d0c090;line-height:1.4;">${result.craftsman_alignment.overall_fit}</div></div>`:"")+`<div style="font-size:8px;color:#507090;text-align:center;margin-top:4px;font-style:italic;">Analysis: ${mode==="employee"?"Development Review":"Hiring Screen"}</div>`:`<div style="color:#506090;font-size:10px;text-align:center;padding:16px;">No dimension data.</div>`}</div><div class="c"><div class="ct">Best Position Fit</div>${pf.map(({r,s})=>`<div style="margin-bottom:7px;padding-bottom:5px;border-bottom:1px solid rgba(184,150,74,0.1);"><div style="font-size:10px;color:#fff;margin-bottom:2px;">${r}</div><div>${Array.from({length:5}).map((_,i)=>`<span style="font-size:12px;color:${i<s?"#B8964A":"#1a2a1a"};">★</span>`).join("")}</div></div>`).join("")}<div style="font-size:8px;color:#507090;margin-top:3px;">5=Excellent · 1=Poor</div></div></div><div class="g3b"><div class="c" style="background:linear-gradient(135deg,#0a1a0a,#0d2010);border:1px solid #1a3a1a;"><div class="ct" style="color:#4EC94E;">💪 Strengths</div>${(result.strengths||[]).map(s=>`<div style="display:flex;gap:5px;margin-bottom:5px;"><span style="color:#4EC94E;font-size:10px;">✓</span><span style="font-size:9px;color:#D4AF6A;line-height:1.4;">${s}</span></div>`).join("")}</div><div class="c" style="background:linear-gradient(135deg,#1a0d00,#201000);border:1px solid #3a2a00;"><div class="ct" style="color:#B8964A;">⚠️ Watch Areas</div>${(result.watch_areas||[]).map(w=>`<div style="display:flex;gap:5px;margin-bottom:5px;"><span style="color:#B8964A;font-size:10px;">!</span><span style="font-size:9px;color:#D4AF6A;line-height:1.4;">${w}</span></div>`).join("")}</div><div class="c"><div class="ct">🌟 Leadership Potential</div>${lb.map(({l,p})=>{const lc=p>=75?"linear-gradient(90deg,#1a6b2a,#4EC94E)":p>=55?"linear-gradient(90deg,#B8964A,#D4AF6A)":"linear-gradient(90deg,#6b2a0a,#c05a20)";const tc=p>=75?"#4EC94E":p>=55?"#B8964A":"#E67E22";return`<div style="margin-bottom:6px;"><div style="display:flex;justify-content:space-between;font-size:10px;color:#D4AF6A;margin-bottom:1px;"><span>${l}</span><span style="color:${tc};">${p}%</span></div><div class="bw"><div class="bf" style="width:${p}%;background:${lc};"></div></div></div>`;}).join("")}</div></div><div class="c" style="margin-bottom:9px;"><div class="ct">📋 Leadership Playbook</div><div class="g5"><div style="background:#07101f;border-radius:4px;padding:7px;border:1px solid rgba(184,150,74,0.12);"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">🎯 MOTIVATE</div><div style="font-size:8px;color:#90a0b8;line-height:1.5;">Recognize privately. Give ownership. Provide stability and clear structure.</div></div><div style="background:#07101f;border-radius:4px;padding:7px;border:1px solid rgba(184,150,74,0.12);"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">💬 COMMUNICATE</div><div style="font-size:8px;color:#90a0b8;line-height:1.5;">Be direct. Use written instructions. Explain the why behind changes.</div></div><div style="background:#07101f;border-radius:4px;padding:7px;border:1px solid rgba(184,150,74,0.12);"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">📈 COACHING</div><div style="font-size:8px;color:#90a0b8;line-height:1.5;">Correct privately. Introduce change gradually. Reinforce consistency.</div></div><div style="background:#07101f;border-radius:4px;padding:7px;border:1px solid rgba(184,150,74,0.12);"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">⚡ WATCH FOR</div><div style="font-size:8px;color:#90a0b8;line-height:1.5;">${(result.watch_areas||["Monitor development areas."]).slice(0,2).join(" · ")}</div></div><div style="background:#07101f;border-radius:4px;padding:7px;border:1px solid rgba(184,150,74,0.12);"><div style="font-size:8px;font-weight:800;color:#B8964A;margin-bottom:2px;">🏠 ENVIRONMENT</div><div style="font-size:8px;color:#90a0b8;line-height:1.5;">Structured, predictable, clear procedures and consistent expectations.</div></div></div></div><div class="g2v"><div class="c" style="background:linear-gradient(135deg,${vb},#07101f);border:2px solid ${vc};display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;"><div style="font-size:36px;margin-bottom:3px;">${result.verdict==="PASS"?"✅":result.verdict==="FAIL"?"❌":"⚠️"}</div><div style="font-size:15px;font-weight:900;letter-spacing:2px;color:${vc};margin-bottom:4px;font-family:Cinzel,serif;">${result.verdict==="PASS"?"HIRE":"DO NOT HIRE"}</div><div style="font-size:9px;color:#D4AF6A;letter-spacing:2px;margin-bottom:5px;">HIRING RECOMMENDATION</div><div style="font-size:9px;color:#fff;line-height:1.5;margin-bottom:7px;font-style:italic;">"${result.hiring_recommendation||"See analysis notes."}"</div><div style="padding:3px 8px;border-radius:3px;font-size:9px;font-weight:700;background:${vb};color:${vc};border:1px solid ${vc}44;">Confidence: ${result.confidence}</div></div><div class="c"><div class="ct">🏆 Strength Indicators</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:7px;">${bdg.map((b,i)=>`<div style="background:#07101f;border:1px solid rgba(184,150,74,0.25);border-radius:4px;padding:6px 4px;text-align:center;"><div style="font-size:17px;margin-bottom:1px;">${ICONS[i]}</div><div style="font-size:7px;font-weight:800;color:#D4AF6A;line-height:1.3;">${b.toUpperCase()}</div></div>`).join("")}</div><div style="font-size:8px;color:#D4AF6A;font-style:italic;text-align:center;padding:5px 7px;background:#07101f;border:1px solid rgba(184,150,74,0.15);border-radius:4px;line-height:1.5;">H.E.R.O. Command Center · HOODZ of the MidSouth · ${date}</div></div></div><div class="ft"><div style="font-size:9px;color:#B8964A;letter-spacing:1px;font-family:Cinzel,serif;">H.E.R.O. CERTIFIED · PEOPLE PROTECTING PEOPLE</div><div style="font-size:9px;color:#406080;">HOODZ FIRE PREVENTION · CONFIDENTIAL</div></div></div></body></html>`;
 }
 
 function ScorecardButton({result,name,date,role,mode}){
-  function openScorecard(){
-    const roleLabel=(ROLE_PROFILES[role]||ROLE_PROFILES.asst_tech).label;
-    const html=generateScorecard(result,name,date||new Date().toISOString().slice(0,10),roleLabel,mode,LOGO);
+  function open(){
+    const rl=(ROLE_PROFILES[role]||ROLE_PROFILES.asst_tech).label;
+    const html=generateScorecard(result,name,date||new Date().toISOString().slice(0,10),rl,mode,LOGO);
     const blob=new Blob([html],{type:"text/html"});
     const url=URL.createObjectURL(blob);
     const win=window.open(url,"_blank","width=980,height=860,scrollbars=yes");
-    if(!win)alert("Pop-up blocked — please allow pop-ups for this site and try again.");
+    if(!win)alert("Pop-up blocked — please allow pop-ups for this site.");
     setTimeout(()=>URL.revokeObjectURL(url),120000);
   }
   return(
-    <button style={{...S.btn("primary"),padding:"11px 20px",fontSize:13,fontWeight:900,width:"100%",marginTop:10,background:`linear-gradient(135deg,${NAVY},#0a2030)`,border:`2px solid ${GOLD}`,letterSpacing:1,display:"flex",alignItems:"center",justifyContent:"center",gap:8}} onClick={openScorecard}>
+    <button style={{...S.btn("primary"),padding:"11px 20px",fontSize:13,fontWeight:900,width:"100%",marginTop:10,border:`2px solid ${GOLD}`,letterSpacing:1,display:"flex",alignItems:"center",justifyContent:"center",gap:8}} onClick={open}>
       <span style={{fontSize:16}}>🖨️</span> Generate &amp; Print Talent Assessment Scorecard
     </button>
   );
@@ -4046,6 +3894,8 @@ style={{background:"#0a1a0a",border:"1px solid
 14px",display:"flex",alignItems:"center",gap:8,marginTop:8}}><span>🔗</span><span
 style={{fontSize:12,color:"#60c060"}}>Result saved to
 <strong>{name}</strong>&#39;s Registry profile.</span></div>}
+
+<ScorecardButton result={result} name={name} date={date||new Date().toISOString().slice(0,10)} role={role} mode={mode}/>
 
 </div>
 
