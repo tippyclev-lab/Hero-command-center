@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+            <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
@@ -286,14 +286,89 @@ var CULTURE_TRAITS=[
 ];
 var HIRE_SCORES=["Culture Fit","Coachability","Reliability","Work Ethic","Leadership Potential"];
 var HIRE_DECISIONS=["Strong Hire","Hire","Hold","Do Not Hire"];
-var CRAFTSMAN_PROFILE=`The HOODZ "Craftsman" benchmark describes the ideal field technician pattern on a standard Culture Index-style profile:
-- Conformity: High (8-10). Follows safety procedures and established processes precisely; respects structure and protocol.
-- Pace/Patience: High (7-9). Methodical and steady; comfortable with repetitive, detail-heavy work; does not rush safety-critical tasks.
-- Autonomy: Moderate-to-high (6-9). Works independently and reliably once trained; does not require constant supervision.
-- Sociability: Moderate (5-8). Works well with crews and customers without needing to be the center of attention.
-- Logic/Ingenuity: Lower-to-moderate is acceptable and even expected — this role rewards consistency and dependability over rapid improvisation or high-risk decision-making.
-Strong candidates are dependable, safety-minded, detail-oriented, process-driven, and respect authority and structure — even if they are not naturally assertive or fast decision-makers.
-Caution flags: very low Conformity (rule-breaking risk), very low Patience (rushes through safety-critical work), or high Autonomy combined with low Conformity (resists direction).`;
+var ROLE_PROFILES={
+  asst_tech:{
+    label:"Assistant Technician",
+    hire:`HOODZ "Assistant Technician" HIRING benchmark (stricter standard — evaluating new hires):
+- Autonomy (A): Low-to-moderate (2-4). Should follow direction closely, not freelance decisions on job sites.
+- Sociability (B): Moderate (4-6). Friendly with customers and crew but not a distraction.
+- Pace/Patience (C): High (7-9). Methodical, steady, does not rush safety-critical tasks.
+- Conformity (D): Very high (8-10). Strict adherence to processes, safety protocols, and company standards is non-negotiable at this level.
+- Logic (E): Moderate (4-6). Basic troubleshooting ability; does not need to be highly analytical.
+- Energy (F): Moderate-to-high (5-7). Physically capable and engaged without burning out.
+Strong hire: dependable, process-driven, safety-minded, follows direction without resistance.
+Caution flags: low Conformity (safety risk), low Pace (rushes work), very high Autonomy without Conformity to balance it.`,
+    employee:`HOODZ "Assistant Technician" DEVELOPMENT benchmark (evaluating existing employee — more developmental lens):
+- Autonomy (A): Low-to-moderate (2-5). Some independence is fine once trained.
+- Sociability (B): Moderate (3-6). Team fit matters; some variation acceptable.
+- Pace/Patience (C): Moderate-to-high (6-9). Still needs to be steady and methodical.
+- Conformity (D): High (7-10). Process adherence remains critical even for existing employees.
+- Logic (E): Moderate (4-7). Growing analytical skills are a positive development sign.
+- Energy (F): Moderate (4-7). Sustained engagement over time.
+Focus: Is this person growing toward Lead Tech readiness? Watch for development in Autonomy and Logic.`
+  },
+  lead_tech:{
+    label:"Lead Technician",
+    hire:`HOODZ "Lead Technician" HIRING benchmark (stricter — this person will lead a crew):
+- Autonomy (A): Moderate-to-high (6-8). Must make independent job site decisions without constant check-ins.
+- Sociability (B): Moderate-to-high (5-7). Leads crew relationships and customer interactions.
+- Pace/Patience (C): Moderate-to-high (6-8). Steady under pressure; models calm for the crew.
+- Conformity (D): Moderate-to-high (6-8). Follows company standards AND enforces them with others.
+- Logic (E): Moderate-to-high (6-8). Diagnoses complex problems; makes sound technical decisions.
+- Energy (F): High (7-9). High output, sets the pace for the team.
+Strong hire: independent executor who also develops others, technically sharp, process-respecting.
+Caution flags: low Conformity (won't enforce standards), very low Sociability (poor crew leadership), low Logic (poor diagnostic ability).`,
+    employee:`HOODZ "Lead Technician" DEVELOPMENT benchmark (existing employee lens):
+- Autonomy (A): Moderate-to-high (5-8). Comfortable owning jobs end-to-end.
+- Sociability (B): Moderate (4-7). Leading crew effectively; some variation acceptable.
+- Pace/Patience (C): Moderate-to-high (5-8). Manages job flow without rushing crew.
+- Conformity (D): Moderate-to-high (5-8). Models compliance culture for the team.
+- Logic (E): Moderate-to-high (5-8). Growing into complex diagnostics.
+- Energy (F): Moderate-to-high (6-9). Consistent output and leadership presence.
+Focus: Is this person ready for Supervisor? Watch for Autonomy growth and Sociability as indicators.`
+  },
+  supervisor:{
+    label:"Supervisor",
+    hire:`HOODZ "Supervisor" HIRING benchmark (stricter — managing multiple techs and customer relationships):
+- Autonomy (A): High (7-9). Makes independent operational decisions; owns their territory.
+- Sociability (B): Moderate-to-high (6-8). Builds crew trust, manages customer escalations, communicates up to management.
+- Pace/Patience (C): Moderate (5-7). Manages urgency without losing composure; delegates effectively.
+- Conformity (D): Moderate (5-7). Respects process but exercises judgment; not rigidly rule-bound.
+- Logic (E): Moderate-to-high (6-8). Analyzes team performance, job profitability, and operational problems.
+- Energy (F): High (7-9). High drive; sets the standard for the team.
+Strong hire: decisive, relationship-driven, analytically capable, operationally accountable.
+Caution flags: very low Sociability (poor people leadership), very low Conformity (won't follow or enforce company direction), low Logic (can't diagnose operational problems).`,
+    employee:`HOODZ "Supervisor" DEVELOPMENT benchmark (existing employee lens):
+- Autonomy (A): High (6-9). Owns their operational domain with confidence.
+- Sociability (B): Moderate-to-high (5-8). Leads people effectively across crew and customer contexts.
+- Pace/Patience (C): Moderate (4-7). Balances urgency with steady decision-making.
+- Conformity (D): Moderate (4-7). Exercises sound judgment within company framework.
+- Logic (E): Moderate-to-high (5-8). Evaluates performance data and operational outcomes.
+- Energy (F): Moderate-to-high (6-9). Sustained leadership energy.
+Focus: Is this person ready for Manager? Watch for Logic growth and ability to operate more strategically.`
+  },
+  manager:{
+    label:"Manager",
+    hire:`HOODZ "Manager" HIRING benchmark (stricter — strategic, multi-team, P&L responsible):
+- Autonomy (A): Very high (8-10). Operates independently; owns outcomes without needing direction.
+- Sociability (B): Moderate-to-high (6-8). Builds organizational relationships, influences culture, communicates strategy.
+- Pace/Patience (C): Moderate (4-6). Comfortable with ambiguity and longer-horizon thinking; not impulsive.
+- Conformity (D): Low-to-moderate (3-6). Exercises strategic judgment; not bound by rigid process adherence.
+- Logic (E): High (8-10). Analytically driven; evaluates data, P&L, performance trends, and strategic options.
+- Energy (F): High (7-10). High capacity, resilient under sustained pressure.
+Strong hire: strategic, data-driven, autonomous, organizationally influential, results-accountable.
+Caution flags: low Logic (can't think strategically), very high Conformity (too process-bound for a strategic role), low Autonomy (won't operate independently at the right level).`,
+    employee:`HOODZ "Manager" DEVELOPMENT benchmark (existing employee lens):
+- Autonomy (A): Very high (7-10). Drives their domain with full ownership.
+- Sociability (B): Moderate-to-high (5-8). Organizational influence and leadership presence.
+- Pace/Patience (C): Moderate (4-7). Strategic patience; long-horizon thinking.
+- Conformity (D): Low-to-moderate (3-6). Judgment-driven rather than rule-driven.
+- Logic (E): High (7-10). Strategic analytical capability.
+- Energy (F): High (6-10). Sustained high-output leadership.
+Focus: Is this person ready for greater responsibility? Watch for strategic thinking, organizational influence, and P&L accountability growth.`
+  }
+};
+var CRAFTSMAN_PROFILE=ROLE_PROFILES.asst_tech.hire;
 var LEVEL_REQS={
   Candidate:["Leadership Recommendation","Mentor Assigned","Complete Passport","All 4 H.E.R.O. Cards","Development Activities"],
   Certified:["All Candidate Requirements","Mentor Review Complete","Certification Application","Council Approval"],
@@ -1220,6 +1295,7 @@ function setCIKey(k){ localStorage.setItem('hero_ci_key',k); }
 
 function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,onLock}){
   const [mode,setMode]=useState("candidate"); // "candidate" | "employee"
+  const [role,setRole]=useState("asst_tech"); // "asst_tech"|"lead_tech"|"supervisor"|"manager"
   const [file,setFile]=useState(null);const [preview,setPreview]=useState(null);const [fType,setFType]=useState(null);const [name,setName]=useState("");const [date,setDate]=useState("");const [notes,setNotes]=useState("");const [loading,setLoading]=useState(false);const [result,setResult]=useState(null);const [error,setError]=useState("");
   const [history,setHistory]=useState(()=>dbGet("hero_ci_history")||[]);
   const [view,setView]=useState("upload");
@@ -1235,11 +1311,15 @@ function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,on
     if(!file||!preview){setError("Upload a Culture Index profile first.");return;}
     if(!name.trim()){setError(mode==="employee"?"Select an employee first.":"Enter the candidate name.");return;}
     setLoading(true);setError("");setResult(null);
-    try{const b64=preview.split(",")[1];const mt=file.type||"image/jpeg";const isImg=fType==="image";const parts=[{type:isImg?"image":"document",source:{type:"base64",media_type:mt,data:b64}},{type:"text",text:`You are an HR analyst for HOODZ of the MidSouth.\nAnalyze this Culture Index / talent profile for: ${name}.\n\nCraftsman benchmark:\n${CRAFTSMAN_PROFILE}\n\nSome reports include HOODZ-specific scoring (an overall HOODZ Fit Score out of 100, and HERO Alignment scores for Honest/Excellence/Respect/Own It out of 10 each). If those exact figures appear in the document, extract them precisely. If they do not appear, leave those fields null rather than estimating.\n\nRespond ONLY with valid JSON (no markdown, no extra text):\n{"verdict":"PASS or FAIL","confidence":"High/Medium/Low","summary":"2-3 sentences","hero_fit_score":number or null,"hero_alignment_scores":{"honest":number or null,"excellence":number or null,"respect":number or null,"ownIt":number or null},"craftsman_alignment":{"autonomy":"note","sociability":"note","pace":"note","conformity":"note","overall_fit":"1-2 sentences"},"strengths":["s1","s2","s3"],"watch_areas":["w1","w2"],"hiring_recommendation":"one sentence","notes":"observations"}`}];
-    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":getCIKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1100,messages:[{role:"user",content:parts}]})});
+    try{const b64=preview.split(",")[1];const mt=file.type||"image/jpeg";const isImg=fType==="image";
+    const roleProfile=ROLE_PROFILES[role]||(ROLE_PROFILES.asst_tech);
+    const benchmark=mode==="employee"?roleProfile.employee:roleProfile.hire;
+    const roleLabel=roleProfile.label;
+    const parts=[{type:isImg?"image":"document",source:{type:"base64",media_type:mt,data:b64}},{type:"text",text:`You are an HR analyst for HOODZ of the MidSouth.\nAnalyze this Culture Index / talent profile for: ${name}.\nRole being evaluated for: ${roleLabel} (${mode==="employee"?"existing employee development review":"hiring candidate screening"}).\n\nRole benchmark:\n${benchmark}\n\nSome reports include HOODZ-specific scoring (an overall HOODZ Fit Score out of 100, and HERO Alignment scores for Honest/Excellence/Respect/Own It out of 10 each). If those exact figures appear in the document, extract them precisely. If they do not appear, leave those fields null rather than estimating.\n\nRespond ONLY with valid JSON (no markdown, no extra text):\n{"verdict":"PASS or FAIL","confidence":"High/Medium/Low","summary":"2-3 sentences","role":"${roleLabel}","context":"${mode==="employee"?"Development Review":"Hiring Screen"}","hero_fit_score":number or null,"hero_alignment_scores":{"honest":number or null,"excellence":number or null,"respect":number or null,"ownIt":number or null},"craftsman_alignment":{"autonomy":"note","sociability":"note","pace":"note","conformity":"note","logic":"note","energy":"note","overall_fit":"1-2 sentences"},"strengths":["s1","s2","s3"],"watch_areas":["w1","w2"],"hiring_recommendation":"one sentence","notes":"observations"}`}];
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":getCIKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1200,messages:[{role:"user",content:parts}]})});
     const data=await res.json();if(data.error)throw new Error(data.error.message);
     const raw=data.content.map(b=>b.text||"").join("").trim().replace(/```json|```/g,"").trim();
-    const parsed=JSON.parse(raw);const entry={id:Date.now(),name,date:date||new Date().toISOString().slice(0,10),notes,mode,result:parsed};
+    const parsed=JSON.parse(raw);const entry={id:Date.now(),name,date:date||new Date().toISOString().slice(0,10),notes,mode,role,roleLabel:(ROLE_PROFILES[role]||ROLE_PROFILES.asst_tech).label,result:parsed};
     setResult(parsed);setHistory(prev=>[entry,...prev]);
     if(mode==="candidate"&&candidates&&setCandidates){
       setCandidates(p=>p.map(c=>c.name&&c.name.toLowerCase().trim()===name.toLowerCase().trim()?{...c,cultureIndexResult:parsed.verdict,cultureIndexSummary:parsed.summary,cultureIndexDate:entry.date}:c));
@@ -1304,10 +1384,23 @@ function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,on
               <button style={{...S.btn(),fontSize:10,padding:"3px 8px"}} onClick={()=>setShowKeyInput(true)}>Change Key</button>
             </div>
           )}
-          <div style={{...S.card,background:"linear-gradient(135deg,#150f00,#0d0d00)",border:`1px solid ${GOLD}44`,marginBottom:12}}><div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}><span style={{fontSize:28}}>🧠</span><div><div style={{fontSize:14,fontWeight:900,color:GOLD2}}>Culture Index Analyzer</div><div style={{fontSize:11,color:"#806030"}}>AI scoring against the H.E.R.O. Craftsman profile</div></div></div><div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{["Autonomy","Sociability","Pace","Conformity","Logic","Energy"].map(d=>(<span key={d} style={{...S.badge("gold"),fontSize:10}}>{d}</span>))}</div></div>
-          <div style={{display:"flex",gap:8,marginBottom:12}}>
+          <div style={{...S.card,background:"linear-gradient(135deg,#150f00,#0d0d00)",border:`1px solid ${GOLD}44`,marginBottom:12}}><div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}><span style={{fontSize:28}}>🧠</span><div><div style={{fontSize:14,fontWeight:900,color:GOLD2}}>Culture Index Analyzer</div><div style={{fontSize:11,color:"#806030"}}>AI scoring against role-specific HOODZ benchmarks</div></div></div><div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{["Autonomy","Sociability","Pace","Conformity","Logic","Energy"].map(d=>(<span key={d} style={{...S.badge("gold"),fontSize:10}}>{d}</span>))}</div></div>
+          <div style={{display:"flex",gap:8,marginBottom:10}}>
             <button style={{...S.btn(mode==="candidate"?"primary":"default"),flex:1}} onClick={()=>{setMode("candidate");setName("");}}>🎯 Hiring Candidate</button>
             <button style={{...S.btn(mode==="employee"?"primary":"default"),flex:1}} onClick={()=>{setMode("employee");setName("");}}>🪪 Existing Employee</button>
+          </div>
+          <div style={{...S.card,marginBottom:12,padding:"10px 12px"}}>
+            <div style={{fontSize:9,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:6}}>📌 Role — Evaluating For</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:6}}>
+              {Object.entries(ROLE_PROFILES).map(([key,rp])=>(
+                <button key={key} style={{...S.btn(role===key?"primary":"default"),fontSize:11,padding:"6px 8px",textAlign:"left"}} onClick={()=>setRole(key)}>
+                  {role===key?"✓ ":""}{rp.label}
+                </button>
+              ))}
+            </div>
+            <div style={{fontSize:10,color:"#604820",marginTop:8,paddingTop:6,borderTop:"1px solid #1a1200"}}>
+              Benchmark: <strong style={{color:GOLD}}>{(ROLE_PROFILES[role]||ROLE_PROFILES.asst_tech).label}</strong> — {mode==="employee"?"Development Review (flexible)":"Hiring Screen (stricter)"}
+            </div>
           </div>
           <div style={S.card}>
             <div style={S.cardTitle}>📋 {mode==="employee"?"Employee Info":"Candidate Info"}</div>
@@ -1336,10 +1429,10 @@ function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,on
               {(preview||result)&&<button style={{...S.btn(),padding:"9px 16px"}} onClick={reset}>↺ New</button>}
             </div>
           </div>
-          {loading&&<div style={{...S.card,textAlign:"center",padding:"2rem"}}><div style={{fontSize:36,marginBottom:10}}>🔄</div><div style={{fontSize:14,fontWeight:700,color:GOLD2}}>Analyzing against Craftsman benchmark...</div></div>}
+          {loading&&<div style={{...S.card,textAlign:"center",padding:"2rem"}}><div style={{fontSize:36,marginBottom:10}}>🔄</div><div style={{fontSize:14,fontWeight:700,color:GOLD2}}>Analyzing against {(ROLE_PROFILES[role]||ROLE_PROFILES.asst_tech).label} benchmark...</div><div style={{fontSize:11,color:"#806030",marginTop:4}}>{mode==="employee"?"Development Review":"Hiring Screen"}</div></div>}
           {result&&!loading&&(
             <div>
-              <div style={{background:vbg(result.verdict),border:`2px solid ${vb(result.verdict)}`,borderRadius:10,padding:"18px 20px",marginBottom:12,textAlign:"center"}}><div style={{fontSize:40,marginBottom:6}}>{result.verdict==="PASS"?"✅":result.verdict==="FAIL"?"❌":"⚠️"}</div><div style={{fontSize:22,fontWeight:900,color:vc(result.verdict),letterSpacing:3,textTransform:"uppercase",marginBottom:4}}>{result.verdict} — {result.confidence} Confidence</div><div style={{fontSize:13,color:"#d0c090",maxWidth:500,margin:"0 auto"}}>{result.summary}</div></div>
+              <div style={{background:vbg(result.verdict),border:`2px solid ${vb(result.verdict)}`,borderRadius:10,padding:"18px 20px",marginBottom:12,textAlign:"center"}}><div style={{fontSize:40,marginBottom:6}}>{result.verdict==="PASS"?"✅":result.verdict==="FAIL"?"❌":"⚠️"}</div><div style={{fontSize:22,fontWeight:900,color:vc(result.verdict),letterSpacing:3,textTransform:"uppercase",marginBottom:4}}>{result.verdict} — {result.confidence} Confidence</div>{(result.role||result.context)&&<div style={{display:"flex",gap:6,justifyContent:"center",marginBottom:8,flexWrap:"wrap"}}>{result.role&&<span style={{...S.badge("gold"),fontSize:11}}>{result.role}</span>}{result.context&&<span style={{...S.badge("default"),fontSize:11}}>{result.context}</span>}</div>}<div style={{fontSize:13,color:"#d0c090",maxWidth:500,margin:"0 auto"}}>{result.summary}</div></div>
               {(result.hero_fit_score!=null||result.hero_alignment_scores)&&(
                 <div style={S.card}>
                   <div style={S.cardTitle}>🛡️ HOODZ / H.E.R.O. Scoring (from report)</div>
@@ -1371,7 +1464,7 @@ function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,on
           {!history.length?<div style={{...S.card,textAlign:"center",padding:"2.5rem"}}><div style={{fontSize:36,marginBottom:10}}>🧠</div><div style={{fontSize:14,fontWeight:700,color:GOLD2}}>No analyses yet</div></div>:
           history.map((entry,i)=>(<div key={entry.id} style={{...S.card,marginBottom:12}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8,marginBottom:10}}>
-              <div><div style={{fontSize:15,fontWeight:800,color:GOLD2}}>{entry.name}</div><div style={{fontSize:11,color:"#604820",marginTop:2}}>{entry.date}</div></div>
+              <div><div style={{fontSize:15,fontWeight:800,color:GOLD2}}>{entry.name}</div><div style={{fontSize:11,color:"#604820",marginTop:2}}>{entry.date}{entry.roleLabel&&<span style={{marginLeft:6,color:"#806030"}}>· {entry.roleLabel}</span>}{entry.mode&&<span style={{marginLeft:4,color:"#604820"}}>({entry.mode==="employee"?"Dev Review":"Hiring"})</span>}</div></div>
               <div style={{display:"flex",gap:8,alignItems:"center"}}><div style={{background:vbg(entry.result.verdict),border:`1px solid ${vb(entry.result.verdict)}`,borderRadius:20,padding:"4px 14px",fontSize:13,fontWeight:900,color:vc(entry.result.verdict)}}>{entry.result.verdict==="PASS"?"✅":"❌"} {entry.result.verdict}</div><span style={S.badge("default")}>{entry.result.confidence}</span></div>
             </div>
             <div style={{fontSize:12,color:"#d0c090",marginBottom:8}}>{entry.result.summary}</div>
@@ -3645,15 +3738,15 @@ function MemberProfileTab({members,setMembers,activities,reviews,motmHistory,isA
       </div>
 
       {/* Culture Index result, if one has been uploaded for this member */}
-      {m.cultureIndex&&m.cultureIndex.verdict&&(
+      {m.cultureIndex&&(
         <div style={S.card}>
           <div style={S.cardTitle}>🧠 Culture Index — {m.cultureIndex.date}</div>
           <div style={{display:"flex",gap:14,alignItems:"center",flexWrap:"wrap",marginBottom:m.cultureIndex.heroAlignmentScores?12:0}}>
             <div style={{background:m.cultureIndex.verdict==="PASS"?"#0a1a0a":"#1a0000",border:`1px solid ${m.cultureIndex.verdict==="PASS"?"#204020":"#401010"}`,borderRadius:20,padding:"4px 14px",fontSize:13,fontWeight:900,color:m.cultureIndex.verdict==="PASS"?"#60c060":"#f06060"}}>{m.cultureIndex.verdict==="PASS"?"✅":"❌"} {m.cultureIndex.verdict}</div>
             {m.cultureIndex.heroFitScore!=null&&<div><span style={{fontSize:20,fontWeight:900,color:GOLD2}}>{m.cultureIndex.heroFitScore}</span><span style={{fontSize:12,color:"#604820"}}>/100 HOODZ Fit</span></div>}
           </div>
-          {m.cultureIndex&&m.cultureIndex.summary&&<div style={{fontSize:12,color:"#d0c090",marginBottom:m.cultureIndex&&m.cultureIndex.heroAlignmentScores?12:0}}>{m.cultureIndex.summary}</div>}
-          {m.cultureIndex&&m.cultureIndex.heroAlignmentScores&&<div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+          {m.cultureIndex.summary&&<div style={{fontSize:12,color:"#d0c090",marginBottom:m.cultureIndex.heroAlignmentScores?12:0}}>{m.cultureIndex.summary}</div>}
+          {m.cultureIndex.heroAlignmentScores&&<div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
             {[["honest","H",GOLD],["excellence","E","#5A8AC6"],["respect","R","#4A9A4A"],["ownIt","O","#9A4A4A"]].map(([k,l,color])=>{const v=m.cultureIndex.heroAlignmentScores[k];return v==null?null:(
               <div key={k} style={{background:"#0d0d00",border:`1px solid ${color}55`,borderRadius:6,padding:"6px 12px",textAlign:"center"}}><span style={{fontFamily:"serif",fontWeight:900,color}}>{l}</span> <span style={{fontSize:12,color:"#d0c090"}}>{v}/10</span></div>
             );})}
