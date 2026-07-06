@@ -464,6 +464,212 @@ var S={
 
 function levelBadge(l){const c={Candidate:"default",Certified:"blue",Ambassador:"green",Elite:"gold","Hall of Legacy":"gold"};return <span style={S.badge(c[l]||"default")}>{l}</span>;}
 function readBadge(r){const c={"Ready Now":"green","Within 12 Months":"blue","Within 24 Months":"default","Future Potential":"default"};return <span style={S.badge(c[r]||"default")}>{r||"—"}</span>;}
+const CI_TRAIT_LABELS=[["a","Autonomy"],["b","Sociability"],["c","Pace"],["d","Conformity"],["l","Logic"],["i","Ingenuity"]];
+function TraitInputRow({title,values,onChange}){
+  return (
+    <div style={{marginBottom:10}}>
+      <div style={{fontSize:9,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:6}}>{title}</div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(6,1fr)",gap:6}}>
+        {CI_TRAIT_LABELS.map(([k,lbl])=>(
+          <div key={k} style={{textAlign:"center"}}>
+            <div style={{fontSize:9,fontWeight:800,color:GOLD,marginBottom:3}}>{k.toUpperCase()}</div>
+            <input type="number" min="0" max="10" step="0.5" value={values?.[k]??""} placeholder="—"
+              onChange={e=>onChange(k,e.target.value)}
+              style={{...S.input,padding:"5px 4px",textAlign:"center",fontSize:12}}/>
+            <div style={{fontSize:7,color:"#604820",marginTop:2}}>{lbl}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+function scoreTierInfo(s){
+  if(s==null) return {label:"—",bg:"#1a1a1a",color:"#806030"};
+  if(s>=85) return {label:"ELITE FIT",bg:"#0d2a0d",color:"#2ECC71"};
+  if(s>=70) return {label:"STRONG FIT",bg:"#1a2a0a",color:"#8BC34A"};
+  if(s>=55) return {label:"GOOD FIT",bg:"#1a1a00",color:"#C9A84C"};
+  if(s>=40) return {label:"MODERATE FIT",bg:"#1a0d00",color:"#E67E22"};
+  return {label:"POOR FIT",bg:"#1a0000",color:"#E74C3C"};
+}
+function verdictVisuals(v){
+  if(v==="PASS") return {icon:"✅",label:"STRONG HIRE",color:"#2ECC71",bg:"#0a1a0a",border:"#1A6B2A"};
+  if(v==="FAIL") return {icon:"❌",label:"DO NOT HIRE",color:"#E74C3C",bg:"#1a0000",border:"#5a2020"};
+  return {icon:"⚠️",label:"HIRE — CAUTION",color:"#C9A84C",bg:"#1a1000",border:"#B8964A"};
+}
+function printHeroScorecard(entry, roleLabel) {
+  const win = window.open("", "_blank");
+  if (!win) { alert("Pop-up blocked. Please allow pop-ups."); return; }
+  const r = entry.result || {};
+  const vv = verdictVisuals(r.verdict);
+  const verdictLabel = r.verdict==="PASS" ? "STRONG HIRE" : r.verdict==="FAIL" ? "DO NOT HIRE" : `HIRE${r.verdict_note?" — "+r.verdict_note.toUpperCase():""}`;
+  const tier = scoreTierInfo(r.fit_score);
+  const KEYS=["a","b","c","d","l","i"]; const LABELS=["A","B","C","D","L","I"];
+  const TC={a:["#dc3545","rgba(220,53,69,0.5)"],b:["#fd7e14","rgba(253,126,20,0.5)"],c:["#4a9eff","rgba(74,158,255,0.5)"],d:["#28a745","rgba(40,167,69,0.5)"],l:["#9b59b6","rgba(155,89,182,0.5)"],i:["#20c997","rgba(32,201,151,0.5)"]};
+  const traits = r.trait_scores||{}; const jobB = r.job_behavior_scores||{};
+  const hasTraitGraph = KEYS.some(k=>traits[k]!=null);
+  const hasJobGraph = KEYS.some(k=>jobB[k]!=null);
+  const traitRows = !hasTraitGraph ? "" : KEYS.map((k,idx)=>{
+    const v=traits[k], jv=jobB[k];
+    const vPos = v==null?null:v*10, jPos = jv==null?null:jv*10;
+    const bridge = (v!=null&&jv!=null) ? `<div style="position:absolute;top:50%;left:${Math.min(vPos,jPos)}%;width:${Math.abs(vPos-jPos)}%;height:2px;background:rgba(184,150,74,0.3);transform:translateY(-50%);"></div>` : "";
+    const dot1 = v==null?"":`<div style="position:absolute;top:50%;transform:translate(-50%,-50%);border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);left:${vPos}%;width:11px;height:11px;background:${TC[k][0]};"></div>`;
+    const dot2 = jv==null?"":`<div style="position:absolute;top:50%;transform:translate(-50%,-50%);border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);left:${jPos}%;width:9px;height:9px;background:${TC[k][1]};"></div>`;
+    return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><div style="width:18px;font-size:10px;font-weight:700;color:#E8C96A;text-align:center;">${LABELS[idx]}</div><div style="flex:1;position:relative;height:18px;background:#0d1a2e;border-radius:3px;">${bridge}${dot1}${dot2}</div></div>`;
+  }).join("");
+  const jobRows = !hasJobGraph ? "" : KEYS.map((k,idx)=>{
+    const jv=jobB[k]; if(jv==null) return "";
+    return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><div style="width:18px;font-size:10px;font-weight:700;color:#E8C96A;text-align:center;">${LABELS[idx]}</div><div style="flex:1;position:relative;height:18px;background:#0d1a2e;border-radius:3px;"><div style="position:absolute;top:50%;transform:translate(-50%,-50%);border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);left:${jv*10}%;width:10px;height:10px;background:${TC[k][0]};"></div></div></div>`;
+  }).join("");
+  const heroScores = r.hero_alignment_scores||{};
+  const heroItems=[["🛡️","HONESTY",heroScores.honest],["⭐","EXCELLENCE",heroScores.excellence],["🤝","RESPECT",heroScores.respect],["🎯","OWN IT",heroScores.ownIt]].filter(([,,v])=>v!=null);
+  let heroTotal=0;
+  const heroBars = heroItems.map(([ic,lb,v])=>{heroTotal+=v;const pct=v*10;const color=v>=9?"#2ECC71":v>=7?"#C9A84C":"#E67E22";return `<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;"><div style="font-size:10px;color:#fff;">${ic} <span>${lb}</span></div><span style="font-size:12px;font-weight:900;color:${color};">${v}/10</span></div><div style="background:#0d1a2e;border-radius:3px;height:7px;overflow:hidden;"><div style="height:100%;border-radius:3px;width:${pct}%;background:linear-gradient(90deg,#C0392B,${color});"></div></div></div>`;}).join("");
+  const posFit = (r.position_fit||[]).map(({role,score})=>`<div style="margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(184,150,74,0.12);"><div style="font-size:10px;color:#fff;margin-bottom:2px;">${role}</div><div>${Array.from({length:5}).map((_,i)=>`<span style="font-size:13px;color:${i<score?'#B8964A':'#1a2a1a'};">★</span>`).join("")}</div></div>`).join("");
+  const strengthsList = (r.strengths||[]).map(s=>`<div style="display:flex;gap:5px;margin-bottom:5px;"><span style="color:#4EC94E;font-size:10px;margin-top:1px;">✓</span><span style="font-size:10px;color:#E8C96A;line-height:1.4;">${s}</span></div>`).join("");
+  const watchList = (r.watch_areas||[]).map(w=>`<div style="display:flex;gap:5px;margin-bottom:5px;"><span style="color:#B8964A;font-size:10px;margin-top:1px;">!</span><span style="font-size:10px;color:#E8C96A;line-height:1.4;">${w}</span></div>`).join("");
+  const leadership = (r.leadership_potential||[]).map(({label,pct})=>{const lc=pct>=75?"linear-gradient(90deg,#1a6b2a,#4EC94E)":pct>=55?"linear-gradient(90deg,#B8964A,#D4AF6A)":"linear-gradient(90deg,#6b2a0a,#c05a20)";const tc=pct>=75?"#4EC94E":pct>=55?"#B8964A":"#E67E22";return `<div style="margin-bottom:6px;"><div style="display:flex;justify-content:space-between;font-size:10px;color:#E8C96A;margin-bottom:2px;"><span>${label}</span><span style="color:${tc};">${pct}%</span></div><div style="background:#0d1a2e;border-radius:3px;height:7px;overflow:hidden;"><div style="height:100%;border-radius:3px;width:${pct}%;background:${lc};"></div></div></div>`;}).join("");
+  const badgeEmojis=["🔧","⚙️","📋","🏅","🎯","🛡️"];
+  const badgesGrid=(r.strength_badges||[]).map((b,i)=>`<div style="background:#07101f;border:1px solid rgba(184,150,74,0.3);border-radius:5px;padding:7px 5px;text-align:center;"><div style="font-size:18px;margin-bottom:2px;">${badgeEmojis[i]||"🔧"}</div><div style="font-size:7px;font-weight:800;color:#E8C96A;letter-spacing:.5px;line-height:1.3;">${(b||"").toUpperCase()}</div></div>`).join("");
+  const pb = r.playbook||{};
+  const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>H.E.R.O. Talent Assessment — ${entry.name}</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#060d1a;color:#fff;font-family:'Open Sans',sans-serif;min-height:100vh;}
+.page{max-width:900px;margin:0 auto;padding:16px;}
+@media print{body{background:#fff!important;color:#000!important;}.no-print{display:none!important;}.page{max-width:100%;padding:0;}.card{background:#f8f6f0!important;border:1px solid #c8a840!important;}}
+.header{background:linear-gradient(135deg,#1B2A4A 0%,#0a1220 100%);border:2px solid #B8964A;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.card{background:linear-gradient(135deg,#1B2A4A,#0d1a2e);border:1px solid rgba(184,150,74,0.25);border-radius:8px;padding:12px 14px;}
+.card-title{font-size:9px;font-weight:700;color:#D4AF6A;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:8px;text-align:center;font-family:'Cinzel',serif;}
+.g2{display:grid;grid-template-columns:1fr 140px;gap:10px;margin-bottom:10px;}
+.g3{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:10px;margin-bottom:10px;}
+.g3b{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px;}
+.g2v{display:grid;grid-template-columns:1fr 1.6fr;gap:10px;margin-bottom:10px;}
+.gcol{display:flex;flex-direction:column;gap:8px;}
+.meta-row{display:flex;gap:4px;margin-bottom:3px;flex-wrap:wrap;}
+.meta-k{font-size:9px;color:#506090;min-width:80px;}
+.meta-v{font-size:9px;color:#D4AF6A;font-weight:600;}
+.play-card{background:#07101f;border-radius:5px;padding:8px;border:1px solid rgba(184,150,74,0.15);}
+.play-lbl{font-size:8px;font-weight:800;color:#B8964A;margin-bottom:3px;letter-spacing:1px;}
+.play-txt{font-size:8px;color:#90a0b8;line-height:1.5;}
+.note-stripe{font-size:9px;color:#D4AF6A;font-style:italic;text-align:center;padding:6px 8px;background:#07101f;border:1px solid rgba(184,150,74,0.2);border-radius:5px;line-height:1.5;}
+.footer{border-top:1px solid rgba(184,150,74,0.3);padding-top:8px;display:flex;justify-content:space-between;align-items:center;margin-top:4px;}
+.btn{padding:8px 18px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Open Sans',sans-serif;}
+.btn-gold{background:linear-gradient(135deg,#B8964A,#D4AF6A);color:#1B2A4A;}
+.btn-navy{background:#1B2A4A;color:#B8964A;border:1px solid #B8964A;}
+</style></head><body><div class="page">
+<div class="print-bar no-print" style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+  <button class="btn btn-gold" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  <button class="btn btn-navy" onclick="window.close()">✕ Close</button>
+</div>
+<div class="header">
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div style="width:56px;height:56px;background:#B8964A;border-radius:6px;"></div>
+    <div>
+      <div style="font-size:8px;letter-spacing:4px;color:#D4AF6A;font-family:'Cinzel',serif;">H.E.R.O. CERTIFIED</div>
+      <div style="font-size:15px;font-weight:700;color:#fff;letter-spacing:1px;font-family:'Cinzel',serif;">TALENT ASSESSMENT</div>
+      <div style="font-size:9px;color:#506090;">HOODZ of the MidSouth</div>
+    </div>
+  </div>
+  <div style="text-align:right;">
+    <div style="font-size:8px;letter-spacing:3px;color:#D4AF6A;">CI PATTERN</div>
+    <div style="font-size:22px;font-weight:900;color:#B8964A;letter-spacing:2px;font-family:'Cinzel',serif;">${(r.ci_pattern||"—").toUpperCase()}</div>
+  </div>
+</div>
+<div class="g2">
+  <div class="card">
+    <div style="font-size:24px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:2px;font-family:'Cinzel',serif;">${entry.name.toUpperCase()}</div>
+    <div style="font-size:11px;color:#B8964A;margin-bottom:10px;">Pattern: ${r.ci_pattern||"—"}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;">
+      <div class="meta-row"><span class="meta-k">Survey Date</span><span class="meta-v">${r.survey_date||"—"}</span></div>
+      <div class="meta-row"><span class="meta-k">Survey ID</span><span class="meta-v">${r.survey_id||"—"}</span></div>
+      <div class="meta-row"><span class="meta-k">Traits EU</span><span class="meta-v">${r.trait_eu!=null?r.trait_eu+" (Natural)":"—"}</span></div>
+      <div class="meta-row"><span class="meta-k">Job Behavior EU</span><span class="meta-v">${r.job_behavior_eu!=null?r.job_behavior_eu+" (Adapted)":"—"}</span></div>
+      <div class="meta-row"><span class="meta-k">Survey Type</span><span class="meta-v">${r.survey_type||"—"}</span></div>
+      <div class="meta-row"><span class="meta-k">Applied To</span><span class="meta-v">${roleLabel||"—"}</span></div>
+    </div>
+  </div>
+  <div class="gcol">
+    <div class="card" style="border:2px solid #B8964A;text-align:center;flex:1;">
+      <div style="font-size:8px;letter-spacing:2px;color:#D4AF6A;margin-bottom:2px;">CI FIT SCORE</div>
+      <div style="font-size:50px;font-weight:900;color:#B8964A;line-height:1;font-family:'Cinzel',serif;">${r.fit_score!=null?r.fit_score:"—"}</div>
+      <div style="font-size:13px;color:#507090;">/100</div>
+      <div style="margin-top:6px;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:800;letter-spacing:1px;display:inline-block;background:${tier.bg};color:${tier.color};border:1px solid ${tier.color}44;">${tier.label}</div>
+    </div>
+    <div class="card" style="text-align:center;padding:8px 12px;">
+      <div style="font-size:8px;letter-spacing:2px;color:#D4AF6A;">TALENT TIER</div>
+      <div style="font-size:13px;font-weight:900;color:#B8964A;font-family:'Cinzel',serif;">${r.talent_tier||"—"}</div>
+    </div>
+  </div>
+</div>
+<div class="g3">
+  <div class="card">
+    <div class="card-title">H.E.R.O. Alignment</div>
+    ${heroBars||'<div style="font-size:10px;color:#506090;text-align:center;">Not reported</div>'}
+    ${heroItems.length?`<div style="margin-top:8px;border-top:1px solid rgba(184,150,74,0.2);padding-top:6px;text-align:center;"><div style="font-size:8px;color:#507090;">OVERALL H.E.R.O. SCORE</div><div style="font-size:26px;font-weight:900;color:#B8964A;font-family:'Cinzel',serif;">${heroTotal}<span style="font-size:12px;color:#507090;">/${heroItems.length*10}</span></div></div>`:""}
+  </div>
+  <div class="card">
+    <div class="card-title">Culture Index Trait Graph</div>
+    ${hasTraitGraph?`<div style="font-size:8px;color:#B8964A;margin-bottom:2px;letter-spacing:1px;">TRAITS (INHERENT)</div>${traitRows}<div style="font-size:8px;color:#507090;text-align:center;margin:2px 0 6px;">${r.trait_eu!=null?"EU = "+r.trait_eu:""}</div>`:""}
+    ${hasJobGraph?`<div style="font-size:8px;color:#B8964A;margin-bottom:2px;letter-spacing:1px;">JOB BEHAVIORS (ADAPTED)</div>${jobRows}<div style="font-size:8px;color:#507090;text-align:center;margin-top:2px;">${r.job_behavior_eu!=null?"EU = "+r.job_behavior_eu:""}</div>`:""}
+    ${!hasTraitGraph&&!hasJobGraph?'<div style="font-size:10px;color:#506090;text-align:center;">Not available</div>':""}
+  </div>
+  <div class="card">
+    <div class="card-title">Best Position Fit</div>
+    ${posFit||'<div style="font-size:10px;color:#506090;text-align:center;">Not assessed</div>'}
+    <div style="font-size:8px;color:#507090;margin-top:4px;">5 = Excellent Fit · 1 = Poor Fit</div>
+  </div>
+</div>
+<div class="g3b">
+  <div class="card" style="background:linear-gradient(135deg,#0a1a0a,#0d2010);border:1px solid #1a3a1a;">
+    <div class="card-title" style="color:#4EC94E;">💪 Top Strengths</div>
+    ${strengthsList||'<div style="font-size:10px;color:#506090;">None noted</div>'}
+  </div>
+  <div class="card" style="background:linear-gradient(135deg,#1a0d00,#201000);border:1px solid #3a2a00;">
+    <div class="card-title" style="color:#B8964A;">⚠️ Development Areas</div>
+    ${watchList||'<div style="font-size:10px;color:#506090;">None noted</div>'}
+  </div>
+  <div class="card">
+    <div class="card-title">🌟 Leadership Potential</div>
+    ${leadership||'<div style="font-size:10px;color:#506090;">Not assessed</div>'}
+    <div style="margin-top:6px;padding:7px 8px;background:#07101f;border-radius:5px;border:1px solid rgba(184,150,74,0.2);">
+      <div style="font-size:8px;font-weight:700;color:#D4AF6A;margin-bottom:2px;letter-spacing:1px;">LEADERSHIP SUMMARY</div>
+      <div style="font-size:9px;color:#90a0b8;line-height:1.5;">${r.leadership_summary||"—"}</div>
+    </div>
+  </div>
+</div>
+<div class="card" style="margin-bottom:10px;">
+  <div class="card-title">📋 Leadership Playbook</div>
+  <div class="g5" style="margin-bottom:0;">
+    <div class="play-card"><div class="play-lbl">🎯 MOTIVATE</div><div class="play-txt">${pb.motivate||"—"}</div></div>
+    <div class="play-card"><div class="play-lbl">💬 COMMUNICATE</div><div class="play-txt">${pb.communicate||"—"}</div></div>
+    <div class="play-card"><div class="play-lbl">📈 COACHING</div><div class="play-txt">${pb.coach||"—"}</div></div>
+    <div class="play-card"><div class="play-lbl">⚡ FRUSTRATES</div><div class="play-txt">${pb.frustrates||"—"}</div></div>
+    <div class="play-card"><div class="play-lbl">🏠 ENVIRONMENT</div><div class="play-txt">${pb.environment||"—"}</div></div>
+  </div>
+</div>
+<div class="g2v">
+  <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:2px solid ${vv.border};background:linear-gradient(135deg,${vv.bg},#07101f);">
+    <div style="font-size:38px;margin-bottom:4px;">${vv.icon}</div>
+    <div style="font-size:16px;font-weight:900;letter-spacing:2px;margin-bottom:6px;font-family:'Cinzel',serif;color:${vv.color};">${verdictLabel}</div>
+    <div style="font-size:9px;color:#D4AF6A;letter-spacing:2px;margin-bottom:6px;">RECOMMENDATION</div>
+    <div style="font-size:10px;color:#fff;line-height:1.5;margin-bottom:8px;">${r.hiring_recommendation||""}</div>
+    <div style="padding:3px 10px;border-radius:4px;font-size:10px;font-weight:700;background:${vv.bg};color:${vv.color};border:1px solid ${vv.border}44;">Confidence: ${r.confidence||"—"}</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🏆 ${r.ci_pattern||"Talent"} Strength Badges</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px;">${badgesGrid||""}</div>
+    <div class="note-stripe">${r.pattern_note||""}</div>
+  </div>
+</div>
+<div class="footer">
+  <div style="font-size:9px;color:#B8964A;letter-spacing:1px;font-family:'Cinzel',serif;">H.E.R.O. CERTIFIED · PEOPLE PROTECTING PEOPLE</div>
+  <div style="font-size:9px;color:#406080;">HOODZ · CONFIDENTIAL</div>
+</div>
+</div></body></html>`;
+  win.document.write(html);
+  win.document.close();
+}
 function printCouncilScorecard(member, activities, reviews, motmHistory) {
   const win = window.open("", "_blank");
   if (!win) { alert("Pop-up blocked. Please allow pop-ups."); return; }
@@ -1330,6 +1536,16 @@ function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,on
   const [apiKey,setApiKey]=useState(getCIKey());
   const [showKeyInput,setShowKeyInput]=useState(!getCIKey());
   function saveKey(k){ setCIKey(k); setApiKey(k); setShowKeyInput(false); setError(""); }
+  function updateTrait(scope,key,val){
+    const num = val===""?null:Math.max(0,Math.min(10,parseFloat(val)));
+    setResult(prev=>prev?{...prev,[scope]:{...(prev[scope]||{}),[key]:num}}:prev);
+    setHistory(prev=>prev.map((h,idx)=>idx===0&&h.result?{...h,result:{...h.result,[scope]:{...(h.result[scope]||{}),[key]:num}}}:h));
+  }
+  function updateHistoryTrait(entryId,scope,key,val){
+    const num = val===""?null:Math.max(0,Math.min(10,parseFloat(val)));
+    setHistory(prev=>prev.map(h=>h.id===entryId?{...h,result:{...h.result,[scope]:{...(h.result[scope]||{}),[key]:num}}}:h));
+  }
+  const [expandedTraits,setExpandedTraits]=useState({});
   function handleFile(e){const f=e.target.files[0];if(!f)return;setError("");setResult(null);setFile(f);const t=f.type.startsWith("image/")?"image":"pdf";setFType(t);const r=new FileReader();r.onload=ev=>setPreview(ev.target.result);r.readAsDataURL(f);}
   async function analyze(){
     if(loading)return;
@@ -1342,7 +1558,7 @@ function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,on
     const roleProfile=ROLE_PROFILES[role]||(ROLE_PROFILES.asst_tech);
     const benchmark=mode==="employee"?roleProfile.employee:roleProfile.hire;
     const roleLabel=roleProfile.label;
-    const parts=[{type:isImg?"image":"document",source:{type:"base64",media_type:mt,data:b64}},{type:"text",text:`You are an HR analyst for HOODZ of the MidSouth.\nAnalyze this Culture Index / talent profile for: ${name}.\nRole being evaluated for: ${roleLabel} (${mode==="employee"?"existing employee development review":"hiring candidate screening"}).\n\nRole benchmark:\n${benchmark}\n\nSome reports include HOODZ-specific scoring (an overall HOODZ Fit Score out of 100, and HERO Alignment scores for Honest/Excellence/Respect/Own It out of 10 each). If those exact figures appear in the document, extract them precisely. If they do not appear, leave those fields null rather than estimating.\n\nSeparately, YOU must compute a fit_score by comparing this person's actual A/B/C/D/Logic traits against the role benchmark pattern above (this is your own judgment call, not extracted from the document). Use these tiers:\n- Elite Fit: 85-100\n- Strong Fit: 70-84\n- Good Fit: 55-69\n- Moderate Fit: 40-54\n- Poor Fit: below 40\n\nFor verdict, use exactly one of: "PASS" (clear fit, no reservations), "CAUTION" (fit overall but with a specific area to monitor — e.g. Pace, Logic), or "FAIL" (pattern mismatch). If CAUTION, set verdict_note to a short 2-4 word flag naming the specific watch area (e.g. "Monitor Pace"). If PASS or FAIL, set verdict_note to an empty string. Judge primarily on whether the pattern described in the benchmark matches (e.g. the AB stack for Craftsman-type roles), not on any single trait threshold in isolation.\n\nRespond ONLY with valid JSON (no markdown, no extra text):\n{"verdict":"PASS or CAUTION or FAIL","verdict_note":"short watch-area flag or empty string","fit_score":number 0-100,"fit_tier":"Elite Fit, Strong Fit, Good Fit, Moderate Fit, or Poor Fit","confidence":"High/Medium/Low","summary":"2-3 sentences","role":"${roleLabel}","context":"${mode==="employee"?"Development Review":"Hiring Screen"}","hero_fit_score":number or null,"hero_alignment_scores":{"honest":number or null,"excellence":number or null,"respect":number or null,"ownIt":number or null},"craftsman_alignment":{"autonomy":"note","sociability":"note","pace":"note","conformity":"note","logic":"note","overall_fit":"1-2 sentences"},"strengths":["s1","s2","s3"],"watch_areas":["w1","w2"],"hiring_recommendation":"one sentence","notes":"observations"}`}];
+    const parts=[{type:isImg?"image":"document",source:{type:"base64",media_type:mt,data:b64}},{type:"text",text:`You are an HR analyst for HOODZ of the MidSouth.\nAnalyze this Culture Index / talent profile for: ${name}.\nRole being evaluated for: ${roleLabel} (${mode==="employee"?"existing employee development review":"hiring candidate screening"}).\n\nRole benchmark:\n${benchmark}\n\nSome reports include HOODZ-specific scoring (an overall HOODZ Fit Score out of 100, and HERO Alignment scores for Honest/Excellence/Respect/Own It out of 10 each). If those exact figures appear in the document, extract them precisely. If they do not appear, leave those fields null rather than estimating.\n\nSeparately, YOU must compute a fit_score by comparing this person's actual A/B/C/D/Logic traits against the role benchmark pattern above (this is your own judgment call, not extracted from the document). Use these tiers:\n- Elite Fit: 85-100\n- Strong Fit: 70-84\n- Good Fit: 55-69\n- Moderate Fit: 40-54\n- Poor Fit: below 40\n\nFor verdict, use exactly one of: "PASS" (clear fit, no reservations), "CAUTION" (fit overall but with a specific area to monitor — e.g. Pace, Logic), or "FAIL" (pattern mismatch). If CAUTION, set verdict_note to a short 2-4 word flag naming the specific watch area (e.g. "Monitor Pace"). If PASS or FAIL, set verdict_note to an empty string. Judge primarily on whether the pattern described in the benchmark matches (e.g. the AB stack for Craftsman-type roles), not on any single trait threshold in isolation.\n\nAlso extract/read directly from the report image or document where visible: the CI pattern name printed on the report (e.g. "Craftsman", "Technical Expert"), the survey date, survey ID, survey type (Applicant/General/Behavior), and the approximate 0-10 dot positions for each trait (A=Autonomy, B=Sociability, C=Pace, D=Conformity, L=Logic, I=Ingenuity) for BOTH the "Traits" (inherent) graph and the "Job Behaviors" (adapted) graph if both are shown, plus each graph's stated Energy Units (EU) number. If a value truly is not visible or not applicable, use null for that field — do not guess precise numbers you cannot see.\n\nFinally, generate supporting scorecard content as your own professional judgment (clearly commentary, not extracted data): a short 2-3 word talent tier title (e.g. "Field Craftsman"), up to 5 position-fit ratings from 1-5 stars for realistic HOODZ roles this person could fill, a leadership-potential breakdown (3-5 dimensions like "Technical Aptitude", "People Leadership" each 0-100%), a one-paragraph leadership/development summary, a management playbook with 5 short entries (motivate, communicate, coach, frustrates, environment) tailored to this person's pattern, 4-6 short strength-badge labels (2-3 words each, e.g. "Process Expert"), and a 1-2 sentence general note about what this CI pattern typically means.\n\nRespond ONLY with valid JSON (no markdown, no extra text):\n{"verdict":"PASS or CAUTION or FAIL","verdict_note":"short watch-area flag or empty string","fit_score":number 0-100,"fit_tier":"Elite Fit, Strong Fit, Good Fit, Moderate Fit, or Poor Fit","confidence":"High/Medium/Low","summary":"2-3 sentences","role":"${roleLabel}","context":"${mode==="employee"?"Development Review":"Hiring Screen"}","hero_fit_score":number or null,"hero_alignment_scores":{"honest":number or null,"excellence":number or null,"respect":number or null,"ownIt":number or null},"craftsman_alignment":{"autonomy":"note","sociability":"note","pace":"note","conformity":"note","logic":"note","overall_fit":"1-2 sentences"},"strengths":["s1","s2","s3"],"watch_areas":["w1","w2"],"hiring_recommendation":"one sentence","notes":"observations","ci_pattern":"pattern name from report or null","survey_date":"date string or null","survey_id":"id string or null","survey_type":"string or null","talent_tier":"2-3 word title","trait_scores":{"a":number 0-10 or null,"b":number 0-10 or null,"c":number 0-10 or null,"d":number 0-10 or null,"l":number 0-10 or null,"i":number 0-10 or null},"trait_eu":number or null,"job_behavior_scores":{"a":number 0-10 or null,"b":number 0-10 or null,"c":number 0-10 or null,"d":number 0-10 or null,"l":number 0-10 or null,"i":number 0-10 or null},"job_behavior_eu":number or null,"position_fit":[{"role":"role name","score":number 1-5}],"leadership_potential":[{"label":"dimension","pct":number 0-100}],"leadership_summary":"one paragraph","playbook":{"motivate":"short text","communicate":"short text","coach":"short text","frustrates":"short text","environment":"short text"},"strength_badges":["badge1","badge2","badge3"],"pattern_note":"1-2 sentences"}`}];
     const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":getCIKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:1200,messages:[{role:"user",content:parts}]})});
     const data=await res.json();if(data.error)throw new Error(data.error.message);
     const raw=data.content.map(b=>b.text||"").join("").trim().replace(/```json|```/g,"").trim();
@@ -1480,6 +1696,15 @@ function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,on
                 <div style={S.card}><div style={{...S.cardTitle,color:"#e8a07a"}}>👀 Watch Areas</div>{(result.watch_areas||[]).map((w,i)=>(<div key={i} style={{display:"flex",gap:7,marginBottom:7,alignItems:"flex-start"}}><span style={{color:"#e8a07a",flexShrink:0}}>⚠</span><div style={{fontSize:12,color:"#d0c090"}}>{w}</div></div>))}</div>
               </div>
               <div style={{...S.card,border:`1px solid ${GOLD}44`}}><div style={S.cardTitle}>📋 Recommendation</div><div style={{fontSize:13,color:"#e8c060",fontStyle:"italic",marginBottom:result.notes?10:0}}>"{result.hiring_recommendation}"</div>{result.notes&&<div style={{fontSize:12,color:"#604820",marginTop:8,paddingTop:8,borderTop:"1px solid #2a2200"}}><strong style={{color:"#a08040"}}>Notes: </strong>{result.notes}</div>}</div>
+              <div style={{...S.card,border:`1px solid ${GOLD}`,background:"linear-gradient(135deg,#150f00,#0d0d00)"}}>
+                <div style={S.cardTitle}>🔍 Verify Culture Index Trait Values</div>
+                <div style={{fontSize:11,color:"#a08040",lineHeight:1.5,marginBottom:10}}>Claude reads these dot positions visually off the report. Check them against the source image/PDF and correct any before generating the scorecard — these numbers drive the trait graph.</div>
+                {(result.trait_scores||result.job_behavior_scores)?<>
+                  {result.trait_scores&&<TraitInputRow title="Traits (Inherent)" values={result.trait_scores} onChange={(k,v)=>updateTrait("trait_scores",k,v)}/>}
+                  {result.job_behavior_scores&&<TraitInputRow title="Job Behaviors (Adapted)" values={result.job_behavior_scores} onChange={(k,v)=>updateTrait("job_behavior_scores",k,v)}/>}
+                </>:<div style={{fontSize:11,color:"#604820",fontStyle:"italic"}}>No trait graph detected on this report — scorecard will omit the trait graph section.</div>}
+              </div>
+              <button style={{...S.btn("primary"),width:"100%",marginTop:12,fontFamily:"'Playfair Display',Georgia,serif",fontSize:13,letterSpacing:".04em"}} onClick={()=>printHeroScorecard({name,date:date||new Date().toISOString().slice(0,10),result},(ROLE_PROFILES[role]||ROLE_PROFILES.asst_tech).label)}>🎖️ Generate H.E.R.O. Scorecard</button>
               {mode==="candidate"&&candidates&&candidates.some(c=>c.name&&c.name.toLowerCase().trim()===name.toLowerCase().trim())&&<div style={{background:"#0a1a0a",border:"1px solid #204020",borderRadius:6,padding:"10px 14px",display:"flex",alignItems:"center",gap:8,marginTop:8}}><span>🔗</span><span style={{fontSize:12,color:"#60c060"}}>Result linked to <strong>{name}</strong>&#39;s hiring record.</span></div>}
               {mode==="employee"&&members&&members.some(m=>m.name&&m.name.toLowerCase().trim()===name.toLowerCase().trim())&&<div style={{background:"#0a1a0a",border:"1px solid #204020",borderRadius:6,padding:"10px 14px",display:"flex",alignItems:"center",gap:8,marginTop:8}}><span>🔗</span><span style={{fontSize:12,color:"#60c060"}}>Result saved to <strong>{name}</strong>&#39;s Registry profile.</span></div>}
             </div>
@@ -1499,7 +1724,18 @@ function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,on
             {entry.result.watch_areas?.length>0&&<div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:5}}>{entry.result.watch_areas.map((w,j)=><span key={j} style={{...S.badge("orange"),fontSize:10}}>⚠ {w}</span>)}</div>}
             <div style={{fontSize:11,color:"#a08040",fontStyle:"italic",marginTop:6,paddingTop:6,borderTop:"1px solid #1a1200"}}>"{entry.result.hiring_recommendation}"</div>
             {entry.notes&&<div style={{fontSize:11,color:"#604820",marginTop:4}}>Notes: {entry.notes}</div>}
-            <div style={{marginTop:10,paddingTop:8,borderTop:"1px solid #1a1200",display:"flex",justifyContent:"flex-end"}}><button style={{...S.btn("danger"),padding:"4px 10px",fontSize:11}} onClick={()=>{if(!isAdmin){onLock();return;}setHistory(p=>p.filter((_,idx)=>idx!==i));}}>🗑 Delete</button></div>
+            <div style={{marginTop:10,paddingTop:8,borderTop:"1px solid #1a1200"}}>
+              <button style={{...S.btn(),padding:"4px 10px",fontSize:11,marginBottom:expandedTraits[entry.id]?8:0}} onClick={()=>setExpandedTraits(p=>({...p,[entry.id]:!p[entry.id]}))}>{expandedTraits[entry.id]?"▲":"🔍"} Verify Traits</button>
+              {expandedTraits[entry.id]&&<div style={{background:"#0d0d00",border:`1px solid ${GOLD}33`,borderRadius:6,padding:"10px 12px",marginBottom:8}}>
+                <div style={{fontSize:10,color:"#a08040",lineHeight:1.5,marginBottom:8}}>Correct against the source report before generating a scorecard from this saved analysis.</div>
+                {entry.result.trait_scores&&<TraitInputRow title="Traits (Inherent)" values={entry.result.trait_scores} onChange={(k,v)=>updateHistoryTrait(entry.id,"trait_scores",k,v)}/>}
+                {entry.result.job_behavior_scores&&<TraitInputRow title="Job Behaviors (Adapted)" values={entry.result.job_behavior_scores} onChange={(k,v)=>updateHistoryTrait(entry.id,"job_behavior_scores",k,v)}/>}
+              </div>}
+              <div style={{display:"flex",justifyContent:"space-between",gap:8,flexWrap:"wrap"}}>
+                <button style={{...S.btn("primary"),padding:"5px 12px",fontSize:11,fontFamily:"'Playfair Display',Georgia,serif"}} onClick={()=>printHeroScorecard(entry,entry.roleLabel)}>🎖️ Scorecard</button>
+                <button style={{...S.btn("danger"),padding:"4px 10px",fontSize:11}} onClick={()=>{if(!isAdmin){onLock();return;}setHistory(p=>p.filter((_,idx)=>idx!==i));}}>🗑 Delete</button>
+              </div>
+            </div>
           </div>))}
         </div>
       )}
