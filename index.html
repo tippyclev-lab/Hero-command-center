@@ -426,12 +426,34 @@ HOW TO SCORE: Prioritize high Logic combined with low-moderate Sociability and l
 Strong hire: decisive, logic-driven, comfortable with fast pace and variety, direct communicator, builds/improves process rather than just following it.
 Caution flags: low Logic (can't operate strategically at this level), very high Sociability paired with low Logic (charisma without substance), very high Conformity or very high Patience (may be a strong technician but not naturally suited to a Director pace).
 
-Retention note (not a hiring criterion): Real HOODZ Director-level profiles often show a large drop in Energy Units from natural Traits to Job Behaviors — this pattern shows up in multiple current Directors and is flagged in their own reports as a possible morale/burnout indicator. If you see this in a candidate or existing Director, note it as a coaching/retention watch item rather than a red flag on the assessment itself.`,
+Retention note (not a hiring criterion): Real HOODZ Director-level profiles often show a large drop in Energy Units from natural Traits to Job Behaviors — this pattern shows up in multiple current Directors and is flagged in their own reports as a possible morale/burnout indicator. If you see this in a candidate or existing Director, note it as a coaching/retention watch item rather than a red flag on the assessment itself.
+
+OFFICIAL CULTURE INDEX FLASHPOINTS — use whichever set matches the person's actual pattern (or blend thoughtfully if traits sit between the two) for the playbook fields. This is certified reference material, not something to improvise.
+
+If pattern reads as ARCHITECT (higher Autonomy, assertive, e.g. Shelby's shape):
+- Motivation: Independence, financial rewards, goal setting.
+- Communication: Commanding, detailed, email or text preferred. Blunt, factual, no-nonsense, reserved — can seem cold/distanced; not a chit-chatter. "Tell rather than sell."
+- Management: Authoritarian, instructional, few direct reports; direct and hands-on but not necessarily "motivational" in style — capable at supervising provided the staff is small and trusted.
+- Organization/Environment: Structured, fast-paced, change required; precise, demanding, disciplined; prefers project work over routine tasks.
+- Additional notes: Self-sufficient and reluctant to delegate until trust is earned ("no one can do it any better"); can appear impulsive but decisions are actually well-considered — they just don't always communicate the thinking; witty/dry humor emerges once comfortable; motivated by tangible completion and sincere (not showy) recognition tied to results.
+
+If pattern reads as TECHNICAL EXPERT (more moderate/earned Autonomy, e.g. Cory/Michael's shape):
+- Motivation: Independence, personalized rewards, private recognition.
+- Communication: Factual, quick, email preferred. Reserved and introspective initially — won't volunteer information until they trust you; can seem very talkative once engaged, but the content is informative, not social.
+- Management: Instructional, tends toward micromanagement, few direct reports; expects follow-through and closure on anything delegated; by-the-book with a system, inflexible if the system is challenged.
+- Organization/Environment: Structured, fast-paced, needs personal space; very orderly, dislikes clutter.
+- Additional notes: Needs volumes of proof before changing their mind; fear of being wrong runs high, so they double- and triple-check; prefers a specialized learning opportunity or one-on-one acknowledgment of expertise over a generic bonus; in meetings often stays quiet and shares real input only afterward — draw it out proactively rather than assuming silence means agreement.`,
     employee:`HOODZ "Director" DEVELOPMENT benchmark (existing leader — same real-data logic as hiring):
 
 Judge primarily on high Logic combined with low-moderate Sociability and low-moderate Pace — the pattern seen in Cory Bracey and Shelby Bekker, both Directors of Operations. Do not flag low Sociability or low Patience as problems; they are typical and even favorable at this level. Autonomy may be high (asserts direction independently) or more moderate (earns latitude through demonstrated competence) — both are healthy patterns.
 
-Focus: Is this person's Logic and decision-making growing to match increased scope? Watch for the Energy Units gap between natural Traits and Job Behaviors — a large drop is a common pattern among current HOODZ Directors and is worth a direct, supportive conversation about workload and sustainability rather than treated as a performance concern.`
+Focus: Is this person's Logic and decision-making growing to match increased scope? Watch for the Energy Units gap between natural Traits and Job Behaviors — a large drop is a common pattern among current HOODZ Directors and is worth a direct, supportive conversation about workload and sustainability rather than treated as a performance concern.
+
+OFFICIAL CULTURE INDEX FLASHPOINTS — use whichever set matches the person's actual pattern for the playbook fields (certified reference material, not something to improvise):
+
+ARCHITECT pattern (higher, assertive Autonomy): Motivation — independence, financial rewards, goal setting. Communication — commanding, detailed, email/text preferred, blunt and factual, "tell rather than sell." Management — authoritarian, instructional, few direct reports, hands-on. Organization/Environment — structured, fast-paced, change required, precise and disciplined. Notes: reluctant to delegate until trust is earned; decisions are well-considered even when they appear impulsive; motivated by tangible completion and sincere recognition.
+
+TECHNICAL EXPERT pattern (more moderate, earned Autonomy): Motivation — independence, personalized rewards, private recognition. Communication — factual, quick, email preferred; reserved until trust is built, then very informative. Management — instructional, tends toward micromanagement, few direct reports, expects follow-through. Organization/Environment — structured, fast-paced, needs personal space, very orderly. Notes: needs proof before changing position; prefers specialized learning or one-on-one recognition over generic reward; often stays quiet in meetings and shares real input afterward.`
   }
 };
 var CRAFTSMAN_PROFILE=ROLE_PROFILES.asst_tech.hire;
@@ -459,6 +481,7 @@ var DB_TO_AT_KEY = {
   hero_reviews:    "reviews",
   hero_candidates: "candidates",
   hero_motm:       "motm",
+  hero_ci_history: "ci_history",
 };
 
 async function atCall(action, tableKey, data){
@@ -534,6 +557,85 @@ function verdictVisuals(v){
   if(v==="PASS") return {icon:"✅",label:"STRONG HIRE",color:"#2ECC71",bg:"#0a1a0a",border:"#1A6B2A"};
   if(v==="FAIL") return {icon:"❌",label:"DO NOT HIRE",color:"#E74C3C",bg:"#1a0000",border:"#5a2020"};
   return {icon:"⚠️",label:"HIRE — CAUTION",color:"#C9A84C",bg:"#1a1000",border:"#B8964A"};
+}
+function printJourneyGraph(member, timeline, startDate) {
+  const win = window.open("", "_blank");
+  if (!win) { alert("Pop-up blocked. Please allow pop-ups."); return; }
+  const kindMeta = {
+    start:{icon:"🎖️",color:"#B8964A",label:"PROGRAM START"},
+    ci:{icon:"🧠",color:"#D4AF6A",label:"CI ANALYSIS"},
+    activity:{icon:"🎓",color:"#4A9EFF",label:"ACADEMY"},
+    review:{icon:"⚖️",color:"#C05A5A",label:"COUNCIL"},
+  };
+  const vColor = v=>v==="PASS"?"#2ECC71":v==="FAIL"?"#E74C3C":v==="CAUTION"?"#C9A84C":"#90a0b8";
+  const rows = timeline.map((t,idx)=>{
+    const km = kindMeta[t.kind]||{icon:"•",color:"#90a0b8",label:t.kind.toUpperCase()};
+    const accentColor = t.kind==="ci"&&t.verdict ? vColor(t.verdict) : km.color;
+    return `<div style="display:flex;gap:0;position:relative;">
+      <div style="width:120px;flex-shrink:0;text-align:right;padding-right:16px;padding-top:2px;">
+        <div style="font-size:10px;color:#90a0b8;font-weight:600;">${t.date||""}</div>
+      </div>
+      <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;width:32px;">
+        <div style="width:26px;height:26px;border-radius:50%;background:${accentColor}22;border:2px solid ${accentColor};display:flex;align-items:center;justify-content:center;font-size:13px;z-index:1;">${km.icon}</div>
+        ${idx<timeline.length-1?`<div style="width:2px;flex:1;background:linear-gradient(180deg,${accentColor}66,rgba(184,150,74,0.15));min-height:24px;"></div>`:""}
+      </div>
+      <div style="flex:1;padding-left:16px;padding-bottom:${idx<timeline.length-1?"22":"2"}px;">
+        <div style="font-size:8px;font-weight:800;letter-spacing:1.5px;color:${accentColor};margin-bottom:2px;">${km.label}</div>
+        <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;">${t.label}</div>
+        ${t.detail?`<div style="font-size:11px;color:#90a0b8;line-height:1.4;">${t.detail}</div>`:""}
+      </div>
+    </div>`;
+  }).join("");
+  const ciCount = timeline.filter(t=>t.kind==="ci").length;
+  const activityCount = timeline.filter(t=>t.kind==="activity").length;
+  const reviewCount = timeline.filter(t=>t.kind==="review").length;
+  const spanDays = timeline.length>1 ? Math.round((new Date(timeline[timeline.length-1].date)-new Date(timeline[0].date))/(1000*60*60*24)) : 0;
+  const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>H.E.R.O. Journey — ${member.name}</title><style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#060d1a;color:#fff;font-family:'Open Sans',sans-serif;min-height:100vh;}
+.page{max-width:820px;margin:0 auto;padding:16px;}
+@media print{body{background:#fff!important;color:#000!important;}.no-print{display:none!important;}.page{max-width:100%;padding:0;}}
+.header{background:linear-gradient(135deg,#1B2A4A 0%,#0a1220 100%);border:2px solid #B8964A;border-radius:10px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.card{background:linear-gradient(135deg,#1B2A4A,#0d1a2e);border:1px solid rgba(184,150,74,0.25);border-radius:8px;padding:16px 18px;}
+.stat{text-align:center;padding:10px;}
+.stat-num{font-size:26px;font-weight:900;color:#B8964A;font-family:'Cinzel',serif;}
+.stat-lbl{font-size:8px;color:#90a0b8;letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+.btn{padding:8px 18px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Open Sans',sans-serif;}
+.btn-gold{background:linear-gradient(135deg,#B8964A,#D4AF6A);color:#1B2A4A;}
+.btn-navy{background:#1B2A4A;color:#B8964A;border:1px solid #B8964A;}
+</style></head><body><div class="page">
+<div class="no-print" style="display:flex;gap:8px;margin-bottom:12px;">
+  <button class="btn btn-gold" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  <button class="btn btn-navy" onclick="window.close()">✕ Close</button>
+</div>
+<div class="header">
+  <div>
+    <div style="font-size:8px;letter-spacing:4px;color:#D4AF6A;font-family:'Cinzel',serif;">H.E.R.O. CERTIFIED</div>
+    <div style="font-size:20px;font-weight:700;color:#fff;letter-spacing:1px;font-family:'Cinzel',serif;">JOURNEY PROGRESSION</div>
+    <div style="font-size:11px;color:#506090;margin-top:2px;">HOODZ of the MidSouth</div>
+  </div>
+  <div style="text-align:right;">
+    <div style="font-size:22px;font-weight:900;color:#B8964A;font-family:'Cinzel',serif;">${member.name}</div>
+    ${startDate?`<div style="font-size:10px;color:#90a0b8;margin-top:2px;">H.E.R.O. accepted ${startDate}</div>`:""}
+  </div>
+</div>
+<div class="card" style="margin-bottom:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+  <div class="stat"><div class="stat-num">${spanDays}</div><div class="stat-lbl">Days Tracked</div></div>
+  <div class="stat"><div class="stat-num">${ciCount}</div><div class="stat-lbl">CI Analyses</div></div>
+  <div class="stat"><div class="stat-num">${activityCount}</div><div class="stat-lbl">Academy Events</div></div>
+  <div class="stat"><div class="stat-num">${reviewCount}</div><div class="stat-lbl">Council Reviews</div></div>
+</div>
+<div class="card">
+  ${rows||'<div style="font-size:12px;color:#90a0b8;text-align:center;padding:20px;">No tracked events yet.</div>'}
+</div>
+<div style="border-top:1px solid rgba(184,150,74,0.3);padding-top:8px;display:flex;justify-content:space-between;align-items:center;margin-top:14px;">
+  <div style="font-size:9px;color:#B8964A;letter-spacing:1px;font-family:'Cinzel',serif;">H.E.R.O. CERTIFIED · PEOPLE PROTECTING PEOPLE</div>
+  <div style="font-size:9px;color:#406080;">HOODZ · CONFIDENTIAL</div>
+</div>
+</div></body></html>`;
+  win.document.write(html);
+  win.document.close();
 }
 function printHeroScorecard(entry, roleLabel) {
   const win = window.open("", "_blank");
@@ -1565,13 +1667,13 @@ function CouncilTab({reviews,setReviews,members,isAdmin,role,onLock}){
 function getCIKey(){ return localStorage.getItem('hero_ci_key')||''; }
 function setCIKey(k){ localStorage.setItem('hero_ci_key',k); }
 
-function CultureIndexTab({candidates,setCandidates,members,setMembers,isAdmin,onLock}){
+function CultureIndexTab({candidates,setCandidates,members,setMembers,ciHistory,setCiHistory,isAdmin,onLock}){
   const [mode,setMode]=useState("candidate"); // "candidate" | "employee"
   const [role,setRole]=useState("asst_tech"); // "asst_tech"|"lead_tech"|"supervisor"|"manager"
   const [file,setFile]=useState(null);const [preview,setPreview]=useState(null);const [fType,setFType]=useState(null);const [name,setName]=useState("");const [date,setDate]=useState("");const [notes,setNotes]=useState("");const [loading,setLoading]=useState(false);const [result,setResult]=useState(null);const [error,setError]=useState("");
-  const [history,setHistory]=useState(()=>dbGet("hero_ci_history")||[]);
+  const history = ciHistory||[]; const setHistory = setCiHistory;
   const [view,setView]=useState("upload");
-  useEffect(()=>{dbSet("hero_ci_history",history);},[history]);
+  // ciHistory persistence now handled by App-level setCiHistory (syncs to Airtable + localStorage)
   const [apiKey,setApiKey]=useState(getCIKey());
   const [showKeyInput,setShowKeyInput]=useState(!getCIKey());
   function saveKey(k){ setCIKey(k); setApiKey(k); setShowKeyInput(false); setError(""); }
@@ -3838,7 +3940,7 @@ function BulkPhotoUpload({members,setMembers,isAdmin,onLock}){
 }
 
 // ── MEMBER PROFILE TAB ───────────────────────────────────────────────────────
-function MemberProfileTab({members,setMembers,activities,reviews,motmHistory,isAdmin,onLock}){
+function MemberProfileTab({members,setMembers,activities,reviews,motmHistory,ciHistory,isAdmin,onLock}){
   const [selected,setSelected]=useState("");
   const [ciUploading,setCiUploading]=useState(false);
   const m = members.find(x=>x.name===selected);
@@ -4058,7 +4160,72 @@ function MemberProfileTab({members,setMembers,activities,reviews,motmHistory,isA
         </div>
       )}
 
-      {/* Stored Culture Index report file — upload, store, print. No API key needed. */}
+      {/* Culture Index Progression — full history across every role tried, plus a combined timeline with check-ins/reviews */}
+      {(() => {
+        const ciHistAll = (ciHistory||[]).filter(h=>h.name===m.name).sort((a,b)=>new Date(a.date)-new Date(b.date));
+        if(!ciHistAll.length) return null;
+        const startDate = m.enrollDate||null;
+        const ciHist = startDate ? ciHistAll.filter(h=>h.date>=startDate) : ciHistAll;
+        const byRole = {};
+        ciHist.forEach(h=>{ byRole[h.roleLabel] = h; }); // keep most recent per role (array is date-ascending, so later overwrites)
+        const roleOrder = ["Assistant Technician","Lead Technician","Supervisor","Manager","Director"];
+        const roleRows = roleOrder.filter(r=>byRole[r]).map(r=>byRole[r]);
+        const filteredActivities = startDate ? memberActivities.filter(a=>a.date&&a.date>=startDate) : memberActivities;
+        const filteredReviews = startDate ? memberReviews.filter(r=>r.date&&r.date>=startDate) : memberReviews;
+        const timeline = [
+          ...(startDate?[{date:startDate,kind:"start",label:"H.E.R.O. Certified — Program Accepted",detail:"Progression tracking begins here"}]:[]),
+          ...ciHist.map(h=>({date:h.date,kind:"ci",label:`CI Analysis — ${h.roleLabel}`,detail:`${h.result.verdict}${h.result.verdict_note?" — "+h.result.verdict_note:""}${h.result.fit_score!=null?` (${h.result.fit_score}/100)`:""}`,verdict:h.result.verdict})),
+          ...filteredActivities.map(a=>({date:a.date,kind:"activity",label:a.type||"Activity",detail:`${a.level||""} ${a.status?"— "+a.status:""}`.trim()})),
+          ...filteredReviews.map(r=>({date:r.date,kind:"review",label:r.reviewType||"Council Review",detail:r.decision||""})),
+        ].filter(t=>t.date).sort((a,b)=>new Date(a.date)-new Date(b.date));
+        const kindStyle = {
+          start:{icon:"🎖️",color:GOLD},
+          ci:{icon:"🧠",color:GOLD2},
+          activity:{icon:"🎓",color:"#60a8e0"},
+          review:{icon:"⚖️",color:"#9A4A4A"},
+        };
+        const vc2=v=>v==="PASS"?"#60c060":v==="FAIL"?"#f06060":v==="CAUTION"?"#e8c060":"#e8a07a";
+        const vbg2=v=>v==="PASS"?"#0a1a0a":v==="FAIL"?"#1a0000":v==="CAUTION"?"#1a1200":"#1a0d00";
+        const vb2=v=>v==="PASS"?"#204020":v==="FAIL"?"#401010":v==="CAUTION"?GOLD:"#5a2a00";
+        const vIcon2=v=>v==="PASS"?"✅":v==="FAIL"?"❌":v==="CAUTION"?"⚠️":"◆";
+        return (
+          <div style={S.card}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",flexWrap:"wrap",gap:8,marginBottom:4}}>
+              <div style={S.cardTitle}>📈 Culture Index Progression ({ciHist.length} analys{ciHist.length===1?"is":"es"})</div>
+              <button style={{...S.btn("primary"),padding:"5px 12px",fontSize:11,fontFamily:"'Playfair Display',Georgia,serif"}} onClick={()=>printJourneyGraph(m,timeline,startDate)}>🗺️ Generate Journey Graph</button>
+            </div>
+            <div style={{fontSize:11,color:"#806030",marginBottom:12,lineHeight:1.5}}>
+              {startDate?<>Progression tracked from H.E.R.O. acceptance on <strong style={{color:"#a08040"}}>{startDate}</strong>. </>:<>No enroll/acceptance date on file — showing full history. </>}
+              Re-running the same report against a new role doesn't require a new survey — traits don't change, only which benchmark they're measured against.
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:8,marginBottom:14}}>
+              {roleRows.map(h=>(
+                <div key={h.roleLabel} style={{background:vbg2(h.result.verdict),border:`1px solid ${vb2(h.result.verdict)}`,borderRadius:8,padding:"10px 12px"}}>
+                  <div style={{fontSize:10,color:"#806030",textTransform:"uppercase",letterSpacing:".04em",marginBottom:4}}>{h.roleLabel}</div>
+                  <div style={{fontSize:13,fontWeight:900,color:vc2(h.result.verdict),marginBottom:2}}>{vIcon2(h.result.verdict)} {h.result.verdict}{h.result.verdict_note?` — ${h.result.verdict_note}`:""}</div>
+                  {h.result.fit_score!=null&&<div style={{fontSize:11,color:"#a08040"}}>{h.result.fit_score}/100 · {h.result.fit_tier}</div>}
+                  <div style={{fontSize:9,color:"#604820",marginTop:4}}>{h.date}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{fontSize:10,color:"#806030",textTransform:"uppercase",letterSpacing:".04em",marginBottom:8,borderTop:"1px solid #1a1200",paddingTop:10}}>Combined Timeline</div>
+            <div>
+              {timeline.map((t,idx)=>{const ks=kindStyle[t.kind];return(
+                <div key={idx} style={{display:"flex",gap:10,marginBottom:10,alignItems:"flex-start"}}>
+                  <div style={{width:22,textAlign:"center",fontSize:13}}>{ks.icon}</div>
+                  <div style={{flex:1,borderLeft:idx<timeline.length-1?"1px solid #1a1200":"none",paddingLeft:10,paddingBottom:idx<timeline.length-1?10:0,marginLeft:-11}}>
+                    <div style={{display:"flex",gap:8,alignItems:"baseline",flexWrap:"wrap"}}>
+                      <span style={{fontSize:12,fontWeight:700,color:ks.color}}>{t.label}</span>
+                      <span style={{fontSize:10,color:"#604820"}}>{t.date}</span>
+                    </div>
+                    {t.detail&&<div style={{fontSize:11,color:"#a08040",marginTop:2}}>{t.detail}</div>}
+                  </div>
+                </div>
+              );})}
+            </div>
+          </div>
+        );
+      })()}
       <div style={S.card}>
         <div style={S.cardTitle}>📎 Culture Index Report (on file)</div>
         {(m.cultureIndexFile||m.cultureIndexFileKey)?(
@@ -4221,6 +4388,7 @@ function App(){
   const [reviews,setReviewsRaw]=useState([]);
   const [candidates,setCandidatesRaw]=useState([]);
   const [motmHistory,setMotmHistoryRaw]=useState([]);
+  const [ciHistory,setCiHistoryRaw]=useState([]);
   const [isAdmin,setIsAdmin]=useState(false);
   const [role,setRole]=useState(null);
   const [showPin,setShowPin]=useState(false);
@@ -4231,30 +4399,34 @@ function App(){
   useEffect(()=>{
     (async ()=>{
       try{
-        const [mR,aR,rR,cR,motmR] = await Promise.all([
+        const [mR,aR,rR,cR,motmR,ciR] = await Promise.all([
           atLoadArray("members"),
           atLoadArray("activities"),
           atLoadArray("reviews"),
           atLoadArray("candidates"),
           atLoadArray("motm"),
+          atLoadArray("ci_history"),
         ]);
-        const cloudIsReady = [mR,aR,rR,cR,motmR].some(x=>x&&x.ready);
+        const cloudIsReady = [mR,aR,rR,cR,motmR,ciR].some(x=>x&&x.ready);
         setCloudReady(cloudIsReady);
 
-        let m=mR&&mR.data, a=aR&&aR.data, r=rR&&rR.data, c=cR&&cR.data, motm=motmR&&motmR.data;
-        const cloudM=m, cloudA=a, cloudR=r, cloudC=c, cloudMotm=motm;
+        let m=mR&&mR.data, a=aR&&aR.data, r=rR&&rR.data, c=cR&&cR.data, motm=motmR&&motmR.data, ci=ciR&&ciR.data;
+        const cloudM=m, cloudA=a, cloudR=r, cloudC=c, cloudMotm=motm, cloudCi=ci;
         const localM=dbGet("hero_members"), localA=dbGet("hero_activities"),
-              localR=dbGet("hero_reviews"), localC=dbGet("hero_candidates"), localMotm=dbGet("hero_motm");
+              localR=dbGet("hero_reviews"), localC=dbGet("hero_candidates"), localMotm=dbGet("hero_motm"),
+              localCi=dbGet("hero_ci_history");
         if(!m) m=localM;
         if(!a) a=localA;
         if(!r) r=localR;
         if(!c) c=localC;
         if(!motm) motm=localMotm;
+        if(!ci) ci=localCi;
         if(m)setMembersRaw(m);
         if(a)setActivitiesRaw(a);
         if(r)setReviewsRaw(r);
         if(c)setCandidatesRaw(c);
         if(motm)setMotmHistoryRaw(motm);
+        if(ci)setCiHistoryRaw(ci);
         // First time connecting Airtable with pre-existing local data? Seed the cloud so it isn't empty.
         if(cloudIsReady){
           if(!cloudM&&localM&&localM.length) atSaveArray("members",localM);
@@ -4262,6 +4434,7 @@ function App(){
           if(!cloudR&&localR&&localR.length) atSaveArray("reviews",localR);
           if(!cloudC&&localC&&localC.length) atSaveArray("candidates",localC);
           if(!cloudMotm&&localMotm&&localMotm.length) atSaveArray("motm",localMotm);
+          if(!cloudCi&&localCi&&localCi.length) atSaveArray("ci_history",localCi);
         }
       }catch(e){console.log("Load error",e);}
       setLoaded(true);
@@ -4281,6 +4454,7 @@ function App(){
   function setReviews(fn){setReviewsRaw(p=>{const n=typeof fn==="function"?fn(p):fn;persist("hero_reviews",n);return n;});}
   function setCandidates(fn){setCandidatesRaw(p=>{const n=typeof fn==="function"?fn(p):fn;persist("hero_candidates",n);return n;});}
   function setMotmHistory(fn){setMotmHistoryRaw(p=>{const n=typeof fn==="function"?fn(p):fn;persist("hero_motm",n);return n;});}
+  function setCiHistory(fn){setCiHistoryRaw(p=>{const n=typeof fn==="function"?fn(p):fn;persist("hero_ci_history",n);return n;});}
 
   const alertCounts = getAlertCounts(members, candidates, reviews, motmHistory);
 
@@ -4327,11 +4501,11 @@ function App(){
       </div>
       <div style={S.tabs}>{TABS.map(t=><button key={t.id} style={S.tab(tab===t.id)} onClick={()=>setTab(t.id)}>{t.label}{t.alert&&alertCounts[t.alert]>0&&<AlertBadge count={alertCounts[t.alert]}/>}</button>)}</div>
       <div style={S.body}>
-        {tab==="profile"&&<MemberProfileTab members={members} setMembers={setMembers} activities={activities} reviews={reviews} motmHistory={motmHistory} isAdmin={isAdmin} onLock={()=>setShowPin(true)}/>}
+        {tab==="profile"&&<MemberProfileTab members={members} setMembers={setMembers} activities={activities} reviews={reviews} motmHistory={motmHistory} ciHistory={ciHistory} isAdmin={isAdmin} onLock={()=>setShowPin(true)}/>}
         {tab==="dashboard"&&<DashboardTab members={members} candidates={candidates} motmHistory={motmHistory}/>}
         {tab==="quicklog"&&<QuickLogTab members={members} setMembers={setMembers} activities={activities} setActivities={setActivities} isAdmin={isAdmin} onLock={()=>setShowPin(true)}/>}
         {tab==="hiring"&&<HiringTab candidates={candidates} setCandidates={setCandidates} members={members} setMembers={setMembers} isAdmin={isAdmin} onLock={()=>setShowPin(true)}/>}
-        {tab==="cultureindex"&&<CultureIndexTab candidates={candidates} setCandidates={setCandidates} members={members} setMembers={setMembers} isAdmin={isAdmin} onLock={()=>setShowPin(true)}/>}
+        {tab==="cultureindex"&&<CultureIndexTab candidates={candidates} setCandidates={setCandidates} members={members} setMembers={setMembers} ciHistory={ciHistory} setCiHistory={setCiHistory} isAdmin={isAdmin} onLock={()=>setShowPin(true)}/>}
         {tab==="registry"&&<RegistryTab members={members} setMembers={setMembers} activities={activities} reviews={reviews} motmHistory={motmHistory} isAdmin={isAdmin} onLock={()=>setShowPin(true)}/>}
         {tab==="academy"&&<AcademyTab members={members} activities={activities} setActivities={setActivities} isAdmin={isAdmin} onLock={()=>setShowPin(true)}/>}
         {tab==="council"&&<CouncilTab reviews={reviews} setReviews={setReviews} members={members} isAdmin={isAdmin} role={role} onLock={()=>setShowPin(true)}/>}
