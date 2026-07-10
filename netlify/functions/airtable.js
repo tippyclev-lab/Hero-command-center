@@ -8,6 +8,7 @@ const TABLES = {
   activities: "Activities",
   reviews: "Reviews",
   motm: "MOTM",
+  ci_history: "CI History",
 };
 
 const CORS_HEADERS = {
