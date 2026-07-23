@@ -3729,6 +3729,29 @@ const CORE_VALUE_SERIES={label:"Core Value Series",color:"#B8964A",types:{
   o:{label:"Own It",icon:"✊"},
 }};
 
+// Bulk-add matching: turns a pasted list of milestone names into series-tagged, icon-matched
+// entries automatically, falling back to "Custom" (Special Achievements, generic icon) when nothing
+// in the registry is a confident match. Always shown as an editable preview before saving.
+function flatMilestoneLookup(){
+  const flat=[];
+  Object.entries(MILESTONE_SERIES).forEach(([sKey,s])=>{
+    Object.entries(s.types).forEach(([tKey,t])=>{ flat.push({series:sKey,typeKey:tKey,label:t.label,icon:t.icon}); });
+  });
+  return flat;
+}
+function msTokens(s){ return s.toLowerCase().replace(/(\d)([a-z])/gi,"$1 $2").replace(/[^a-z0-9 ]/g," ").split(/\s+/).filter(Boolean); }
+function msMatchScore(a,b){
+  const ta=new Set(msTokens(a)),tb=new Set(msTokens(b));
+  let common=0; ta.forEach(t=>{if(tb.has(t))common++;});
+  return common/Math.min(ta.size||1,tb.size||1);
+}
+function matchMilestoneText(text){
+  const flat=flatMilestoneLookup();
+  let best=null,bestScore=0;
+  flat.forEach(f=>{ const sc=msMatchScore(text,f.label); if(sc>bestScore){bestScore=sc;best=f;} });
+  return bestScore>=0.5?best:null;
+}
+
 function MilestoneShelf({member,setMembers,motmEntries,memberCompliments,isAdmin,onLock}){
   const [adding,setAdding]=useState(false);
   const [pickedSeries,setPickedSeries]=useState("");
@@ -3737,6 +3760,10 @@ function MilestoneShelf({member,setMembers,motmEntries,memberCompliments,isAdmin
   const [customIcon,setCustomIcon]=useState("🎖️");
   const [mDate,setMDate]=useState(new Date().toISOString().slice(0,10));
   const [notes,setNotes]=useState("");
+  const [bulkMode,setBulkMode]=useState(false);
+  const [bulkText,setBulkText]=useState("");
+  const [bulkDate,setBulkDate]=useState(new Date().toISOString().slice(0,10));
+  const [bulkPreview,setBulkPreview]=useState(null);
 
   const manual=(member.milestones||[]).slice();
 
@@ -3765,6 +3792,29 @@ function MilestoneShelf({member,setMembers,motmEntries,memberCompliments,isAdmin
     if(!isAdmin){onLock();return;}
     if(!window.confirm("Remove this milestone?"))return;
     setMembers(p=>p.map(x=>x.name===member.name?{...x,milestones:(x.milestones||[]).filter(ms=>ms.id!==id)}:x));
+  }
+
+  function parseBulk(){
+    const lines=bulkText.split("\n").map(l=>l.trim()).filter(Boolean);
+    if(!lines.length){alert("Paste at least one milestone, one per line.");return;}
+    const preview=lines.map(line=>{
+      const match=matchMilestoneText(line);
+      return match
+        ? {raw:line,series:match.series,typeKey:match.typeKey,label:match.label,icon:match.icon,matched:true}
+        : {raw:line,series:"special",typeKey:null,label:line,icon:"🎖️",matched:false};
+    });
+    setBulkPreview(preview);
+  }
+  function updateBulkRow(i,field,val){
+    setBulkPreview(p=>p.map((r,idx)=>idx===i?{...r,[field]:val,...(field==="series"?{typeKey:null}:{})}:r));
+  }
+  function removeBulkRow(i){ setBulkPreview(p=>p.filter((_,idx)=>idx!==i)); }
+  function saveBulk(){
+    if(!isAdmin){onLock();return;}
+    if(!bulkPreview||!bulkPreview.length)return;
+    const records=bulkPreview.map(r=>({id:Date.now()+Math.random(),series:r.series,typeKey:r.typeKey,label:r.label,icon:r.icon,date:bulkDate,notes:""}));
+    setMembers(p=>p.map(x=>x.name===member.name?{...x,milestones:[...(x.milestones||[]),...records]}:x));
+    setBulkText("");setBulkPreview(null);setBulkMode(false);setAdding(false);
   }
 
   // Build each series' slot row: predefined types show earned (colored, dated) or not-yet-earned (dim outline);
@@ -3808,10 +3858,47 @@ function MilestoneShelf({member,setMembers,motmEntries,memberCompliments,isAdmin
     <div style={S.card}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10,flexWrap:"wrap",gap:8}}>
         <div style={S.cardTitle}>🎖️ Milestones & Achievements</div>
-        {isAdmin&&<button style={{...S.btn(adding?"default":"primary"),padding:"5px 12px",fontSize:11}} onClick={()=>setAdding(a=>!a)}>{adding?"✕ Cancel":"+ Add Milestone"}</button>}
+        {isAdmin&&<div style={{display:"flex",gap:6}}>
+          <button style={{...S.btn(adding&&!bulkMode?"default":"primary"),padding:"5px 12px",fontSize:11}} onClick={()=>{setAdding(a=>bulkMode?true:!a);setBulkMode(false);setBulkPreview(null);}}>{adding&&!bulkMode?"✕ Cancel":"+ Add Milestone"}</button>
+          <button style={{...S.btn(bulkMode?"primary":"default"),padding:"5px 12px",fontSize:11}} onClick={()=>{setBulkMode(m=>!m);setAdding(true);setBulkPreview(null);}}>{bulkMode?"✕ Cancel Bulk":"📋 Bulk Add"}</button>
+        </div>}
       </div>
 
-      {adding&&(
+      {adding&&bulkMode&&(
+        <div style={{background:"#0d0d00",border:`1px solid ${GOLD}44`,borderRadius:6,padding:"12px 14px",marginBottom:16}}>
+          {!bulkPreview ? <>
+            <div style={{fontSize:10,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:6}}>Paste One Milestone Per Line</div>
+            <textarea style={{...S.textarea,minHeight:140,fontFamily:"monospace"}} value={bulkText} onChange={e=>setBulkText(e.target.value)} placeholder={"Lead Tech\nSenior Lead Tech\nRoof Tech certified\nZero accidents\n1yr of service\n95% quality club\n..."}/>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:8,margin:"10px 0"}}>
+              <div><div style={{fontSize:9,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:3}}>Date Achieved (applies to all — adjust individually after if needed)</div><input type="date" style={S.input} value={bulkDate} onChange={e=>setBulkDate(e.target.value)}/></div>
+            </div>
+            <button style={{...S.btn("primary"),width:"100%"}} onClick={parseBulk}>Preview Matches →</button>
+          </> : <>
+            <div style={{fontSize:10,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:10}}>Review Before Saving — {bulkPreview.length} Milestone{bulkPreview.length===1?"":"s"} ({bulkPreview.filter(r=>r.matched).length} auto-matched)</div>
+            <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:12,maxHeight:340,overflowY:"auto"}}>
+              {bulkPreview.map((r,i)=>(
+                <div key={i} style={{display:"flex",gap:6,alignItems:"center",background:r.matched?"#0d1200":"#1a0d00",border:`1px solid ${r.matched?"#2a4a1a":"#5a2a00"}`,borderRadius:6,padding:"6px 8px"}}>
+                  <div style={{fontSize:16,minWidth:22,textAlign:"center"}}>{r.icon}</div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:11,color:"#e8dfc8",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>"{r.raw}"</div>
+                    <div style={{fontSize:9,color:r.matched?"#60c060":"#e8a07a"}}>{r.matched?`Matched → ${MILESTONE_SERIES[r.series].label}: ${r.label}`:"No confident match — will save as custom"}</div>
+                  </div>
+                  <select style={{...S.select,width:130,fontSize:10,padding:"4px 6px"}} value={r.series} onChange={e=>updateBulkRow(i,"series",e.target.value)}>
+                    {Object.entries(MILESTONE_SERIES).map(([k,s])=><option key={k} value={k}>{s.label}</option>)}
+                  </select>
+                  <button onClick={()=>removeBulkRow(i)} style={{background:"none",border:"none",color:"#604820",cursor:"pointer",fontSize:13}}>✕</button>
+                </div>
+              ))}
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <button style={{...S.btn("default"),flex:1}} onClick={()=>setBulkPreview(null)}>← Back to Edit List</button>
+              <button style={{...S.btn("primary"),flex:2}} onClick={saveBulk}>Save All {bulkPreview.length} Milestones</button>
+            </div>
+          </>}
+        </div>
+      )}
+
+      {adding&&!bulkMode&&(
         <div style={{background:"#0d0d00",border:`1px solid ${GOLD}44`,borderRadius:6,padding:"12px 14px",marginBottom:16}}>
           <div style={{fontSize:10,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:6}}>1. Pick A Series</div>
           <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
