@@ -570,6 +570,7 @@ function printJourneyGraph(member, timeline, startDate) {
     compliment:{icon:"⭐",color:"#4ECDC4",label:"RECOGNITION"},
     writeup:{icon:"⚠️",color:"#E67E5A",label:"CORRECTIVE ACTION"},
     motm:{icon:"🏆",color:"#FFD700",label:"MEMBER OF THE MONTH"},
+    milestone:{icon:"🎖️",color:"#B98CE0",label:"MILESTONE"},
   };
   const vColor = v=>v==="PASS"?"#2ECC71":v==="FAIL"?"#E74C3C":v==="CAUTION"?"#C9A84C":"#90a0b8";
   const rows = timeline.map((t,idx)=>{
@@ -3665,6 +3666,191 @@ const WRITEUP_CATEGORIES={
 const DISCIPLINE_LEVELS=["Verbal Warning","Written Warning","Final Written Warning","Suspension","Termination"];
 const COMPLIMENT_TYPES=["Customer Compliment","Above & Beyond","Team Player","H.E.R.O. Values Demonstrated","Safety Excellence","Quality Achievement","Leadership Recognition","General Recognition"];
 
+// Milestone series — organized to mirror the physical patch/sticker program (Safety, Quality, Training,
+// Leadership, Performance, Service, Core Values, Special). Core Values is auto-derived from existing
+// H.E.R.O. Value Cards, never entered manually. Every other series is admin-awarded, with a "Custom"
+// option in each so a brand-new patch type never requires a code change — just pick the series it
+// belongs to and name it.
+const MILESTONE_SERIES={
+  safety:{label:"Safety Series",color:"#4ECD70",types:{
+    zeroIncident1yr:{label:"Zero Incident Club — 1 Year",icon:"🛡️"},
+    roofSafety:{label:"Roof Safety Certified",icon:"⛰️"},
+    confinedSpace:{label:"Confined Space Qualified",icon:"⚠️"},
+    lockoutTagout:{label:"Lockout/Tagout Certified",icon:"🔒"},
+    safetyStreak6mo:{label:"6-Month Safety Streak",icon:"🦺"},
+  }},
+  quality:{label:"Quality Series",color:"#5A9AE8",types:{
+    club95:{label:"95% Club",icon:"💯"},
+    inspection100:{label:"100% Inspection",icon:"📋"},
+    noCallback:{label:"No Callback Champion",icon:"✅"},
+    detailDriven:{label:"Detail Driven",icon:"🔍"},
+  }},
+  training:{label:"Training Series",color:"#B98CE0",types:{
+    trainer:{label:"Trainer",icon:"🧑‍🏫"},
+    mentor:{label:"Mentor",icon:"🧑‍🤝‍🧑"},
+    heroInstructor:{label:"H.E.R.O. Instructor",icon:"📖"},
+  }},
+  leadership:{label:"Leadership Series",color:"#E85A5A",types:{
+    leadTech:{label:"Lead Technician",icon:"🔧"},
+    crewLeader:{label:"Crew Leader",icon:"⚔️"},
+    seniorLead:{label:"Senior Lead",icon:"⭐"},
+    fieldSupervisor:{label:"Field Supervisor",icon:"🏛️"},
+    operationsLeader:{label:"Operations Leader",icon:"👑"},
+  }},
+  performance:{label:"Performance Series",color:"#E8A05A",types:{
+    kitchens500:{label:"500 Kitchens Cleaned",icon:"🍳"},
+    kitchens1000:{label:"1,000 Kitchens Cleaned",icon:"🍳"},
+    kitchens2500:{label:"2,500 Kitchens Cleaned",icon:"🍳"},
+    kitchens5000:{label:"5,000 Kitchens Cleaned",icon:"🍳"},
+    highestRevenue:{label:"Highest Revenue",icon:"💰"},
+  }},
+  service:{label:"Service Series",color:"#E8C060",types:{
+    year1:{label:"1 Year of Service",icon:"①"},
+    year3:{label:"3 Years of Service",icon:"③"},
+    year5:{label:"5 Years of Service",icon:"⑤"},
+    year10:{label:"10 Years of Service",icon:"⑩"},
+    year15:{label:"15 Years of Service",icon:"⑮"},
+  }},
+  special:{label:"Special Achievements",color:"#D4AF6A",types:{
+    customerHero:{label:"Customer Hero",icon:"🤝"},
+    preventionChampion:{label:"Prevention Champion",icon:"🔥"},
+    rescueAward:{label:"Rescue Award",icon:"⛑️"},
+    perfectAttendance:{label:"Perfect Attendance",icon:"📅"},
+    hoodzBowlChampion:{label:"Hoodz Bowl Champion",icon:"🏈"},
+    fantasyFootballWinner:{label:"Fantasy Football Winner",icon:"🏆"},
+    cultureChampion:{label:"Culture Champion",icon:"👥"},
+    helpingHand:{label:"Helping Hand",icon:"🤲"},
+  }},
+};
+const CORE_VALUE_SERIES={label:"Core Value Series",color:"#B8964A",types:{
+  h:{label:"Honesty",icon:"🛡️"},
+  e:{label:"Excellence",icon:"⭐"},
+  r:{label:"Respect",icon:"🤝"},
+  o:{label:"Own It",icon:"✊"},
+}};
+
+function MilestoneShelf({member,setMembers,motmEntries,memberCompliments,isAdmin,onLock}){
+  const [adding,setAdding]=useState(false);
+  const [pickedSeries,setPickedSeries]=useState("");
+  const [pickedType,setPickedType]=useState("");
+  const [customLabel,setCustomLabel]=useState("");
+  const [customIcon,setCustomIcon]=useState("🎖️");
+  const [mDate,setMDate]=useState(new Date().toISOString().slice(0,10));
+  const [notes,setNotes]=useState("");
+
+  const manual=(member.milestones||[]).slice();
+
+  // Auto-derived program milestones — kept separate from the series grid since they're specific to the
+  // H.E.R.O. program itself, not the general achievement/patch system.
+  const programAuto=[];
+  if(member.certDate) programAuto.push({icon:"🥇",label:"H.E.R.O. Certified",date:member.certDate});
+  if(member.ambDate) programAuto.push({icon:"⭐",label:"Ambassador",date:member.ambDate});
+  if(member.eliteDate) programAuto.push({icon:"👑",label:"Elite",date:member.eliteDate});
+  programAuto.sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+  const totalManualPlusAuto=manual.length+programAuto.length+(motmEntries||[]).length+(memberCompliments||[]).length;
+
+  function addMilestone(){
+    if(!isAdmin){onLock();return;}
+    if(!pickedSeries){alert("Pick a series first.");return;}
+    const type=pickedType?MILESTONE_SERIES[pickedSeries].types[pickedType]:null;
+    const label=type?type.label:customLabel.trim();
+    const icon=type?type.icon:(customIcon.trim()||"🎖️");
+    if(!label){alert("Enter a milestone name or pick one.");return;}
+    const record={id:Date.now(),series:pickedSeries,typeKey:pickedType||null,label,icon,date:mDate,notes:notes.trim()};
+    setMembers(p=>p.map(x=>x.name===member.name?{...x,milestones:[...(x.milestones||[]),record]}:x));
+    setPickedSeries("");setPickedType("");setCustomLabel("");setCustomIcon("🎖️");setNotes("");setAdding(false);
+  }
+  function removeMilestone(id){
+    if(!isAdmin){onLock();return;}
+    if(!window.confirm("Remove this milestone?"))return;
+    setMembers(p=>p.map(x=>x.name===member.name?{...x,milestones:(x.milestones||[]).filter(ms=>ms.id!==id)}:x));
+  }
+
+  // Build each series' slot row: predefined types show earned (colored, dated) or not-yet-earned (dim outline);
+  // any manual entries beyond the predefined list append as extra earned slots.
+  function seriesRow(seriesKey,seriesDef,earnedLookup){
+    const predefinedKeys=Object.keys(seriesDef.types);
+    const extras=manual.filter(m2=>m2.series===seriesKey && !predefinedKeys.includes(m2.typeKey));
+    return predefinedKeys.map(tk=>{
+      const earned=earnedLookup(tk);
+      return earned
+        ? {icon:seriesDef.types[tk].icon,label:seriesDef.types[tk].label,date:earned.date,notes:earned.notes,filled:true,removable:earned.id?true:false,id:earned.id}
+        : {icon:seriesDef.types[tk].icon,label:seriesDef.types[tk].label,filled:false};
+    }).concat(extras.map(m2=>({icon:m2.icon,label:m2.label,date:m2.date,notes:m2.notes,filled:true,removable:true,id:m2.id})));
+  }
+
+  const coreValueRow=Object.keys(CORE_VALUE_SERIES.types).map(k=>{
+    const val=member[k];
+    return val
+      ? {icon:CORE_VALUE_SERIES.types[k].icon,label:CORE_VALUE_SERIES.types[k].label,date:typeof val==="string"?val:"",filled:true,removable:false}
+      : {icon:CORE_VALUE_SERIES.types[k].icon,label:CORE_VALUE_SERIES.types[k].label,filled:false};
+  });
+
+  const Badge=({b})=>(
+    <div style={{background:b.filled?"#0d1200":"#0a0a0a",border:`1px solid ${b.filled?GOLD+"66":"#2a2200"}`,borderRadius:8,padding:"9px 10px",minWidth:104,textAlign:"center",position:"relative",opacity:b.filled?1:0.4}}>
+      {b.removable&&isAdmin&&<button onClick={()=>removeMilestone(b.id)} style={{position:"absolute",top:1,right:3,background:"none",border:"none",color:"#604820",cursor:"pointer",fontSize:10}}>✕</button>}
+      <div style={{fontSize:19,marginBottom:3,filter:b.filled?"none":"grayscale(1)"}}>{b.icon}</div>
+      <div style={{fontSize:9,fontWeight:800,color:b.filled?GOLD2:"#4a4020",lineHeight:1.3}}>{b.label}</div>
+      {b.filled&&b.date&&<div style={{fontSize:8,color:"#604820",marginTop:2}}>{b.date}</div>}
+      {!b.filled&&<div style={{fontSize:8,color:"#3a3220",marginTop:2}}>Not yet earned</div>}
+    </div>
+  );
+
+  const SeriesSection=({title,color,badges})=>(
+    <div style={{marginBottom:16}}>
+      <div style={{fontSize:10,fontWeight:800,color,textTransform:"uppercase",letterSpacing:".08em",marginBottom:8,paddingBottom:4,borderBottom:`1px solid ${color}33`}}>{title}</div>
+      <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>{badges.map((b,i)=><Badge key={i} b={b}/>)}</div>
+    </div>
+  );
+
+  return(
+    <div style={S.card}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10,flexWrap:"wrap",gap:8}}>
+        <div style={S.cardTitle}>🎖️ Milestones & Achievements</div>
+        {isAdmin&&<button style={{...S.btn(adding?"default":"primary"),padding:"5px 12px",fontSize:11}} onClick={()=>setAdding(a=>!a)}>{adding?"✕ Cancel":"+ Add Milestone"}</button>}
+      </div>
+
+      {adding&&(
+        <div style={{background:"#0d0d00",border:`1px solid ${GOLD}44`,borderRadius:6,padding:"12px 14px",marginBottom:16}}>
+          <div style={{fontSize:10,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:6}}>1. Pick A Series</div>
+          <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
+            {Object.entries(MILESTONE_SERIES).map(([key,s])=>(
+              <button key={key} onClick={()=>{setPickedSeries(key);setPickedType("");setCustomLabel("");}} style={{...S.btn(pickedSeries===key?"primary":"default"),padding:"6px 12px",fontSize:11}}>{s.label}</button>
+            ))}
+          </div>
+          {pickedSeries&&<>
+            <div style={{fontSize:10,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:6}}>2. Quick Pick, Or Add Custom Below</div>
+            <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
+              {Object.entries(MILESTONE_SERIES[pickedSeries].types).map(([key,t])=>(
+                <button key={key} onClick={()=>{setPickedType(key);setCustomLabel("");}} style={{...S.btn(pickedType===key?"primary":"default"),padding:"6px 10px",fontSize:11}}>{t.icon} {t.label}</button>
+              ))}
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"60px 1fr",gap:8,marginBottom:10}}>
+              <input style={{...S.input,textAlign:"center",fontSize:18}} value={customIcon} onChange={e=>{setCustomIcon(e.target.value);setPickedType("");}} placeholder="🎖️" maxLength={2}/>
+              <input style={S.input} value={customLabel} onChange={e=>{setCustomLabel(e.target.value);setPickedType("");}} placeholder={`Custom ${MILESTONE_SERIES[pickedSeries].label.toLowerCase()} milestone name`}/>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:8,marginBottom:10}}>
+              <div><div style={{fontSize:9,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:3}}>Date Achieved</div><input type="date" style={S.input} value={mDate} onChange={e=>setMDate(e.target.value)}/></div>
+              <div><div style={{fontSize:9,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:3}}>Notes (optional)</div><input style={S.input} value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Context, e.g. Q2 2026"/></div>
+            </div>
+            <button style={{...S.btn("primary"),width:"100%"}} onClick={addMilestone}>Save Milestone</button>
+          </>}
+        </div>
+      )}
+
+      {programAuto.length>0 && <SeriesSection title="H.E.R.O. Program Milestones" color={GOLD} badges={programAuto.map(b=>({...b,filled:true}))}/>}
+      <SeriesSection title={CORE_VALUE_SERIES.label} color={CORE_VALUE_SERIES.color} badges={coreValueRow}/>
+      {Object.entries(MILESTONE_SERIES).map(([key,s])=>(
+        <SeriesSection key={key} title={s.label} color={s.color} badges={seriesRow(key,s,tk=>manual.find(m2=>m2.series===key&&m2.typeKey===tk))}/>
+      ))}
+      {((motmEntries||[]).length>0 || (memberCompliments||[]).length>0) && (
+        <div style={{fontSize:10,color:"#604820",marginTop:4}}>Also on file: {(motmEntries||[]).length} Employee of the Month win{(motmEntries||[]).length===1?"":"s"}, {(memberCompliments||[]).length} compliment{(memberCompliments||[]).length===1?"":"s"} — see Write-Ups tab for full detail.</div>
+      )}
+    </div>
+  );
+}
+
 function generateWriteUpDoc(member,record){
   const today=new Date().toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
   const isWriteUp=record.type==="writeup";
@@ -3746,7 +3932,7 @@ function generateWriteUpDoc(member,record){
 }
 
 function WriteUpsTab({members,setMembers,isAdmin,onLock}){
-  const blank={type:"writeup",date:new Date().toISOString().slice(0,10),incidentDate:"",category:"",violation:"",description:"",disciplineLevel:"Written Warning",priorActions:"",correctiveActions:"",heroValues:[],supervisorName:"",issuedBy:"Michael Cleveland",complimentType:"General Recognition",acknowledged:false,docNum:""};
+  const blank={type:"writeup",date:new Date().toISOString().slice(0,10),incidentDate:"",category:"",violation:"",description:"",disciplineLevel:"Written Warning",priorActions:"",correctiveActions:"",heroValues:[],supervisorName:"",issuedBy:"Michael Cleveland",complimentType:"General Recognition",acknowledged:false,docNum:"",setFollowUp:false,followUpDate:"",followUpLabel:""};
   const [form,setForm]=useState(blank);
   const [selectedMember,setSelectedMember]=useState("");
   const [view,setView]=useState("list");
@@ -3763,7 +3949,14 @@ function WriteUpsTab({members,setMembers,isAdmin,onLock}){
     const mi=getMemberIdx();if(mi===-1){alert("Member not found.");return;}
     const docNum=(form.type==="writeup"?"CA":"REC")+"-"+new Date().getFullYear()+"-"+String((members[mi].writeups||[]).length+1).padStart(3,"0");
     const record={...form,id:Date.now(),docNum};
-    setMembers(p=>p.map((m,i)=>i===mi?{...m,writeups:[...(m.writeups||[]),record]}:m));
+    setMembers(p=>p.map((m,i)=>{
+      if(i!==mi) return m;
+      const updated={...m,writeups:[...(m.writeups||[]),record]};
+      if(form.setFollowUp&&form.followUpDate){
+        updated.flag={active:true,label:form.followUpLabel||`Review progress — ${form.category||"corrective action"}`,dueDate:form.followUpDate};
+      }
+      return updated;
+    }));
     setForm(blank);setView("list");
   }
   function deleteRecord(memberIdx,recId){
@@ -3786,6 +3979,9 @@ function WriteUpsTab({members,setMembers,isAdmin,onLock}){
   const complimentCount=allRecords.filter(r=>r.type==="compliment").length;
   const unackCount=allRecords.filter(r=>r.type==="writeup"&&!r.acknowledged).length;
   const violationsForCat=selectedCat?(WRITEUP_CATEGORIES[selectedCat]||[]):[];
+  const selMemberObj=members.find(m=>m.name===selectedMember);
+  const memberPriorWriteups=(selMemberObj?.writeups||[]).filter(w=>w.type==="writeup").sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const priorInSameCat=selectedCat?memberPriorWriteups.filter(w=>w.category===selectedCat):[];
   return(
     <div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(110px,1fr))",gap:10,marginBottom:12}}>
@@ -3826,6 +4022,12 @@ function WriteUpsTab({members,setMembers,isAdmin,onLock}){
                 </select>
               </div>
             </div>
+            {selectedMember&&memberPriorWriteups.length>0&&(
+              <div style={{background:priorInSameCat.length>0?"#1a0d00":"#0d0d00",border:`1px solid ${priorInSameCat.length>0?"#5a2a00":BORDER}`,borderRadius:6,padding:"8px 12px",marginBottom:10,fontSize:11,color:priorInSameCat.length>0?"#e8a07a":"#806030"}}>
+                📋 {selectedMember} has <strong>{memberPriorWriteups.length}</strong> prior write-up{memberPriorWriteups.length===1?"":"s"} on file{selectedCat?<> — <strong>{priorInSameCat.length}</strong> in "{selectedCat}"</>:""}.
+                {priorInSameCat.length>0&&<> Most recent: {priorInSameCat[0].date} ({priorInSameCat[0].violation||priorInSameCat[0].category}, {priorInSameCat[0].disciplineLevel||"—"}).</>}
+              </div>
+            )}
             <div style={{marginBottom:10}}><div style={{fontSize:9,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:3}}>Discipline Level</div>
               <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
                 {DISCIPLINE_LEVELS.map(d=>(<button key={d} onClick={()=>set("disciplineLevel",d)} style={{...S.btn(form.disciplineLevel===d?(d==="Termination"||d==="Final Written Warning"?"danger":"primary"):"default"),padding:"5px 12px",fontSize:11}}>{d}</button>))}
@@ -3834,6 +4036,16 @@ function WriteUpsTab({members,setMembers,isAdmin,onLock}){
             {form.disciplineLevel==="Suspension"&&<div style={{marginBottom:10}}><div style={{fontSize:9,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:3}}>Suspension Days</div><input type="number" style={{...S.input,width:120}} min="1" value={form.suspensionDays||""} onChange={e=>set("suspensionDays",e.target.value)} placeholder="# of days"/></div>}
             <div style={{marginBottom:10}}><div style={{fontSize:9,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:3}}>Prior Disciplinary History</div><input style={S.input} value={form.priorActions} onChange={e=>set("priorActions",e.target.value)} placeholder="e.g. Verbal warning 3/15/2026"/></div>
             <div style={{marginBottom:10}}><div style={{fontSize:9,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:3}}>Required Corrective Actions</div><input style={S.input} value={form.correctiveActions} onChange={e=>set("correctiveActions",e.target.value)} placeholder="Specific actions employee must take"/></div>
+            <div style={{marginBottom:10,background:"#0d0d00",border:`1px solid ${BORDER}`,borderRadius:6,padding:"10px 12px"}}>
+              <label style={{display:"flex",alignItems:"center",gap:6,fontSize:12,color:form.setFollowUp?GOLD2:"#806030",cursor:"pointer",marginBottom:form.setFollowUp?8:0}}>
+                <input type="checkbox" checked={!!form.setFollowUp} onChange={e=>set("setFollowUp",e.target.checked)}/>
+                🚩 Set a follow-up flag on this employee (shows on Dashboard until cleared)
+              </label>
+              {form.setFollowUp&&<div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+                <input type="date" style={{...S.input,maxWidth:170}} value={form.followUpDate||""} onChange={e=>set("followUpDate",e.target.value)}/>
+                <input style={{...S.input,flex:1,minWidth:160}} value={form.followUpLabel||""} onChange={e=>set("followUpLabel",e.target.value)} placeholder={`Review progress — ${selectedCat||"corrective action"}`}/>
+              </div>}
+            </div>
           </>}
           {view==="compliment"&&<div style={{marginBottom:10}}><div style={{fontSize:9,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:3}}>Recognition Type</div>
             <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
@@ -4091,6 +4303,18 @@ function MemberProfileTab({members,setMembers,activities,reviews,motmHistory,ciH
     );
   }
 
+  function genToken(){return Array.from({length:22},()=>"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[Math.floor(Math.random()*62)]).join("");}
+  function myJourneyLink(mem){
+    let token = mem.journeyToken;
+    if(!token){
+      token = genToken();
+      setMembers(p=>p.map(x=>x.name===mem.name?{...x,journeyToken:token}:x));
+    }
+    const url = `${window.location.origin}/my-journey.html?t=${token}`;
+    navigator.clipboard?.writeText(url).catch(()=>{});
+    window.prompt("Personal Journey link copied — share this with "+mem.name+" (works without any login):", url);
+  }
+
   return(
     <div>
       {/* Member picker */}
@@ -4102,6 +4326,7 @@ function MemberProfileTab({members,setMembers,activities,reviews,motmHistory,ciH
         <button style={{...S.btn("primary"),padding:"6px 14px",fontSize:11}} onClick={()=>exportMemberCard(m,activities)}>📤 Export Profile PDF</button>
         <button style={{...S.btn("default"),padding:"6px 14px",fontSize:11}} onClick={()=>printCouncilScorecard(m,activities,reviews,motmHistory)}>📋 Council Scorecard</button>
         <button style={{...S.btn("default"),padding:"6px 14px",fontSize:11}} onClick={()=>showQRCode(m)}>📱 QR Code</button>
+        <button style={{...S.btn("primary"),padding:"6px 14px",fontSize:11,fontFamily:"'Playfair Display',Georgia,serif"}} onClick={()=>myJourneyLink(m)}>🔗 My Journey Link</button>
       </div>
 
       {/* Hero header card */}
@@ -4152,6 +4377,9 @@ function MemberProfileTab({members,setMembers,activities,reviews,motmHistory,ciH
         {cardsEarned===4&&<div style={{marginTop:10,background:"#0a1a0a",border:"1px solid #204020",borderRadius:5,padding:"8px 12px",fontSize:12,color:"#60c060",fontWeight:700,textAlign:"center"}}>✦ All 4 H.E.R.O. Cards Earned — Eligible for Certification Review</div>}
       </div>
 
+      {/* Milestone Badge Shelf — combines auto-derived achievements (level, MOTM, compliments) with manually-added milestones */}
+      <MilestoneShelf member={m} setMembers={setMembers} motmEntries={motmEntries} memberCompliments={memberCompliments} isAdmin={isAdmin} onLock={onLock}/>
+
       {/* Culture Index result, if one has been uploaded for this member */}
       {m.cultureIndex&&(
         <div style={S.card}>
@@ -4190,6 +4418,7 @@ function MemberProfileTab({members,setMembers,activities,reviews,motmHistory,ciH
         const earnedCardEvents = Object.keys(CARD_LABELS)
           .filter(k=>typeof m[k]==="string" && (!startDate || m[k]>=startDate))
           .map(k=>({date:m[k],kind:"card",label:`H.E.R.O. Value Card — ${CARD_LABELS[k]}`,detail:"Earned"}));
+        const filteredMilestones = startDate ? (m.milestones||[]).filter(ms=>ms.date&&ms.date>=startDate) : (m.milestones||[]);
         const timeline = [
           ...(startDate?[{date:startDate,kind:"start",label:"H.E.R.O. Certified — Program Accepted",detail:"Progression tracking begins here"}]:[]),
           ...ciHist.map(h=>({date:h.date,kind:"ci",label:`CI Analysis — ${h.roleLabel}`,detail:`${h.result.verdict}${h.result.verdict_note?" — "+h.result.verdict_note:""}${h.result.fit_score!=null?` (${h.result.fit_score}/100)`:""}`,verdict:h.result.verdict})),
@@ -4199,6 +4428,7 @@ function MemberProfileTab({members,setMembers,activities,reviews,motmHistory,ciH
           ...filteredCompliments.map(c=>({date:c.date,kind:"compliment",label:c.category||"Recognition",detail:c.description||""})),
           ...filteredWriteups.map(w=>({date:w.date,kind:"writeup",label:w.category||"Corrective Action",detail:w.description||""})),
           ...filteredMotm.map(e=>({date:e.date,kind:"motm",label:`Member of the Month — ${e.month} ${e.year}`,detail:e.reason||""})),
+          ...filteredMilestones.map(ms=>({date:ms.date,kind:"milestone",label:`${ms.icon} ${ms.label}`,detail:ms.notes||""})),
         ].filter(t=>t.date).sort((a,b)=>new Date(a.date)-new Date(b.date));
         const kindStyle = {
           start:{icon:"🎖️",color:GOLD},
@@ -4209,6 +4439,7 @@ function MemberProfileTab({members,setMembers,activities,reviews,motmHistory,ciH
           compliment:{icon:"⭐",color:"#4ECDC4"},
           writeup:{icon:"⚠️",color:"#E67E5A"},
           motm:{icon:"🏆",color:"#e8c060"},
+          milestone:{icon:"🎖️",color:"#B98CE0"},
         };
         const vc2=v=>v==="PASS"?"#60c060":v==="FAIL"?"#f06060":v==="CAUTION"?"#e8c060":"#e8a07a";
         const vbg2=v=>v==="PASS"?"#0a1a0a":v==="FAIL"?"#1a0000":v==="CAUTION"?"#1a1200":"#1a0d00";
