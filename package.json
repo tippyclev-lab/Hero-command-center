@@ -2,7 +2,7 @@
   "name": "hero-command-center",
   "private": true,
   "scripts": {
-    "build": "esbuild app.jsx --outfile=app.js --minify"
+    "build": "esbuild ./app.tsx --outfile=app.js --minify"
   },
   "dependencies": {
     "@netlify/blobs": "^10.0.0"
