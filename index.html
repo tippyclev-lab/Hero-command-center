@@ -482,6 +482,7 @@ var DB_TO_AT_KEY = {
   hero_candidates: "candidates",
   hero_motm:       "motm",
   hero_ci_history: "ci_history",
+  hero_ta_evaluations: "TA Evaluations",
 };
 
 async function atCall(action, tableKey, data){
@@ -1677,6 +1678,83 @@ function CouncilTab({reviews,setReviews,members,isAdmin,role,onLock}){
 function getCIKey(){ return localStorage.getItem('hero_ci_key')||''; }
 function setCIKey(k){ localStorage.setItem('hero_ci_key',k); }
 
+// ── TALENT ACQUISITION JOB PROFILES ──────────────────────────────────────────
+// Each entry is a full position benchmark, built from the H.E.R.O. Talent Acquisition
+// Command Center master prompt, aligned to the real H.E.R.O. values (Honest, Excellence,
+// Respect, Own It). Add new roles here as new positions need AI-assisted screening.
+const JOB_PROFILES={
+  schedulerDispatcher:{
+    label:"Scheduler/Dispatcher",
+    benchmark:`POSITION: Scheduler/Dispatcher, Operations Coordinator — HOODZ of the MidSouth
+Reports to the Director of Client Services.
+
+COMPANY CONTEXT: HOODZ of the MidSouth cleans commercial kitchen exhaust systems to NFPA standards, serving schools, restaurants, hotels, and healthcare facilities.
+
+POSITION SUMMARY: Solely responsible for dispatching and scheduling all work orders across all crews and territories — hood cleaning, filter exchange, mechanical/service work, and return jobs. Builds technician runs that keep recurring client accounts on schedule, balances revenue and technician-hour goals, and coordinates with the Account Coordinator and Quality Review team.
+
+RESPONSIBILITIES:
+- Dispatch all work orders for all crews across all territories.
+- Build technician runs for recurring booked business (30/60/90-day cycles) while scheduling new clients.
+- Balance client needs, revenue goals, technician-hour goals, travel requirements, and skill levels.
+- Build schedules as far in advance as possible to reduce last-minute disruption.
+- Maintain a daily backup job list so crews always have productive work if a job falls through.
+- Track keys leaving/returning the office for daily jobs.
+- Complete data entry/admin tasks in scheduling and dispatch systems.
+- Coordinate with the Account Coordinator on conflicts, client issues, and priorities.
+- Coordinate with Quality Review on failed-standard work and return visits.
+- Communicate with technicians/managers on travel logistics for out-of-town work.
+
+QUALIFICATIONS: Excellent verbal/written communication. Strong organization and time management. Ability to learn scheduling/data-management software. Ability to manage multiple demands and reprioritize quickly. Preferred experience in scheduling, dispatch, logistics, operations coordination, or route planning.
+
+DESIRED ATTRIBUTES: Creative problem solver who treats scheduling as an operational puzzle. Detail-oriented, especially with access requirements and key tracking. Customer-focused and proactive. Collaborative across departments. Adaptable and calm under urgent/last-minute change.
+
+MOST LIKELY REASONS FOR FAILURE IN THIS ROLE: Rigid thinking under pressure, poor multi-party communication, sloppy detail tracking (especially keys/access), inability to reprioritize quickly when the day's plan breaks, avoiding ownership when a scheduling decision goes wrong.`
+  },
+};
+
+// ── TALENT ACQUISITION MASTER PROMPT ─────────────────────────────────────────
+function buildTAPrompt(jobProfile, candidateName, resumeText, interviewNotes, hasCI){
+  return `You are the H.E.R.O. Talent Acquisition Command Center for HOODZ of the MidSouth — an executive hiring advisor. Evaluate candidates objectively and connect every recommendation to evidence. Never recommend or reject a candidate based on personality/Culture Index data alone — it is one input, not a pass-or-fail test. Your goal is to reduce hiring risk, improve quality of hire, strengthen company culture, and identify people who will perform consistently over time.
+
+COMPANY CORE VALUES (the only four — score cultural fit against exactly these, nothing else):
+- HONEST: Demonstrates integrity, communicates truthfully, builds trust, accepts responsibility.
+- EXCELLENCE: Maintains high standards, pursues continuous improvement, professionalism, quality work.
+- RESPECT: Treats others with dignity and professionalism, supports teammates, values different perspectives.
+- OWN IT: Accepts accountability, takes initiative, follows through on commitments, responds positively to challenges.
+
+POSITION BENCHMARK — treat as the primary hiring standard, evaluate the candidate against this role before comparing candidates to each other:
+${jobProfile.benchmark}
+
+FOUR-PART HIRING TEST — apply all four:
+1. Can the candidate do the job? (skills, experience, judgment, technical aptitude, communication, organization, learning ability)
+2. Will the candidate do the job? (motivation, reliability, work ethic, accountability, follow-through, ownership)
+3. Will the candidate fit the culture? (evidence-based alignment with Honest, Excellence, Respect, Own It — not assumptions)
+4. Will the candidate elevate the organization? (likely to make HOODZ stronger after one year through performance, teamwork, problem solving, growth potential)
+
+CANDIDATE EVIDENCE:
+Name: ${candidateName}
+Resume / Work History:
+${resumeText||"(not provided)"}
+
+Interview Notes:
+${interviewNotes||"(not provided)"}
+
+${hasCI?"A Culture Index report image/PDF is attached — incorporate its findings as one input among several, never as a standalone pass/fail.":"No Culture Index report was provided for this evaluation — evaluate on resume and interview evidence alone, and note in missing_information that a CI report would strengthen the assessment."}
+
+DECISION STANDARDS AND SAFEGUARDS — follow strictly:
+- Do not make unsupported assumptions. Separate direct evidence from inference.
+- Label missing information clearly rather than filling gaps with guesses.
+- Do not infer or score on protected personal characteristics.
+- Apply the same job-related standards to every applicant.
+- Do not claim a precise success probability — use qualitative confidence levels (High/Medium/Low) only.
+- If evidence conflicts, note the conflict and state what should be verified next.
+
+Respond ONLY with valid JSON (no markdown, no extra text):
+{"grade":"A/B/C/D/F","fit_score":number 1-10,"recommendation":"Elite Candidate, Strong Hire, Hire, Potential Fit, Development Candidate, Proceed with Caution, or Do Not Hire","confidence":"High, Medium, or Low","executive_summary":"2-3 sentences — would you hire this candidate and why","strengths":["s1","s2","s3"],"concerns":["c1","c2"],"missing_information":["item1","item2"],"cultural_fit":{"honest":{"score":number 1-10,"evidence":"short evidence or gap noted"},"excellence":{"score":number 1-10,"evidence":"..."},"respect":{"score":number 1-10,"evidence":"..."},"ownIt":{"score":number 1-10,"evidence":"..."}},"operational_fit":{"scheduling_dispatch_aptitude":{"score":number 1-10,"evidence":"..."},"problem_solving_composure":{"score":number 1-10,"evidence":"..."},"communication_coordination":{"score":number 1-10,"evidence":"..."},"adaptability_under_pressure":{"score":number 1-10,"evidence":"..."},"ownership_follow_through":{"score":number 1-10,"evidence":"..."}},"top_risks":[{"risk":"short label","why":"1 sentence","coachable":true or false,"strategy":"1 sentence coaching/risk-control approach"}],"first_90_days":{"immediate_priorities":"short text","training_structure":"short text","retention_risk":"Low, Medium, or High with 1 short reason"},"growth_potential":"one sentence on realistic ceiling (e.g. Scheduler to Senior Scheduler within 18-24 months, or role-appropriate ceiling)","interview_questions":[{"question":"specific, candidate-tailored question","risk_tested":"which concern this targets","strong_indicator":"what a strong answer sounds like","red_flag_indicator":"what a concerning answer sounds like"}]}
+
+Provide exactly 3 top_risks and exactly 3 interview_questions. At least one interview question must test operational judgment under pressure, and at least one must test cultural alignment or accountability.`;
+}
+
 function CultureIndexTab({candidates,setCandidates,members,setMembers,ciHistory,setCiHistory,isAdmin,onLock}){
   const [mode,setMode]=useState("candidate"); // "candidate" | "employee"
   const [role,setRole]=useState("asst_tech"); // "asst_tech"|"lead_tech"|"supervisor"|"manager"
@@ -1892,6 +1970,243 @@ function CultureIndexTab({candidates,setCandidates,members,setMembers,ciHistory,
           </div>))}
         </div>
       )}
+    </div>
+  );
+}
+
+// ── TALENT ACQUISITION TAB ────────────────────────────────────────────────────
+function TalentAcquisitionTab({candidates,setCandidates,taEvaluations,setTaEvaluations,isAdmin,onLock}){
+  const [jobKey,setJobKey]=useState("schedulerDispatcher");
+  const [name,setName]=useState("");
+  const [resumeText,setResumeText]=useState("");
+  const [interviewNotes,setInterviewNotes]=useState("");
+  const [ciFile,setCiFile]=useState(null);const [ciPreview,setCiPreview]=useState(null);const [ciFType,setCiFType]=useState(null);
+  const [loading,setLoading]=useState(false);const [result,setResult]=useState(null);const [error,setError]=useState("");
+  const [view,setView]=useState("evaluate"); // "evaluate" | "leaderboard"
+  const [apiKey,setApiKey]=useState(getCIKey());
+  const [showKeyInput,setShowKeyInput]=useState(!getCIKey());
+  const history=taEvaluations||[];
+  function saveKey(k){ setCIKey(k); setApiKey(k); setShowKeyInput(false); setError(""); }
+  function handleCiFile(e){const f=e.target.files[0];if(!f)return;setCiFile(f);const t=f.type.startsWith("image/")?"image":"pdf";setCiFType(t);const r=new FileReader();r.onload=ev=>setCiPreview(ev.target.result);r.readAsDataURL(f);}
+
+  async function evaluate(){
+    if(loading)return;
+    if(!isAdmin){onLock();return;}
+    if(!getCIKey().trim()){setShowKeyInput(true);setError("Enter your Anthropic API key to use AI evaluation.");return;}
+    if(!name.trim()){setError("Enter the candidate name.");return;}
+    if(!resumeText.trim()&&!interviewNotes.trim()&&!ciFile){setError("Provide at least a resume, interview notes, or a Culture Index report.");return;}
+    setLoading(true);setError("");setResult(null);
+    try{
+      const jobProfile=JOB_PROFILES[jobKey];
+      const promptText=buildTAPrompt(jobProfile,name,resumeText,interviewNotes,!!ciFile);
+      const parts=[];
+      if(ciFile&&ciPreview){
+        const b64=ciPreview.split(",")[1];const mt=ciFile.type||"image/jpeg";
+        parts.push({type:ciFType==="image"?"image":"document",source:{type:"base64",media_type:mt,data:b64}});
+      }
+      parts.push({type:"text",text:promptText});
+      const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":getCIKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:4000,messages:[{role:"user",content:parts}]})});
+      const data=await res.json();if(data.error)throw new Error(data.error.message);
+      const raw=data.content.map(b=>b.text||"").join("").trim().replace(/```json|```/g,"").trim();
+      const parsed=JSON.parse(raw);
+      const entry={id:Date.now(),name,jobKey,jobLabel:jobProfile.label,date:new Date().toISOString().slice(0,10),result:parsed};
+      setResult(parsed);
+      setTaEvaluations(prev=>[entry,...(prev||[])]);
+      if(candidates&&setCandidates){
+        setCandidates(p=>p.map(c=>c.name&&c.name.toLowerCase().trim()===name.toLowerCase().trim()?{...c,taRecommendation:parsed.recommendation,taFitScore:parsed.fit_score,taGrade:parsed.grade,taDate:entry.date}:c));
+      }
+    }catch(err){
+      const msg=err.message||"Unknown error";
+      if(msg.includes("401")||msg.toLowerCase().includes("auth")||msg.toLowerCase().includes("api key")){
+        setError("Invalid API key. Check your key and try again.");setShowKeyInput(true);
+      } else if(msg.toLowerCase().includes("json")||msg.toLowerCase().includes("unexpected end")||msg.toLowerCase().includes("expected")){
+        setError("The AI response was incomplete or malformed (usually a cut-off response). Please try again.");
+      } else {
+        setError("Evaluation failed: "+msg);
+      }
+    }finally{setLoading(false);}
+  }
+  function reset(){setName("");setResumeText("");setInterviewNotes("");setCiFile(null);setCiPreview(null);setCiFType(null);setResult(null);setError("");}
+
+  const recColor=r=>{
+    if(!r)return "default";
+    if(["Elite Candidate","Strong Hire"].includes(r))return "green";
+    if(r==="Hire")return "blue";
+    if(["Potential Fit","Development Candidate"].includes(r))return "gold";
+    return "red"; // Proceed with Caution, Do Not Hire
+  };
+
+  const leaderboard=[...history].filter(h=>h.jobKey===jobKey).sort((a,b)=>(b.result.fit_score||0)-(a.result.fit_score||0));
+
+  return(
+    <div>
+      <div style={{textAlign:"center",marginBottom:16}}>
+        <div style={{fontSize:22,fontWeight:900,color:GOLD2,fontFamily:"'Playfair Display',Georgia,serif"}}>🕵️ Talent Acquisition Command Center</div>
+        <div style={{fontSize:12,color:"#806030",marginTop:4}}>AI-assisted candidate screening — evidence-based, scored against your real H.E.R.O. values.</div>
+      </div>
+
+      <div style={{display:"flex",gap:3,marginBottom:14,background:"#0d0d00",padding:4,borderRadius:6,maxWidth:340,margin:"0 auto 16px"}}>
+        <button style={{flex:1,padding:"8px",fontSize:12,fontWeight:700,border:"none",borderRadius:4,cursor:"pointer",background:view==="evaluate"?GOLD:"transparent",color:view==="evaluate"?DARK:"#806030"}} onClick={()=>setView("evaluate")}>📋 Evaluate</button>
+        <button style={{flex:1,padding:"8px",fontSize:12,fontWeight:700,border:"none",borderRadius:4,cursor:"pointer",background:view==="leaderboard"?GOLD:"transparent",color:view==="leaderboard"?DARK:"#806030"}} onClick={()=>setView("leaderboard")}>🏆 Leaderboard ({leaderboard.length})</button>
+      </div>
+
+      {showKeyInput?(
+        <div style={S.card}>
+          <div style={S.cardTitle}>🔑 Anthropic API Key Required</div>
+          <div style={{fontSize:12,color:"#a08040",marginBottom:10}}>Same key used by the Culture Index analyzer — enter once per device/browser.</div>
+          <input type="password" style={S.input} placeholder="sk-ant-..." value={apiKey} onChange={e=>setApiKey(e.target.value)} onKeyDown={e=>e.key==="Enter"&&saveKey(apiKey)}/>
+          <button style={{...S.btn("primary"),marginTop:10,width:"100%"}} onClick={()=>saveKey(apiKey)}>Save Key</button>
+        </div>
+      ):(
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",background:"#0a1a0a",border:"1px solid #204020",borderRadius:6,padding:"6px 12px",marginBottom:14,fontSize:11,color:"#60c060"}}>
+          <span>🔑 API Key configured — AI evaluation ready</span>
+          <button style={{...S.btn(),padding:"3px 10px",fontSize:10}} onClick={()=>setShowKeyInput(true)}>Change Key</button>
+        </div>
+      )}
+
+      {view==="leaderboard"?(
+        <div style={S.card}>
+          <div style={S.cardTitle}>🏆 Live Candidate Leaderboard — {JOB_PROFILES[jobKey].label}</div>
+          <div style={{marginBottom:12}}>
+            <select style={S.select} value={jobKey} onChange={e=>setJobKey(e.target.value)}>
+              {Object.entries(JOB_PROFILES).map(([k,j])=><option key={k} value={k}>{j.label}</option>)}
+            </select>
+          </div>
+          {!leaderboard.length?<div style={{textAlign:"center",padding:"2rem",color:"#604820",fontSize:13}}>No candidates evaluated for this role yet.</div>:(
+            <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse"}}>
+              <thead><tr>{["Rank","Candidate","Fit","Grade","Recommendation","Greatest Strength","Greatest Risk","Date"].map(h=><th key={h} style={S.th}>{h}</th>)}</tr></thead>
+              <tbody>{leaderboard.map((h,i)=>(
+                <tr key={h.id}>
+                  <td style={{...S.td,fontWeight:900,color:GOLD2}}>#{i+1}</td>
+                  <td style={{...S.td,fontWeight:600}}>{h.name}</td>
+                  <td style={{...S.td,fontFamily:"'Playfair Display',Georgia,serif",fontWeight:800}}>{h.result.fit_score}/10</td>
+                  <td style={S.td}>{h.result.grade}</td>
+                  <td style={S.td}><span style={S.badge(recColor(h.result.recommendation))}>{h.result.recommendation}</span></td>
+                  <td style={{...S.td,fontSize:11,color:"#60c060"}}>{(h.result.strengths||[])[0]||"—"}</td>
+                  <td style={{...S.td,fontSize:11,color:"#e8a07a"}}>{(h.result.top_risks||[])[0]?.risk||"—"}</td>
+                  <td style={{...S.td,fontSize:11}}>{h.date}</td>
+                </tr>
+              ))}</tbody>
+            </table></div>
+          )}
+        </div>
+      ):(<>
+        <div style={S.card}>
+          <div style={S.cardTitle}>📋 Candidate Evidence</div>
+          <div style={{marginBottom:10}}>
+            <div style={{fontSize:9,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:3}}>Position</div>
+            <select style={S.select} value={jobKey} onChange={e=>setJobKey(e.target.value)}>
+              {Object.entries(JOB_PROFILES).map(([k,j])=><option key={k} value={k}>{j.label}</option>)}
+            </select>
+          </div>
+          <div style={{marginBottom:10}}>
+            <div style={{fontSize:9,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:3}}>Candidate Name *</div>
+            <input style={S.input} value={name} onChange={e=>setName(e.target.value)} placeholder="Full name"/>
+          </div>
+          <div style={{marginBottom:10}}>
+            <div style={{fontSize:9,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:3}}>Resume / Work History (paste text)</div>
+            <textarea style={{...S.textarea,minHeight:100}} value={resumeText} onChange={e=>setResumeText(e.target.value)} placeholder="Paste resume content, employment history, relevant experience..."/>
+          </div>
+          <div style={{marginBottom:10}}>
+            <div style={{fontSize:9,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:3}}>Interview Notes (paste text)</div>
+            <textarea style={{...S.textarea,minHeight:100}} value={interviewNotes} onChange={e=>setInterviewNotes(e.target.value)} placeholder="Notes from phone screen or in-person interview..."/>
+          </div>
+          <div style={{marginBottom:6}}>
+            <div style={{fontSize:9,color:"#806030",textTransform:"uppercase",letterSpacing:".06em",marginBottom:3}}>Culture Index Report (optional — image or PDF)</div>
+            {!ciFile?(
+              <label style={{display:"block",border:`1px dashed ${BORDER}`,borderRadius:6,padding:"16px",textAlign:"center",cursor:"pointer",fontSize:12,color:"#806030"}}>
+                📎 Click to upload CI report
+                <input type="file" accept="image/*,.pdf" onChange={handleCiFile} style={{display:"none"}}/>
+              </label>
+            ):(
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:"#0d0d00",border:`1px solid ${BORDER}`,borderRadius:6,padding:"8px 12px"}}>
+                <span style={{fontSize:12,color:GOLD2}}>📄 {ciFile.name}</span>
+                <button style={{...S.btn("danger"),padding:"3px 10px",fontSize:10}} onClick={()=>{setCiFile(null);setCiPreview(null);}}>✕ Remove</button>
+              </div>
+            )}
+          </div>
+          {error&&<div style={{background:"#1a0000",border:"1px solid #401010",borderRadius:6,padding:"8px 12px",marginTop:10,fontSize:12,color:"#f06060"}}>{error}</div>}
+          <div style={{display:"flex",gap:8,marginTop:14}}>
+            <button style={{...S.btn("primary"),flex:1,fontFamily:"'Playfair Display',Georgia,serif",fontSize:13}} disabled={loading} onClick={evaluate}>{loading?"🧠 Evaluating...":"🧠 Run AI Evaluation"}</button>
+            {(name||resumeText||interviewNotes||ciFile)&&<button style={S.btn()} onClick={reset}>↺ New</button>}
+          </div>
+        </div>
+
+        {result&&(<>
+          <div style={{background:recColor(result.recommendation)==="green"?"#0a1a0a":recColor(result.recommendation)==="red"?"#1a0000":recColor(result.recommendation)==="gold"?"#1a1200":"#001220",border:`2px solid ${recColor(result.recommendation)==="green"?"#204020":recColor(result.recommendation)==="red"?"#401010":recColor(result.recommendation)==="gold"?GOLD:"#103040"}`,borderRadius:10,padding:"18px 20px",marginBottom:12,textAlign:"center"}}>
+            <div style={{fontSize:22,fontWeight:900,letterSpacing:2,textTransform:"uppercase",marginBottom:6,color:recColor(result.recommendation)==="green"?"#60c060":recColor(result.recommendation)==="red"?"#f06060":recColor(result.recommendation)==="gold"?GOLD2:"#60a8e0"}}>{result.recommendation}</div>
+            <div style={{display:"flex",gap:16,justifyContent:"center",marginBottom:10}}>
+              <div><span style={{fontSize:28,fontWeight:900,fontFamily:"'Playfair Display',Georgia,serif",color:GOLD2}}>{result.fit_score}</span><span style={{fontSize:13,color:"#604820"}}>/10</span></div>
+              <div style={{borderLeft:"1px solid #333",paddingLeft:16}}><span style={{fontSize:28,fontWeight:900,fontFamily:"'Playfair Display',Georgia,serif",color:GOLD2}}>{result.grade}</span></div>
+            </div>
+            <div style={{fontSize:11,color:"#a08040",marginBottom:8}}>{result.confidence} Confidence</div>
+            <div style={{fontSize:13,color:"#d0c090",maxWidth:520,margin:"0 auto"}}>{result.executive_summary}</div>
+          </div>
+
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
+            <div style={S.card}><div style={S.cardTitle}>💪 Strengths</div>{(result.strengths||[]).map((s,i)=><div key={i} style={{fontSize:12,color:"#60c060",marginBottom:5}}>✓ {s}</div>)}</div>
+            <div style={S.card}><div style={S.cardTitle}>⚠️ Concerns</div>{(result.concerns||[]).map((c,i)=><div key={i} style={{fontSize:12,color:"#e8a07a",marginBottom:5}}>! {c}</div>)}{result.missing_information&&result.missing_information.length>0&&<div style={{marginTop:8,paddingTop:8,borderTop:"1px solid #2a2200"}}><div style={{fontSize:10,color:"#806030",marginBottom:4}}>MISSING INFORMATION</div>{result.missing_information.map((m,i)=><div key={i} style={{fontSize:11,color:"#806030"}}>• {m}</div>)}</div>}</div>
+          </div>
+
+          <div style={S.card}>
+            <div style={S.cardTitle}>❤️ Cultural Fit — H.E.R.O. Values</div>
+            {result.cultural_fit&&Object.entries({honest:"Honest",excellence:"Excellence",respect:"Respect",ownIt:"Own It"}).map(([k,label])=>{const cf=result.cultural_fit[k];if(!cf)return null;const pct=(cf.score||0)*10;const color=cf.score>=8?"#60c060":cf.score>=5?GOLD:"#e67e5a";return(
+              <div key={k} style={{marginBottom:10}}>
+                <div style={{display:"flex",justifyContent:"space-between",marginBottom:2}}><span style={{fontSize:12,fontWeight:700,color:"#d0c090"}}>{label}</span><span style={{fontSize:12,fontWeight:900,color}}>{cf.score}/10</span></div>
+                <div style={{background:"#0d0d00",borderRadius:3,height:6,overflow:"hidden",marginBottom:3}}><div style={{height:"100%",width:pct+"%",background:color,borderRadius:3}}/></div>
+                <div style={{fontSize:11,color:"#806030"}}>{cf.evidence}</div>
+              </div>
+            );})}
+          </div>
+
+          <div style={S.card}>
+            <div style={S.cardTitle}>⚙️ Operational Fit</div>
+            {result.operational_fit&&Object.entries(result.operational_fit).map(([k,v])=>{const pct=(v.score||0)*10;const color=v.score>=8?"#60c060":v.score>=5?"#60a8e0":"#e67e5a";const label=k.replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase());return(
+              <div key={k} style={{marginBottom:10}}>
+                <div style={{display:"flex",justifyContent:"space-between",marginBottom:2}}><span style={{fontSize:12,fontWeight:700,color:"#d0c090"}}>{label}</span><span style={{fontSize:12,fontWeight:900,color}}>{v.score}/10</span></div>
+                <div style={{background:"#0d0d00",borderRadius:3,height:6,overflow:"hidden",marginBottom:3}}><div style={{height:"100%",width:pct+"%",background:color,borderRadius:3}}/></div>
+                <div style={{fontSize:11,color:"#806030"}}>{v.evidence}</div>
+              </div>
+            );})}
+          </div>
+
+          <div style={S.card}>
+            <div style={S.cardTitle}>🚩 Top Hiring Risks</div>
+            {(result.top_risks||[]).map((r,i)=>(
+              <div key={i} style={{background:"#0d0d00",border:"1px solid #2a2200",borderRadius:6,padding:"10px 12px",marginBottom:8}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+                  <span style={{fontSize:12,fontWeight:800,color:"#e8a07a"}}>{r.risk}</span>
+                  <span style={S.badge(r.coachable?"green":"red")}>{r.coachable?"Coachable":"Structural"}</span>
+                </div>
+                <div style={{fontSize:11,color:"#a08040",marginBottom:3}}>{r.why}</div>
+                <div style={{fontSize:11,color:"#60a8e0"}}><strong>Strategy:</strong> {r.strategy}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={S.card}>
+            <div style={S.cardTitle}>📅 First 90 Days</div>
+            {result.first_90_days&&<>
+              <div style={{fontSize:12,color:"#d0c090",marginBottom:6}}><strong style={{color:GOLD}}>Priorities:</strong> {result.first_90_days.immediate_priorities}</div>
+              <div style={{fontSize:12,color:"#d0c090",marginBottom:6}}><strong style={{color:GOLD}}>Training:</strong> {result.first_90_days.training_structure}</div>
+              <div style={{fontSize:12,color:"#d0c090"}}><strong style={{color:GOLD}}>Retention Risk:</strong> {result.first_90_days.retention_risk}</div>
+            </>}
+            {result.growth_potential&&<div style={{marginTop:8,paddingTop:8,borderTop:"1px solid #2a2200",fontSize:12,color:"#a08040"}}><strong style={{color:GOLD}}>Growth Ceiling:</strong> {result.growth_potential}</div>}
+          </div>
+
+          <div style={S.card}>
+            <div style={S.cardTitle}>🎯 Interview Scouting Report — 3 Critical Questions</div>
+            {(result.interview_questions||[]).map((q,i)=>(
+              <div key={i} style={{background:"#0d0d00",border:`1px solid ${BORDER}`,borderRadius:6,padding:"12px 14px",marginBottom:10}}>
+                <div style={{fontSize:13,fontWeight:700,color:GOLD2,marginBottom:4}}>{i+1}. {q.question}</div>
+                <div style={{fontSize:11,color:"#806030",marginBottom:6}}>Tests: {q.risk_tested}</div>
+                <div style={{fontSize:11,color:"#60c060",marginBottom:2}}>✓ Strong answer: {q.strong_indicator}</div>
+                <div style={{fontSize:11,color:"#f06060"}}>⚠ Red flag: {q.red_flag_indicator}</div>
+              </div>
+            ))}
+          </div>
+        </>)}
+      </>)}
     </div>
   );
 }
@@ -4733,6 +5048,7 @@ function App(){
   const [candidates,setCandidatesRaw]=useState([]);
   const [motmHistory,setMotmHistoryRaw]=useState([]);
   const [ciHistory,setCiHistoryRaw]=useState([]);
+  const [taEvaluations,setTaEvaluationsRaw]=useState([]);
   const [isAdmin,setIsAdmin]=useState(false);
   const [role,setRole]=useState(null);
   const [showPin,setShowPin]=useState(false);
@@ -4743,34 +5059,37 @@ function App(){
   useEffect(()=>{
     (async ()=>{
       try{
-        const [mR,aR,rR,cR,motmR,ciR] = await Promise.all([
+        const [mR,aR,rR,cR,motmR,ciR,taR] = await Promise.all([
           atLoadArray("members"),
           atLoadArray("activities"),
           atLoadArray("reviews"),
           atLoadArray("candidates"),
           atLoadArray("motm"),
           atLoadArray("ci_history"),
+          atLoadArray("ta_evaluations"),
         ]);
-        const cloudIsReady = [mR,aR,rR,cR,motmR,ciR].some(x=>x&&x.ready);
+        const cloudIsReady = [mR,aR,rR,cR,motmR,ciR,taR].some(x=>x&&x.ready);
         setCloudReady(cloudIsReady);
 
-        let m=mR&&mR.data, a=aR&&aR.data, r=rR&&rR.data, c=cR&&cR.data, motm=motmR&&motmR.data, ci=ciR&&ciR.data;
-        const cloudM=m, cloudA=a, cloudR=r, cloudC=c, cloudMotm=motm, cloudCi=ci;
+        let m=mR&&mR.data, a=aR&&aR.data, r=rR&&rR.data, c=cR&&cR.data, motm=motmR&&motmR.data, ci=ciR&&ciR.data, ta=taR&&taR.data;
+        const cloudM=m, cloudA=a, cloudR=r, cloudC=c, cloudMotm=motm, cloudCi=ci, cloudTa=ta;
         const localM=dbGet("hero_members"), localA=dbGet("hero_activities"),
               localR=dbGet("hero_reviews"), localC=dbGet("hero_candidates"), localMotm=dbGet("hero_motm"),
-              localCi=dbGet("hero_ci_history");
+              localCi=dbGet("hero_ci_history"), localTa=dbGet("hero_ta_evaluations");
         if(!m) m=localM;
         if(!a) a=localA;
         if(!r) r=localR;
         if(!c) c=localC;
         if(!motm) motm=localMotm;
         if(!ci) ci=localCi;
+        if(!ta) ta=localTa;
         if(m)setMembersRaw(m);
         if(a)setActivitiesRaw(a);
         if(r)setReviewsRaw(r);
         if(c)setCandidatesRaw(c);
         if(motm)setMotmHistoryRaw(motm);
         if(ci)setCiHistoryRaw(ci);
+        if(ta)setTaEvaluationsRaw(ta);
         // First time connecting Airtable with pre-existing local data? Seed the cloud so it isn't empty.
         if(cloudIsReady){
           if(!cloudM&&localM&&localM.length) atSaveArray("members",localM);
@@ -4779,6 +5098,7 @@ function App(){
           if(!cloudC&&localC&&localC.length) atSaveArray("candidates",localC);
           if(!cloudMotm&&localMotm&&localMotm.length) atSaveArray("motm",localMotm);
           if(!cloudCi&&localCi&&localCi.length) atSaveArray("ci_history",localCi);
+          if(!cloudTa&&localTa&&localTa.length) atSaveArray("ta_evaluations",localTa);
         }
       }catch(e){console.log("Load error",e);}
       setLoaded(true);
@@ -4799,6 +5119,7 @@ function App(){
   function setCandidates(fn){setCandidatesRaw(p=>{const n=typeof fn==="function"?fn(p):fn;persist("hero_candidates",n);return n;});}
   function setMotmHistory(fn){setMotmHistoryRaw(p=>{const n=typeof fn==="function"?fn(p):fn;persist("hero_motm",n);return n;});}
   function setCiHistory(fn){setCiHistoryRaw(p=>{const n=typeof fn==="function"?fn(p):fn;persist("hero_ci_history",n);return n;});}
+  function setTaEvaluations(fn){setTaEvaluationsRaw(p=>{const n=typeof fn==="function"?fn(p):fn;persist("hero_ta_evaluations",n);return n;});}
 
   const alertCounts = getAlertCounts(members, candidates, reviews, motmHistory);
 
@@ -4807,6 +5128,7 @@ function App(){
     {id:"dashboard",label:"📊 Dashboard",alert:"dashboard"},
     {id:"quicklog",label:"⚡ Quick Log"},
     {id:"hiring",label:"🎯 Hiring",alert:"hiring"},
+    {id:"talentacq",label:"🕵️ Talent Acquisition"},
     {id:"cultureindex",label:"🧠 Culture Index"},
     {id:"registry",label:"📜 Registry"},
     {id:"academy",label:"🎓 Academy"},
@@ -4849,6 +5171,7 @@ function App(){
         {tab==="dashboard"&&<DashboardTab members={members} candidates={candidates} motmHistory={motmHistory}/>}
         {tab==="quicklog"&&<QuickLogTab members={members} setMembers={setMembers} activities={activities} setActivities={setActivities} isAdmin={isAdmin} onLock={()=>setShowPin(true)}/>}
         {tab==="hiring"&&<HiringTab candidates={candidates} setCandidates={setCandidates} members={members} setMembers={setMembers} isAdmin={isAdmin} onLock={()=>setShowPin(true)}/>}
+        {tab==="talentacq"&&<TalentAcquisitionTab candidates={candidates} setCandidates={setCandidates} taEvaluations={taEvaluations} setTaEvaluations={setTaEvaluations} isAdmin={isAdmin} onLock={()=>setShowPin(true)}/>}
         {tab==="cultureindex"&&<CultureIndexTab candidates={candidates} setCandidates={setCandidates} members={members} setMembers={setMembers} ciHistory={ciHistory} setCiHistory={setCiHistory} isAdmin={isAdmin} onLock={()=>setShowPin(true)}/>}
         {tab==="registry"&&<RegistryTab members={members} setMembers={setMembers} activities={activities} reviews={reviews} motmHistory={motmHistory} isAdmin={isAdmin} onLock={()=>setShowPin(true)}/>}
         {tab==="academy"&&<AcademyTab members={members} activities={activities} setActivities={setActivities} isAdmin={isAdmin} onLock={()=>setShowPin(true)}/>}
