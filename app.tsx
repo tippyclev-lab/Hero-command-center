@@ -479,16 +479,16 @@ function printJourneyGraph(member, timeline, startDate) {
     const accentColor = t.kind==="ci"&&t.verdict ? vColor(t.verdict) : km.color;
     return `<div style="display:flex;gap:0;position:relative;">
       <div style="width:120px;flex-shrink:0;text-align:right;padding-right:16px;padding-top:2px;">
-        <div style="font-size:10px;color:#90a0b8;font-weight:600;">${t.date||""}</div>
+        <div style="font-size:12px;color:#90a0b8;font-weight:600;">${t.date||""}</div>
       </div>
       <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;width:32px;">
-        <div style="width:26px;height:26px;border-radius:50%;background:${accentColor}22;border:2px solid ${accentColor};display:flex;align-items:center;justify-content:center;font-size:13px;z-index:1;">${km.icon}</div>
+        <div style="width:26px;height:26px;border-radius:50%;background:${accentColor}22;border:2px solid ${accentColor};display:flex;align-items:center;justify-content:center;font-size:15px;z-index:1;">${km.icon}</div>
         ${idx<timeline.length-1?`<div style="width:2px;flex:1;background:linear-gradient(180deg,${accentColor}66,rgba(184,150,74,0.15));min-height:24px;"></div>`:""}
       </div>
       <div style="flex:1;padding-left:16px;padding-bottom:${idx<timeline.length-1?"22":"2"}px;">
-        <div style="font-size:8px;font-weight:800;letter-spacing:1.5px;color:${accentColor};margin-bottom:2px;">${km.label}</div>
-        <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:2px;">${t.label}</div>
-        ${t.detail?`<div style="font-size:11px;color:#90a0b8;line-height:1.4;">${t.detail}</div>`:""}
+        <div style="font-size:9px;font-weight:800;letter-spacing:1.5px;color:${accentColor};margin-bottom:2px;">${km.label}</div>
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:2px;">${t.label}</div>
+        ${t.detail?`<div style="font-size:13px;color:#90a0b8;line-height:1.4;">${t.detail}</div>`:""}
       </div>
     </div>`;
   }).join("");
@@ -507,9 +507,9 @@ body{background:#060d1a;color:#fff;font-family:'Open Sans',sans-serif;min-height
 .header{background:linear-gradient(135deg,#1B2A4A 0%,#0a1220 100%);border:2px solid #B8964A;border-radius:10px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .card{background:linear-gradient(135deg,#1B2A4A,#0d1a2e);border:1px solid rgba(184,150,74,0.25);border-radius:8px;padding:16px 18px;}
 .stat{text-align:center;padding:8px 4px;}
-.stat-num{font-size:22px;font-weight:900;color:#B8964A;font-family:'Cinzel',serif;}
-.stat-lbl{font-size:7.5px;color:#90a0b8;letter-spacing:0.5px;text-transform:uppercase;margin-top:2px;}
-.btn{padding:8px 18px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Open Sans',sans-serif;}
+.stat-num{font-size:26px;font-weight:900;color:#B8964A;font-family:'Cinzel',serif;}
+.stat-lbl{font-size:9px;color:#90a0b8;letter-spacing:0.5px;text-transform:uppercase;margin-top:2px;}
+.btn{padding:8px 18px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:'Open Sans',sans-serif;}
 .btn-gold{background:linear-gradient(135deg,#B8964A,#D4AF6A);color:#1B2A4A;}
 .btn-navy{background:#1B2A4A;color:#B8964A;border:1px solid #B8964A;}
 </style></head><body><div class="page">
@@ -519,13 +519,13 @@ body{background:#060d1a;color:#fff;font-family:'Open Sans',sans-serif;min-height
 </div>
 <div class="header">
   <div>
-    <div style="font-size:8px;letter-spacing:4px;color:#D4AF6A;font-family:'Cinzel',serif;">H.E.R.O. CERTIFIED</div>
-    <div style="font-size:20px;font-weight:700;color:#fff;letter-spacing:1px;font-family:'Cinzel',serif;">JOURNEY PROGRESSION</div>
-    <div style="font-size:11px;color:#506090;margin-top:2px;">HOODZ of the MidSouth</div>
+    <div style="font-size:9px;letter-spacing:4px;color:#D4AF6A;font-family:'Cinzel',serif;">H.E.R.O. CERTIFIED</div>
+    <div style="font-size:24px;font-weight:700;color:#fff;letter-spacing:1px;font-family:'Cinzel',serif;">JOURNEY PROGRESSION</div>
+    <div style="font-size:13px;color:#506090;margin-top:2px;">HOODZ of the MidSouth</div>
   </div>
   <div style="text-align:right;">
-    <div style="font-size:22px;font-weight:900;color:#B8964A;font-family:'Cinzel',serif;">${member.name}</div>
-    ${startDate?`<div style="font-size:10px;color:#90a0b8;margin-top:2px;">H.E.R.O. accepted ${startDate}</div>`:""}
+    <div style="font-size:26px;font-weight:900;color:#B8964A;font-family:'Cinzel',serif;">${member.name}</div>
+    ${startDate?`<div style="font-size:12px;color:#90a0b8;margin-top:2px;">H.E.R.O. accepted ${startDate}</div>`:""}
   </div>
 </div>
 <div class="card" style="margin-bottom:14px;display:grid;grid-template-columns:repeat(6,1fr);gap:6px;">
@@ -537,11 +537,11 @@ body{background:#060d1a;color:#fff;font-family:'Open Sans',sans-serif;min-height
   <div class="stat"><div class="stat-num">${reviewCount}</div><div class="stat-lbl">Council Reviews</div></div>
 </div>
 <div class="card">
-  ${rows||'<div style="font-size:12px;color:#90a0b8;text-align:center;padding:20px;">No tracked events yet.</div>'}
+  ${rows||'<div style="font-size:14px;color:#90a0b8;text-align:center;padding:20px;">No tracked events yet.</div>'}
 </div>
 <div style="border-top:1px solid rgba(184,150,74,0.3);padding-top:8px;display:flex;justify-content:space-between;align-items:center;margin-top:14px;">
-  <div style="font-size:9px;color:#B8964A;letter-spacing:1px;font-family:'Cinzel',serif;">H.E.R.O. CERTIFIED · PEOPLE PROTECTING PEOPLE</div>
-  <div style="font-size:9px;color:#406080;">HOODZ · CONFIDENTIAL</div>
+  <div style="font-size:11px;color:#B8964A;letter-spacing:1px;font-family:'Cinzel',serif;">H.E.R.O. CERTIFIED · PEOPLE PROTECTING PEOPLE</div>
+  <div style="font-size:11px;color:#406080;">HOODZ · CONFIDENTIAL</div>
 </div>
 </div></body></html>`;
   win.document.write(html);
@@ -553,10 +553,10 @@ function printTAReport(entry) {
   const r = entry.result || {};
   const recColorMap = {"Elite Candidate":"#2ECC71","Strong Hire":"#2ECC71","Hire":"#4A9EFF","Potential Fit":"#C9A84C","Development Candidate":"#C9A84C","Proceed with Caution":"#E74C3C","Do Not Hire":"#E74C3C"};
   const vColor = recColorMap[r.recommendation] || "#90a0b8";
-  const cfRow = (label,cf) => cf ? `<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="font-size:11px;font-weight:700;color:#fff;">${label}</span><span style="font-size:11px;font-weight:900;color:#D4AF6A;">${cf.score}/10</span></div><div style="background:#0d1a2e;border-radius:3px;height:6px;overflow:hidden;margin-bottom:3px;"><div style="height:100%;width:${(cf.score||0)*10}%;background:#D4AF6A;"></div></div><div style="font-size:10px;color:#90a0b8;">${cf.evidence||""}</div></div>` : "";
-  const ofRow = (key,v) => { const label=key.replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase()); return `<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="font-size:11px;font-weight:700;color:#fff;">${label}</span><span style="font-size:11px;font-weight:900;color:#4A9EFF;">${v.score}/10</span></div><div style="background:#0d1a2e;border-radius:3px;height:6px;overflow:hidden;margin-bottom:3px;"><div style="height:100%;width:${(v.score||0)*10}%;background:#4A9EFF;"></div></div><div style="font-size:10px;color:#90a0b8;">${v.evidence||""}</div></div>`; };
-  const riskCard = (risk) => `<div style="background:#07101f;border:1px solid rgba(184,150,74,0.2);border-radius:6px;padding:10px 12px;margin-bottom:8px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:12px;font-weight:800;color:#E67E5A;">${risk.risk}</span><span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;background:${risk.coachable?"#0a1a0a":"#1a0000"};color:${risk.coachable?"#2ECC71":"#E74C3C"};">${risk.coachable?"COACHABLE":"STRUCTURAL"}</span></div><div style="font-size:10px;color:#90a0b8;margin-bottom:3px;">${risk.why}</div><div style="font-size:10px;color:#4A9EFF;"><strong>Strategy:</strong> ${risk.strategy}</div></div>`;
-  const qCard = (q,i) => `<div style="background:#07101f;border:1px solid rgba(184,150,74,0.2);border-radius:6px;padding:10px 12px;margin-bottom:8px;"><div style="font-size:12px;font-weight:700;color:#D4AF6A;margin-bottom:4px;">${i+1}. ${q.question}</div><div style="font-size:9px;color:#90a0b8;margin-bottom:5px;">Tests: ${q.risk_tested}</div><div style="font-size:10px;color:#2ECC71;margin-bottom:2px;">✓ ${q.strong_indicator}</div><div style="font-size:10px;color:#E74C3C;">⚠ ${q.red_flag_indicator}</div></div>`;
+  const cfRow = (label,cf) => cf ? `<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="font-size:13px;font-weight:700;color:#fff;">${label}</span><span style="font-size:13px;font-weight:900;color:#D4AF6A;">${cf.score}/10</span></div><div style="background:#0d1a2e;border-radius:3px;height:6px;overflow:hidden;margin-bottom:3px;"><div style="height:100%;width:${(cf.score||0)*10}%;background:#D4AF6A;"></div></div><div style="font-size:12px;color:#90a0b8;">${cf.evidence||""}</div></div>` : "";
+  const ofRow = (key,v) => { const label=key.replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase()); return `<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span style="font-size:13px;font-weight:700;color:#fff;">${label}</span><span style="font-size:13px;font-weight:900;color:#4A9EFF;">${v.score}/10</span></div><div style="background:#0d1a2e;border-radius:3px;height:6px;overflow:hidden;margin-bottom:3px;"><div style="height:100%;width:${(v.score||0)*10}%;background:#4A9EFF;"></div></div><div style="font-size:12px;color:#90a0b8;">${v.evidence||""}</div></div>`; };
+  const riskCard = (risk) => `<div style="background:#07101f;border:1px solid rgba(184,150,74,0.2);border-radius:6px;padding:10px 12px;margin-bottom:8px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:14px;font-weight:800;color:#E67E5A;">${risk.risk}</span><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:${risk.coachable?"#0a1a0a":"#1a0000"};color:${risk.coachable?"#2ECC71":"#E74C3C"};">${risk.coachable?"COACHABLE":"STRUCTURAL"}</span></div><div style="font-size:12px;color:#90a0b8;margin-bottom:3px;">${risk.why}</div><div style="font-size:12px;color:#4A9EFF;"><strong>Strategy:</strong> ${risk.strategy}</div></div>`;
+  const qCard = (q,i) => `<div style="background:#07101f;border:1px solid rgba(184,150,74,0.2);border-radius:6px;padding:10px 12px;margin-bottom:8px;"><div style="font-size:14px;font-weight:700;color:#D4AF6A;margin-bottom:4px;">${i+1}. ${q.question}</div><div style="font-size:11px;color:#90a0b8;margin-bottom:5px;">Tests: ${q.risk_tested}</div><div style="font-size:12px;color:#2ECC71;margin-bottom:2px;">✓ ${q.strong_indicator}</div><div style="font-size:12px;color:#E74C3C;">⚠ ${q.red_flag_indicator}</div></div>`;
   const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><title>Talent Acquisition Report — ${entry.name}</title><style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -565,8 +565,8 @@ body{background:#060d1a;color:#fff;font-family:'Open Sans',sans-serif;min-height
 @media print{body{background:#fff!important;color:#000!important;}.no-print{display:none!important;}.page{max-width:100%;padding:0;}}
 .header{background:linear-gradient(135deg,#1B2A4A 0%,#0a1220 100%);border:2px solid #B8964A;border-radius:10px;padding:16px 20px;margin-bottom:14px;}
 .card{background:linear-gradient(135deg,#1B2A4A,#0d1a2e);border:1px solid rgba(184,150,74,0.25);border-radius:8px;padding:16px 18px;margin-bottom:12px;}
-.card-title{font-size:10px;font-weight:700;color:#D4AF6A;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;font-family:'Cinzel',serif;}
-.btn{padding:8px 18px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Open Sans',sans-serif;}
+.card-title{font-size:12px;font-weight:700;color:#D4AF6A;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;font-family:'Cinzel',serif;}
+.btn{padding:8px 18px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:'Open Sans',sans-serif;}
 .btn-gold{background:linear-gradient(135deg,#B8964A,#D4AF6A);color:#1B2A4A;}
 .btn-navy{background:#1B2A4A;color:#B8964A;border:1px solid #B8964A;}
 </style></head><body><div class="page">
@@ -575,18 +575,18 @@ body{background:#060d1a;color:#fff;font-family:'Open Sans',sans-serif;min-height
   <button class="btn btn-navy" onclick="window.close()">✕ Close</button>
 </div>
 <div class="header">
-  <div style="font-size:8px;letter-spacing:4px;color:#D4AF6A;font-family:'Cinzel',serif;">H.E.R.O. TALENT ACQUISITION</div>
-  <div style="font-size:22px;font-weight:800;color:#fff;font-family:'Cinzel',serif;margin:4px 0;">${entry.name}</div>
-  <div style="font-size:11px;color:#90a0b8;">${entry.jobLabel} · Evaluated ${entry.date}${entry.objectiveScreen?" · Objective Pre-Interview Screen":""}</div>
+  <div style="font-size:9px;letter-spacing:4px;color:#D4AF6A;font-family:'Cinzel',serif;">H.E.R.O. TALENT ACQUISITION</div>
+  <div style="font-size:26px;font-weight:800;color:#fff;font-family:'Cinzel',serif;margin:4px 0;">${entry.name}</div>
+  <div style="font-size:13px;color:#90a0b8;">${entry.jobLabel} · Evaluated ${entry.date}${entry.objectiveScreen?" · Objective Pre-Interview Screen":""}</div>
 </div>
 <div class="card" style="text-align:center;border:2px solid ${vColor};">
-  <div style="font-size:18px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:${vColor};margin-bottom:8px;">${r.recommendation||"—"}</div>
+  <div style="font-size:21px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:${vColor};margin-bottom:8px;">${r.recommendation||"—"}</div>
   <div style="display:flex;gap:20px;justify-content:center;margin-bottom:8px;">
-    <div><span style="font-size:30px;font-weight:900;font-family:'Cinzel',serif;color:#B8964A;">${r.fit_score}</span><span style="font-size:13px;color:#507090;">/10</span></div>
-    <div style="border-left:1px solid #333;padding-left:20px;"><span style="font-size:30px;font-weight:900;font-family:'Cinzel',serif;color:#B8964A;">${r.grade}</span></div>
+    <div><span style="font-size:35px;font-weight:900;font-family:'Cinzel',serif;color:#B8964A;">${r.fit_score}</span><span style="font-size:15px;color:#507090;">/10</span></div>
+    <div style="border-left:1px solid #333;padding-left:20px;"><span style="font-size:35px;font-weight:900;font-family:'Cinzel',serif;color:#B8964A;">${r.grade}</span></div>
   </div>
-  <div style="font-size:10px;color:#90a0b8;margin-bottom:8px;">${r.confidence} Confidence</div>
-  <div style="font-size:12px;color:#d0d8e8;max-width:560px;margin:0 auto;">${r.executive_summary||""}</div>
+  <div style="font-size:12px;color:#90a0b8;margin-bottom:8px;">${r.confidence} Confidence</div>
+  <div style="font-size:14px;color:#d0d8e8;max-width:560px;margin:0 auto;">${r.executive_summary||""}</div>
 </div>
 <div class="card">
   <div class="card-title">❤️ Cultural Fit — H.E.R.O. Values</div>
@@ -602,18 +602,18 @@ body{background:#060d1a;color:#fff;font-family:'Open Sans',sans-serif;min-height
 </div>
 <div class="card">
   <div class="card-title">📅 First 90 Days</div>
-  <div style="font-size:11px;color:#d0d8e8;margin-bottom:5px;"><strong style="color:#D4AF6A;">Priorities:</strong> ${r.first_90_days?.immediate_priorities||""}</div>
-  <div style="font-size:11px;color:#d0d8e8;margin-bottom:5px;"><strong style="color:#D4AF6A;">Training:</strong> ${r.first_90_days?.training_structure||""}</div>
-  <div style="font-size:11px;color:#d0d8e8;"><strong style="color:#D4AF6A;">Retention Risk:</strong> ${r.first_90_days?.retention_risk||""}</div>
-  ${r.growth_potential?`<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(184,150,74,0.2);font-size:11px;color:#90a0b8;"><strong style="color:#D4AF6A;">Growth Ceiling:</strong> ${r.growth_potential}</div>`:""}
+  <div style="font-size:13px;color:#d0d8e8;margin-bottom:5px;"><strong style="color:#D4AF6A;">Priorities:</strong> ${r.first_90_days?.immediate_priorities||""}</div>
+  <div style="font-size:13px;color:#d0d8e8;margin-bottom:5px;"><strong style="color:#D4AF6A;">Training:</strong> ${r.first_90_days?.training_structure||""}</div>
+  <div style="font-size:13px;color:#d0d8e8;"><strong style="color:#D4AF6A;">Retention Risk:</strong> ${r.first_90_days?.retention_risk||""}</div>
+  ${r.growth_potential?`<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(184,150,74,0.2);font-size:13px;color:#90a0b8;"><strong style="color:#D4AF6A;">Growth Ceiling:</strong> ${r.growth_potential}</div>`:""}
 </div>
 <div class="card">
   <div class="card-title">🎯 Interview Scouting Report</div>
   ${(r.interview_questions||[]).map(qCard).join("")}
 </div>
 <div style="border-top:1px solid rgba(184,150,74,0.3);padding-top:8px;display:flex;justify-content:space-between;margin-top:8px;">
-  <div style="font-size:9px;color:#B8964A;letter-spacing:1px;font-family:'Cinzel',serif;">H.E.R.O. CERTIFIED · PEOPLE PROTECTING PEOPLE</div>
-  <div style="font-size:9px;color:#406080;">HOODZ · CONFIDENTIAL</div>
+  <div style="font-size:11px;color:#B8964A;letter-spacing:1px;font-family:'Cinzel',serif;">H.E.R.O. CERTIFIED · PEOPLE PROTECTING PEOPLE</div>
+  <div style="font-size:11px;color:#406080;">HOODZ · CONFIDENTIAL</div>
 </div>
 </div></body></html>`;
   win.document.write(html);
@@ -667,22 +667,22 @@ function printHeroScorecard(entry, roleLabel) {
     const bridge = (v!=null&&jv!=null) ? `<div style="position:absolute;top:50%;left:${Math.min(vPos,jPos)}%;width:${Math.abs(vPos-jPos)}%;height:2px;background:rgba(184,150,74,0.3);transform:translateY(-50%);"></div>` : "";
     const dot1 = v==null?"":`<div style="position:absolute;top:50%;transform:translate(-50%,-50%);border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);left:${vPos}%;width:11px;height:11px;background:${TC[k][0]};"></div>`;
     const dot2 = jv==null?"":`<div style="position:absolute;top:50%;transform:translate(-50%,-50%);border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);left:${jPos}%;width:9px;height:9px;background:${TC[k][1]};"></div>`;
-    return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><div style="width:18px;font-size:10px;font-weight:700;color:#E8C96A;text-align:center;">${LABELS[idx]}</div><div style="flex:1;position:relative;height:18px;background:#0d1a2e;border-radius:3px;">${bridge}${dot1}${dot2}</div></div>`;
+    return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><div style="width:18px;font-size:12px;font-weight:700;color:#E8C96A;text-align:center;">${LABELS[idx]}</div><div style="flex:1;position:relative;height:18px;background:#0d1a2e;border-radius:3px;">${bridge}${dot1}${dot2}</div></div>`;
   }).join("");
   const jobRows = !hasJobGraph ? "" : KEYS.map((k,idx)=>{
     const jv=jobB[k]; if(jv==null) return "";
-    return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><div style="width:18px;font-size:10px;font-weight:700;color:#E8C96A;text-align:center;">${LABELS[idx]}</div><div style="flex:1;position:relative;height:18px;background:#0d1a2e;border-radius:3px;"><div style="position:absolute;top:50%;transform:translate(-50%,-50%);border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);left:${jv*10}%;width:10px;height:10px;background:${TC[k][0]};"></div></div></div>`;
+    return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;"><div style="width:18px;font-size:12px;font-weight:700;color:#E8C96A;text-align:center;">${LABELS[idx]}</div><div style="flex:1;position:relative;height:18px;background:#0d1a2e;border-radius:3px;"><div style="position:absolute;top:50%;transform:translate(-50%,-50%);border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);left:${jv*10}%;width:10px;height:10px;background:${TC[k][0]};"></div></div></div>`;
   }).join("");
   const heroScores = r.hero_alignment_scores||{};
   const heroItems=[["🛡️","HONESTY",heroScores.honest],["⭐","EXCELLENCE",heroScores.excellence],["🤝","RESPECT",heroScores.respect],["🎯","OWN IT",heroScores.ownIt]].filter(([,,v])=>v!=null);
   let heroTotal=0;
-  const heroBars = heroItems.map(([ic,lb,v])=>{heroTotal+=v;const pct=v*10;const color=v>=9?"#2ECC71":v>=7?"#C9A84C":"#E67E22";return `<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;"><div style="font-size:10px;color:#fff;">${ic} <span>${lb}</span></div><span style="font-size:12px;font-weight:900;color:${color};">${v}/10</span></div><div style="background:#0d1a2e;border-radius:3px;height:7px;overflow:hidden;"><div style="height:100%;border-radius:3px;width:${pct}%;background:linear-gradient(90deg,#C0392B,${color});"></div></div></div>`;}).join("");
-  const posFit = (r.position_fit||[]).map(({role,score})=>`<div style="margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(184,150,74,0.12);"><div style="font-size:10px;color:#fff;margin-bottom:2px;">${role}</div><div>${Array.from({length:5}).map((_,i)=>`<span style="font-size:13px;color:${i<score?'#B8964A':'#1a2a1a'};">★</span>`).join("")}</div></div>`).join("");
-  const strengthsList = (r.strengths||[]).map(s=>`<div style="display:flex;gap:5px;margin-bottom:5px;"><span style="color:#4EC94E;font-size:10px;margin-top:1px;">✓</span><span style="font-size:10px;color:#E8C96A;line-height:1.4;">${s}</span></div>`).join("");
-  const watchList = (r.watch_areas||[]).map(w=>`<div style="display:flex;gap:5px;margin-bottom:5px;"><span style="color:#B8964A;font-size:10px;margin-top:1px;">!</span><span style="font-size:10px;color:#E8C96A;line-height:1.4;">${w}</span></div>`).join("");
-  const leadership = (r.leadership_potential||[]).map(({label,pct})=>{const lc=pct>=75?"linear-gradient(90deg,#1a6b2a,#4EC94E)":pct>=55?"linear-gradient(90deg,#B8964A,#D4AF6A)":"linear-gradient(90deg,#6b2a0a,#c05a20)";const tc=pct>=75?"#4EC94E":pct>=55?"#B8964A":"#E67E22";return `<div style="margin-bottom:6px;"><div style="display:flex;justify-content:space-between;font-size:10px;color:#E8C96A;margin-bottom:2px;"><span>${label}</span><span style="color:${tc};">${pct}%</span></div><div style="background:#0d1a2e;border-radius:3px;height:7px;overflow:hidden;"><div style="height:100%;border-radius:3px;width:${pct}%;background:${lc};"></div></div></div>`;}).join("");
+  const heroBars = heroItems.map(([ic,lb,v])=>{heroTotal+=v;const pct=v*10;const color=v>=9?"#2ECC71":v>=7?"#C9A84C":"#E67E22";return `<div style="margin-bottom:8px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;"><div style="font-size:12px;color:#fff;">${ic} <span>${lb}</span></div><span style="font-size:14px;font-weight:900;color:${color};">${v}/10</span></div><div style="background:#0d1a2e;border-radius:3px;height:7px;overflow:hidden;"><div style="height:100%;border-radius:3px;width:${pct}%;background:linear-gradient(90deg,#C0392B,${color});"></div></div></div>`;}).join("");
+  const posFit = (r.position_fit||[]).map(({role,score})=>`<div style="margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid rgba(184,150,74,0.12);"><div style="font-size:12px;color:#fff;margin-bottom:2px;">${role}</div><div>${Array.from({length:5}).map((_,i)=>`<span style="font-size:15px;color:${i<score?'#B8964A':'#1a2a1a'};">★</span>`).join("")}</div></div>`).join("");
+  const strengthsList = (r.strengths||[]).map(s=>`<div style="display:flex;gap:5px;margin-bottom:5px;"><span style="color:#4EC94E;font-size:12px;margin-top:1px;">✓</span><span style="font-size:12px;color:#E8C96A;line-height:1.4;">${s}</span></div>`).join("");
+  const watchList = (r.watch_areas||[]).map(w=>`<div style="display:flex;gap:5px;margin-bottom:5px;"><span style="color:#B8964A;font-size:12px;margin-top:1px;">!</span><span style="font-size:12px;color:#E8C96A;line-height:1.4;">${w}</span></div>`).join("");
+  const leadership = (r.leadership_potential||[]).map(({label,pct})=>{const lc=pct>=75?"linear-gradient(90deg,#1a6b2a,#4EC94E)":pct>=55?"linear-gradient(90deg,#B8964A,#D4AF6A)":"linear-gradient(90deg,#6b2a0a,#c05a20)";const tc=pct>=75?"#4EC94E":pct>=55?"#B8964A":"#E67E22";return `<div style="margin-bottom:6px;"><div style="display:flex;justify-content:space-between;font-size:12px;color:#E8C96A;margin-bottom:2px;"><span>${label}</span><span style="color:${tc};">${pct}%</span></div><div style="background:#0d1a2e;border-radius:3px;height:7px;overflow:hidden;"><div style="height:100%;border-radius:3px;width:${pct}%;background:${lc};"></div></div></div>`;}).join("");
   const badgeEmojis=["🔧","⚙️","📋","🏅","🎯","🛡️"];
-  const badgesGrid=(r.strength_badges||[]).map((b,i)=>`<div style="background:#07101f;border:1px solid rgba(184,150,74,0.3);border-radius:5px;padding:7px 5px;text-align:center;"><div style="font-size:18px;margin-bottom:2px;">${badgeEmojis[i]||"🔧"}</div><div style="font-size:7px;font-weight:800;color:#E8C96A;letter-spacing:.5px;line-height:1.3;">${(b||"").toUpperCase()}</div></div>`).join("");
+  const badgesGrid=(r.strength_badges||[]).map((b,i)=>`<div style="background:#07101f;border:1px solid rgba(184,150,74,0.3);border-radius:5px;padding:7px 5px;text-align:center;"><div style="font-size:21px;margin-bottom:2px;">${badgeEmojis[i]||"🔧"}</div><div style="font-size:8px;font-weight:800;color:#E8C96A;letter-spacing:.5px;line-height:1.3;">${(b||"").toUpperCase()}</div></div>`).join("");
   const pb = r.playbook||{};
   const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>H.E.R.O. Talent Assessment — ${entry.name}</title><style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap');
@@ -692,7 +692,7 @@ body{background:#060d1a;color:#fff;font-family:'Open Sans',sans-serif;min-height
 @media print{body{background:#fff!important;color:#000!important;}.no-print{display:none!important;}.page{max-width:100%;padding:0;}.card{background:#f8f6f0!important;border:1px solid #c8a840!important;}}
 .header{background:linear-gradient(135deg,#1B2A4A 0%,#0a1220 100%);border:2px solid #B8964A;border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
 .card{background:linear-gradient(135deg,#1B2A4A,#0d1a2e);border:1px solid rgba(184,150,74,0.25);border-radius:8px;padding:12px 14px;}
-.card-title{font-size:9px;font-weight:700;color:#D4AF6A;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:8px;text-align:center;font-family:'Cinzel',serif;}
+.card-title{font-size:11px;font-weight:700;color:#D4AF6A;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:8px;text-align:center;font-family:'Cinzel',serif;}
 .g2{display:grid;grid-template-columns:1fr 140px;gap:10px;margin-bottom:10px;}
 .g3{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:10px;margin-bottom:10px;}
 .g3b{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
@@ -700,14 +700,14 @@ body{background:#060d1a;color:#fff;font-family:'Open Sans',sans-serif;min-height
 .g2v{display:grid;grid-template-columns:1fr 1.6fr;gap:10px;margin-bottom:10px;}
 .gcol{display:flex;flex-direction:column;gap:8px;}
 .meta-row{display:flex;gap:4px;margin-bottom:3px;flex-wrap:wrap;}
-.meta-k{font-size:9px;color:#506090;min-width:80px;}
-.meta-v{font-size:9px;color:#D4AF6A;font-weight:600;}
+.meta-k{font-size:11px;color:#506090;min-width:80px;}
+.meta-v{font-size:11px;color:#D4AF6A;font-weight:600;}
 .play-card{background:#07101f;border-radius:5px;padding:8px;border:1px solid rgba(184,150,74,0.15);}
-.play-lbl{font-size:8px;font-weight:800;color:#B8964A;margin-bottom:3px;letter-spacing:1px;}
-.play-txt{font-size:8px;color:#90a0b8;line-height:1.5;}
-.note-stripe{font-size:9px;color:#D4AF6A;font-style:italic;text-align:center;padding:6px 8px;background:#07101f;border:1px solid rgba(184,150,74,0.2);border-radius:5px;line-height:1.5;}
+.play-lbl{font-size:9px;font-weight:800;color:#B8964A;margin-bottom:3px;letter-spacing:1px;}
+.play-txt{font-size:9px;color:#90a0b8;line-height:1.5;}
+.note-stripe{font-size:11px;color:#D4AF6A;font-style:italic;text-align:center;padding:6px 8px;background:#07101f;border:1px solid rgba(184,150,74,0.2);border-radius:5px;line-height:1.5;}
 .footer{border-top:1px solid rgba(184,150,74,0.3);padding-top:8px;display:flex;justify-content:space-between;align-items:center;margin-top:4px;}
-.btn{padding:8px 18px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Open Sans',sans-serif;}
+.btn{padding:8px 18px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:'Open Sans',sans-serif;}
 .btn-gold{background:linear-gradient(135deg,#B8964A,#D4AF6A);color:#1B2A4A;}
 .btn-navy{background:#1B2A4A;color:#B8964A;border:1px solid #B8964A;}
 </style></head><body><div class="page">
@@ -719,20 +719,20 @@ body{background:#060d1a;color:#fff;font-family:'Open Sans',sans-serif;min-height
   <div style="display:flex;align-items:center;gap:12px;">
     <div style="width:56px;height:56px;background:#B8964A;border-radius:6px;"></div>
     <div>
-      <div style="font-size:8px;letter-spacing:4px;color:#D4AF6A;font-family:'Cinzel',serif;">H.E.R.O. CERTIFIED</div>
-      <div style="font-size:15px;font-weight:700;color:#fff;letter-spacing:1px;font-family:'Cinzel',serif;">TALENT ASSESSMENT</div>
-      <div style="font-size:9px;color:#506090;">HOODZ of the MidSouth</div>
+      <div style="font-size:9px;letter-spacing:4px;color:#D4AF6A;font-family:'Cinzel',serif;">H.E.R.O. CERTIFIED</div>
+      <div style="font-size:18px;font-weight:700;color:#fff;letter-spacing:1px;font-family:'Cinzel',serif;">TALENT ASSESSMENT</div>
+      <div style="font-size:11px;color:#506090;">HOODZ of the MidSouth</div>
     </div>
   </div>
   <div style="text-align:right;">
-    <div style="font-size:8px;letter-spacing:3px;color:#D4AF6A;">CI PATTERN</div>
-    <div style="font-size:22px;font-weight:900;color:#B8964A;letter-spacing:2px;font-family:'Cinzel',serif;">${(r.ci_pattern||"—").toUpperCase()}</div>
+    <div style="font-size:9px;letter-spacing:3px;color:#D4AF6A;">CI PATTERN</div>
+    <div style="font-size:26px;font-weight:900;color:#B8964A;letter-spacing:2px;font-family:'Cinzel',serif;">${(r.ci_pattern||"—").toUpperCase()}</div>
   </div>
 </div>
 <div class="g2">
   <div class="card">
-    <div style="font-size:24px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:2px;font-family:'Cinzel',serif;">${entry.name.toUpperCase()}</div>
-    <div style="font-size:11px;color:#B8964A;margin-bottom:10px;">Pattern: ${r.ci_pattern||"—"}</div>
+    <div style="font-size:28px;font-weight:900;color:#fff;letter-spacing:1px;margin-bottom:2px;font-family:'Cinzel',serif;">${entry.name.toUpperCase()}</div>
+    <div style="font-size:13px;color:#B8964A;margin-bottom:10px;">Pattern: ${r.ci_pattern||"—"}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;">
       <div class="meta-row"><span class="meta-k">Survey Date</span><span class="meta-v">${r.survey_date||"—"}</span></div>
       <div class="meta-row"><span class="meta-k">Survey ID</span><span class="meta-v">${r.survey_id||"—"}</span></div>
@@ -744,50 +744,50 @@ body{background:#060d1a;color:#fff;font-family:'Open Sans',sans-serif;min-height
   </div>
   <div class="gcol">
     <div class="card" style="border:2px solid #B8964A;text-align:center;flex:1;">
-      <div style="font-size:8px;letter-spacing:2px;color:#D4AF6A;margin-bottom:2px;">CI FIT SCORE</div>
-      <div style="font-size:50px;font-weight:900;color:#B8964A;line-height:1;font-family:'Cinzel',serif;">${r.fit_score!=null?r.fit_score:"—"}</div>
-      <div style="font-size:13px;color:#507090;">/100</div>
-      <div style="margin-top:6px;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:800;letter-spacing:1px;display:inline-block;background:${tier.bg};color:${tier.color};border:1px solid ${tier.color}44;">${tier.label}</div>
+      <div style="font-size:9px;letter-spacing:2px;color:#D4AF6A;margin-bottom:2px;">CI FIT SCORE</div>
+      <div style="font-size:59px;font-weight:900;color:#B8964A;line-height:1;font-family:'Cinzel',serif;">${r.fit_score!=null?r.fit_score:"—"}</div>
+      <div style="font-size:15px;color:#507090;">/100</div>
+      <div style="margin-top:6px;padding:3px 8px;border-radius:4px;font-size:12px;font-weight:800;letter-spacing:1px;display:inline-block;background:${tier.bg};color:${tier.color};border:1px solid ${tier.color}44;">${tier.label}</div>
     </div>
     <div class="card" style="text-align:center;padding:8px 12px;">
-      <div style="font-size:8px;letter-spacing:2px;color:#D4AF6A;">TALENT TIER</div>
-      <div style="font-size:13px;font-weight:900;color:#B8964A;font-family:'Cinzel',serif;">${r.talent_tier||"—"}</div>
+      <div style="font-size:9px;letter-spacing:2px;color:#D4AF6A;">TALENT TIER</div>
+      <div style="font-size:15px;font-weight:900;color:#B8964A;font-family:'Cinzel',serif;">${r.talent_tier||"—"}</div>
     </div>
   </div>
 </div>
 <div class="g3">
   <div class="card">
     <div class="card-title">H.E.R.O. Alignment</div>
-    ${heroBars||'<div style="font-size:10px;color:#506090;text-align:center;">Not reported</div>'}
-    ${heroItems.length?`<div style="margin-top:8px;border-top:1px solid rgba(184,150,74,0.2);padding-top:6px;text-align:center;"><div style="font-size:8px;color:#507090;">OVERALL H.E.R.O. SCORE</div><div style="font-size:26px;font-weight:900;color:#B8964A;font-family:'Cinzel',serif;">${heroTotal}<span style="font-size:12px;color:#507090;">/${heroItems.length*10}</span></div></div>`:""}
+    ${heroBars||'<div style="font-size:12px;color:#506090;text-align:center;">Not reported</div>'}
+    ${heroItems.length?`<div style="margin-top:8px;border-top:1px solid rgba(184,150,74,0.2);padding-top:6px;text-align:center;"><div style="font-size:9px;color:#507090;">OVERALL H.E.R.O. SCORE</div><div style="font-size:31px;font-weight:900;color:#B8964A;font-family:'Cinzel',serif;">${heroTotal}<span style="font-size:14px;color:#507090;">/${heroItems.length*10}</span></div></div>`:""}
   </div>
   <div class="card">
     <div class="card-title">Culture Index Trait Graph</div>
-    ${hasTraitGraph?`<div style="font-size:8px;color:#B8964A;margin-bottom:2px;letter-spacing:1px;">TRAITS (INHERENT)</div>${traitRows}<div style="font-size:8px;color:#507090;text-align:center;margin:2px 0 6px;">${r.trait_eu!=null?"EU = "+r.trait_eu:""}</div>`:""}
-    ${hasJobGraph?`<div style="font-size:8px;color:#B8964A;margin-bottom:2px;letter-spacing:1px;">JOB BEHAVIORS (ADAPTED)</div>${jobRows}<div style="font-size:8px;color:#507090;text-align:center;margin-top:2px;">${r.job_behavior_eu!=null?"EU = "+r.job_behavior_eu:""}</div>`:""}
-    ${!hasTraitGraph&&!hasJobGraph?'<div style="font-size:10px;color:#506090;text-align:center;">Not available</div>':""}
+    ${hasTraitGraph?`<div style="font-size:9px;color:#B8964A;margin-bottom:2px;letter-spacing:1px;">TRAITS (INHERENT)</div>${traitRows}<div style="font-size:9px;color:#507090;text-align:center;margin:2px 0 6px;">${r.trait_eu!=null?"EU = "+r.trait_eu:""}</div>`:""}
+    ${hasJobGraph?`<div style="font-size:9px;color:#B8964A;margin-bottom:2px;letter-spacing:1px;">JOB BEHAVIORS (ADAPTED)</div>${jobRows}<div style="font-size:9px;color:#507090;text-align:center;margin-top:2px;">${r.job_behavior_eu!=null?"EU = "+r.job_behavior_eu:""}</div>`:""}
+    ${!hasTraitGraph&&!hasJobGraph?'<div style="font-size:12px;color:#506090;text-align:center;">Not available</div>':""}
   </div>
   <div class="card">
     <div class="card-title">Best Position Fit</div>
-    ${posFit||'<div style="font-size:10px;color:#506090;text-align:center;">Not assessed</div>'}
-    <div style="font-size:8px;color:#507090;margin-top:4px;">5 = Excellent Fit · 1 = Poor Fit</div>
+    ${posFit||'<div style="font-size:12px;color:#506090;text-align:center;">Not assessed</div>'}
+    <div style="font-size:9px;color:#507090;margin-top:4px;">5 = Excellent Fit · 1 = Poor Fit</div>
   </div>
 </div>
 <div class="g3b">
   <div class="card" style="background:linear-gradient(135deg,#0a1a0a,#0d2010);border:1px solid #1a3a1a;">
     <div class="card-title" style="color:#4EC94E;">💪 Top Strengths</div>
-    ${strengthsList||'<div style="font-size:10px;color:#506090;">None noted</div>'}
+    ${strengthsList||'<div style="font-size:12px;color:#506090;">None noted</div>'}
   </div>
   <div class="card" style="background:linear-gradient(135deg,#1a0d00,#201000);border:1px solid #3a2a00;">
     <div class="card-title" style="color:#B8964A;">⚠️ Development Areas</div>
-    ${watchList||'<div style="font-size:10px;color:#506090;">None noted</div>'}
+    ${watchList||'<div style="font-size:12px;color:#506090;">None noted</div>'}
   </div>
   <div class="card">
     <div class="card-title">🌟 Leadership Potential</div>
-    ${leadership||'<div style="font-size:10px;color:#506090;">Not assessed</div>'}
+    ${leadership||'<div style="font-size:12px;color:#506090;">Not assessed</div>'}
     <div style="margin-top:6px;padding:7px 8px;background:#07101f;border-radius:5px;border:1px solid rgba(184,150,74,0.2);">
-      <div style="font-size:8px;font-weight:700;color:#D4AF6A;margin-bottom:2px;letter-spacing:1px;">LEADERSHIP SUMMARY</div>
-      <div style="font-size:9px;color:#90a0b8;line-height:1.5;">${r.leadership_summary||"—"}</div>
+      <div style="font-size:9px;font-weight:700;color:#D4AF6A;margin-bottom:2px;letter-spacing:1px;">LEADERSHIP SUMMARY</div>
+      <div style="font-size:11px;color:#90a0b8;line-height:1.5;">${r.leadership_summary||"—"}</div>
     </div>
   </div>
 </div>
@@ -803,11 +803,11 @@ body{background:#060d1a;color:#fff;font-family:'Open Sans',sans-serif;min-height
 </div>
 <div class="g2v">
   <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:2px solid ${vv.border};background:linear-gradient(135deg,${vv.bg},#07101f);">
-    <div style="font-size:38px;margin-bottom:4px;">${vv.icon}</div>
-    <div style="font-size:16px;font-weight:900;letter-spacing:2px;margin-bottom:6px;font-family:'Cinzel',serif;color:${vv.color};">${verdictLabel}</div>
-    <div style="font-size:9px;color:#D4AF6A;letter-spacing:2px;margin-bottom:6px;">RECOMMENDATION</div>
-    <div style="font-size:10px;color:#fff;line-height:1.5;margin-bottom:8px;">${r.hiring_recommendation||""}</div>
-    <div style="padding:3px 10px;border-radius:4px;font-size:10px;font-weight:700;background:${vv.bg};color:${vv.color};border:1px solid ${vv.border}44;">Confidence: ${r.confidence||"—"}</div>
+    <div style="font-size:45px;margin-bottom:4px;">${vv.icon}</div>
+    <div style="font-size:19px;font-weight:900;letter-spacing:2px;margin-bottom:6px;font-family:'Cinzel',serif;color:${vv.color};">${verdictLabel}</div>
+    <div style="font-size:11px;color:#D4AF6A;letter-spacing:2px;margin-bottom:6px;">RECOMMENDATION</div>
+    <div style="font-size:12px;color:#fff;line-height:1.5;margin-bottom:8px;">${r.hiring_recommendation||""}</div>
+    <div style="padding:3px 10px;border-radius:4px;font-size:12px;font-weight:700;background:${vv.bg};color:${vv.color};border:1px solid ${vv.border}44;">Confidence: ${r.confidence||"—"}</div>
   </div>
   <div class="card">
     <div class="card-title">🏆 ${r.ci_pattern||"Talent"} Strength Badges</div>
@@ -816,8 +816,8 @@ body{background:#060d1a;color:#fff;font-family:'Open Sans',sans-serif;min-height
   </div>
 </div>
 <div class="footer">
-  <div style="font-size:9px;color:#B8964A;letter-spacing:1px;font-family:'Cinzel',serif;">H.E.R.O. CERTIFIED · PEOPLE PROTECTING PEOPLE</div>
-  <div style="font-size:9px;color:#406080;">HOODZ · CONFIDENTIAL</div>
+  <div style="font-size:11px;color:#B8964A;letter-spacing:1px;font-family:'Cinzel',serif;">H.E.R.O. CERTIFIED · PEOPLE PROTECTING PEOPLE</div>
+  <div style="font-size:11px;color:#406080;">HOODZ · CONFIDENTIAL</div>
 </div>
 </div></body></html>`;
   win.document.write(html);
