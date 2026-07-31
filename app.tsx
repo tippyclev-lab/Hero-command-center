@@ -1712,6 +1712,60 @@ DESIRED ATTRIBUTES: Creative problem solver who treats scheduling as an operatio
 
 MOST LIKELY REASONS FOR FAILURE IN THIS ROLE: Rigid thinking under pressure, poor multi-party communication, sloppy detail tracking (especially keys/access), inability to reprioritize quickly when the day's plan breaks, avoiding ownership when a scheduling decision goes wrong.`
   },
+  assistantTechnician:{
+    label:"Assistant Technician",
+    benchmark:`POSITION: Kitchen Exhaust Cleaning Technician (Assistant Technician) — HOODZ of the MidSouth
+
+COMPANY CONTEXT: HOODZ is in the fire prevention business. Technicians protect restaurants, schools, hospitals, and commercial facilities by cleaning kitchen exhaust systems and reducing fire hazards before they become emergencies. This is physically demanding work built on the H.E.R.O. core values (Honest, Excellence, Respect, Own It).
+
+POSITION SUMMARY: Entry point into the HOODZ technical and H.E.R.O. Certified career path. Performs kitchen exhaust cleaning as part of a crew, typically under the direction of a Lead Technician.
+
+WHAT HOODZ LOOKS FOR: Strong time management, attention to detail, reliability and consistency, effective communication, teamwork, initiative and problem solving, leadership potential, desire to learn and grow.
+
+WORK ENVIRONMENT REQUIREMENTS: Must be comfortable working at heights, working in confined spaces, climbing ladders, getting dirty and working around grease, and performing physical labor throughout the entire shift.
+
+REAL PERFORMANCE PATTERN: HOODZ' actual top-performing Assistant Technicians show a Craftsman-type Culture Index pattern — reserved, methodical, steady-paced, low-to-moderate autonomy and sociability (see the Culture Index analyzer's Assistant Technician benchmark for the full trait detail). This is context, not a hiring requirement on its own — weigh it only if a Culture Index report is provided alongside this evaluation.
+
+MOST LIKELY REASONS FOR FAILURE IN THIS ROLE: Cannot tolerate the physical demands (heights, confined spaces, heat, grease) over a full shift; careless or rushed work that misses cleaning standards; unreliable attendance; poor teamwork or communication with the crew; unwillingness to take direction early in the role.`
+  },
+  leadTechnician:{
+    label:"Lead Technician",
+    benchmark:`POSITION: Lead Technician — HOODZ of the MidSouth
+Note: at HOODZ this role is typically earned through demonstrated leadership and performance as an Assistant Technician, not commonly filled by external hire directly into the role. If evaluating an external candidate, weigh prior leadership/technical trade experience accordingly.
+
+POSITION SUMMARY: Leads a crew through kitchen exhaust cleaning jobs start to finish — job preparation, onsite execution, and crew oversight — while training and developing Assistant Technicians.
+
+RESPONSIBILITIES:
+(Note: The following duties are typical of those performed by this role. Other related duties may also be performed. Incumbents may not necessarily perform all of the duties listed.)
+
+Job Preparation
+- Arriving at the office on time before the first scheduled job.
+- Ensuring all equipment necessary for job completion is loaded into the assigned truck.
+- Arriving at the client's location at a previously scheduled time.
+
+Onsite Cleaning
+- Ensuring the Assistant Technician's work is done properly, up to Hoodz cleaning standards.
+- Work with the Assistant Technician to properly document all aspects of the cleaning process, as well as any deficiencies that persist in the client's system.
+- When the job is complete, ensure that the facility is left in a better condition than it was found.
+- If client communication is necessary while onsite (speaking with an onsite manager, etc.), maintain professional and efficient communication with the client.
+- Efficiently completing a job within the given time frame, and traveling to the next scheduled job on time.
+- If the crew is going to be late getting to the next scheduled job, call the next client to make them aware.
+
+Management Responsibilities
+- Oversee cleaning the kitchen exhaust system, or other assigned cleaning, from start to finish.
+- Communicate with the supervisor any issues that may arise throughout the service.
+- Work to equip and train other technicians to be competent employees of Hoodz of Nashville while promoting teamwork within the company.
+
+Time & Payroll Accountability: Accurately clocks in/out including meal breaks; owns reviewing and certifying their own recorded time; ready to work (uniformed, truck loaded) within about 10 minutes of clock-in.
+
+REAL HOODZ PERFORMANCE STANDARDS (HOODZ's own bonus criteria — a concrete benchmark for what "meeting the bar" looks like in this role): Job Efficiency at or above 95%. Attendance/Punctuality at or above 95% (arriving more than 7 minutes late to a job site counts against this). Quality Grade above 95%. Revenue Goal attainment at or above 95%.
+
+DESIRED ATTRIBUTES: Demonstrated leadership and performance quality prior to promotion. Strong ownership of both the work and the crew's conduct. Ability to train and develop others rather than just perform the work personally. Reliable and trusted to represent HOODZ directly with clients, unsupervised.
+
+REAL PERFORMANCE PATTERN: HOODZ' actual top-performing Lead Technicians show a Craftsman-type Culture Index pattern (reference profile: Jordan Kirven, in the Culture Index analyzer) — reserved, methodical, steady-paced. Do not require high sociability or high conformity for this role; the real pattern skews low-to-moderate on both, with strong Logic and steady Pace as the stronger signals.
+
+MOST LIKELY REASONS FOR FAILURE IN THIS ROLE: Cannot effectively delegate or train (tries to do everything personally rather than developing the Assistant Tech); avoids ownership when something goes wrong with the crew or the job; inconsistent quality oversight (signs off on substandard work); poor communication with the supervisor when issues arise; struggles with the accountability of unsupervised client-facing work.`
+  },
 };
 
 // ── TALENT ACQUISITION MASTER PROMPT ─────────────────────────────────────────
